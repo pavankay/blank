@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [AFFIRMA\pkanaparthy]
+    FROM WINDOWS WITH DEFAULT_LANGUAGE = [us_english];
+
