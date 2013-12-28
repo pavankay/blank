@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="9088179808814b429d4b61dc78bc2bd1" Name="Diagram1">
+        <EntityTypeShape EntityType="Novo.DatabaseModel.AddressType" Width="1.5" PointX="5.25" PointY="10.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Allergy" Width="1.5" PointX="8.25" PointY="30.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.DosageUnitType" Width="1.5" PointX="11.25" PointY="31.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.EmailType" Width="1.5" PointX="8.25" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Gender" Width="1.5" PointX="0.75" PointY="24.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Investigation" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.JobRole" Width="1.5" PointX="6" PointY="28.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MaritialStatu" Width="1.5" PointX="3" PointY="19.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalFacility" Width="1.5" PointX="8.25" PointY="36.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalProvider" Width="1.5" PointX="3" PointY="23.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalProviderAddress" Width="1.5" PointX="5.25" PointY="23.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalProviderEmail" Width="1.5" PointX="8.25" PointY="24.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalProviderMedicalFacility" Width="1.5" PointX="8.25" PointY="21.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalProviderPhone" Width="1.5" PointX="8.25" PointY="27.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.MedicalProviderType" Width="1.5" PointX="0.75" PointY="21.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Medication" Width="1.5" PointX="8.25" PointY="33.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Patient" Width="1.5" PointX="5.25" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientAddress" Width="1.5" PointX="7.5" PointY="16.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientAllergy" Width="1.5" PointX="10.5" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientEmail" Width="1.5" PointX="10.5" PointY="16.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientMedication" Width="1.5" PointX="10.5" PointY="22.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientNote" Width="1.5" PointX="12.75" PointY="27.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientPersonIdentifier" Width="1.5" PointX="7.5" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientPhone" Width="1.5" PointX="13.5" PointY="19.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientProblem" Width="1.5" PointX="10.5" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PatientRelativeProblem" Width="1.5" PointX="13.5" PointY="16.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PersonIdentifierType" Width="1.5" PointX="5.25" PointY="13.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.PhoneType" Width="1.5" PointX="11.25" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Prescription" Width="1.5" PointX="13.5" PointY="22.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Problem" Width="1.5" PointX="8.25" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.RelationType" Width="1.5" PointX="11.25" PointY="10.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.sysdiagram" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Novo.DatabaseModel.Visit" Width="1.5" PointX="10.5" PointY="25.75" IsExpanded="true" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderAddress_AddressType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientAddress_AddressType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientAllergy_Allergy" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Prescription_DosageUnitType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderEmail_EmailType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientEmail_EmailType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProvider_Gender" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderMedicalFacility_JobRole" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Patient_MaritialStatus" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderMedicalFacility_MedicalFacility" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Visit_MedicalFacility" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Visit_MedicalFacility1" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProvider_MedicalProviderType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderAddress_MedicalProvider" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderEmail_MedicalProvider" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderMedicalFacility_MedicalProvider" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderPhone_MedicalProvider" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Patient_MedicalProvider" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Visit_MedicalProvider" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Visit_MedicalProvider1" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_MedicalProviderPhone_PhoneType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientMedication_Medication" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Prescription_Medication" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientAddress_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientAllergy_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientEmail_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientMedication_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientPersonIdentifier_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientPhone_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientProblem_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientRelativeProblemHistory_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Prescription_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Visit_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientMedication_Prescription" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientNotes_Visit" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientPersonIdentifier_PersonIdentifierType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientPhone_PhoneType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientProblem_Problem" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientRelativeProblemHistory_Problem" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_PatientRelativeProblemHistory_RelationType" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Prescription_Visit" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
