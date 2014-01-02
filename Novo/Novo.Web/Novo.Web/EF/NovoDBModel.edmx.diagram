@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="9088179808814b429d4b61dc78bc2bd1" Name="Diagram1">
+      <Diagram DiagramId="9088179808814b429d4b61dc78bc2bd1" Name="Diagram1" ZoomLevel="74">
         <EntityTypeShape EntityType="Novo.DatabaseModel.AddressType" Width="1.5" PointX="5.25" PointY="10.5" IsExpanded="true" />
         <EntityTypeShape EntityType="Novo.DatabaseModel.Allergy" Width="1.5" PointX="8.25" PointY="30.5" IsExpanded="true" />
         <EntityTypeShape EntityType="Novo.DatabaseModel.DosageUnitType" Width="1.5" PointX="11.25" PointY="31.125" IsExpanded="true" />
@@ -79,6 +79,7 @@
         <AssociationConnector Association="Novo.DatabaseModel.FK_PatientRelativeProblemHistory_Problem" ManuallyRouted="false" />
         <AssociationConnector Association="Novo.DatabaseModel.FK_PatientRelativeProblemHistory_RelationType" ManuallyRouted="false" />
         <AssociationConnector Association="Novo.DatabaseModel.FK_Prescription_Visit" ManuallyRouted="false" />
+        <AssociationConnector Association="Novo.DatabaseModel.FK_Patient_Gender" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

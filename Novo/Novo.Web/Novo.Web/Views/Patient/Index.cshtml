@@ -27,9 +27,6 @@
             @Html.DisplayNameFor(model => model.DateOfBirth)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.DateOfDeath)
-        </th>
-        <th>
             @Html.DisplayNameFor(model => model.GenderId)
         </th>
         <th>
@@ -59,16 +56,13 @@
             @Html.DisplayFor(modelItem => item.DateOfBirth)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.DateOfDeath)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.GenderId)
+            @Html.DisplayFor(modelItem => item.Gender.Description)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.MaritialStatu.Description)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.MedicalProvider.Title)
+            @Html.DisplayFor(modelItem => item.MedicalProvider.FirstName)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

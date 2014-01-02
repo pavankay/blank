@@ -14,11 +14,39 @@ namespace Novo.Web.Controllers
     {
         private DBEntities db = new DBEntities();
 
+        public ActionResult Autocomplete(string term)
+        {
+            var model = db.MedicalProviders
+                          .Where(m => m.FirstName.StartsWith(term))
+                          .Take(10)
+                          .Select(m => m.FirstName + m.LastName);
+
+            //return Json(model, JsonRequestBehavior.AllowGet);
+
+            string content = string.Join<string>(@"\n", model);
+            return Content(content);
+        }
+
         // GET: /Patient/
         public ActionResult Index()
         {
             var patients = db.Patients.Include(p => p.MaritialStatu).Include(p => p.MedicalProvider);
+            patients.ToList().ForEach(item => item.Title = GetTitle(item.Title));
             return View(patients.ToList());
+        }
+
+        private string GetTitle(string title)
+        {
+            switch(title)
+            {
+                case "1": title = "Mr."; break;
+                case "2": title = "Mrs"; break;
+                case "3": title = "Dr"; break;
+                case "4": title = "Prof."; break;
+                case "5": title = "Rev"; break;
+            }
+
+            return title;
         }
 
         // GET: /Patient/Details/5
@@ -40,15 +68,16 @@ namespace Novo.Web.Controllers
         public ActionResult Create()
         {
             ViewBag.MaritalStatusId = new SelectList(db.MaritialStatus, "Id", "Description");
-            ViewBag.PrimaryCareProviderId = new SelectList(db.MedicalProviders, "Id", "Title");
+            ViewBag.PrimaryCareProviderId = new SelectList(db.MedicalProviders, "Id", "FirstName");
+            ViewBag.GenderId = new SelectList(db.Genders, "Id", "Description");
             return View();
         }
 
         // POST: /Patient/Create
-		// To protect from over posting attacks, please enable the specific properties you want to bind to, for 
-		// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-		// 
-		// Example: public ActionResult Update([Bind(Include="ExampleProperty1,ExampleProperty2")] Model model)
+        // To protect from over posting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // 
+        // Example: public ActionResult Update([Bind(Include="ExampleProperty1,ExampleProperty2")] Model model)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Patient patient)
@@ -62,6 +91,7 @@ namespace Novo.Web.Controllers
 
             ViewBag.MaritalStatusId = new SelectList(db.MaritialStatus, "Id", "Description", patient.MaritalStatusId);
             ViewBag.PrimaryCareProviderId = new SelectList(db.MedicalProviders, "Id", "Title", patient.PrimaryCareProviderId);
+            ViewBag.GenderId = new SelectList(db.Genders, "Id", "Description", patient.GenderId);
             return View(patient);
         }
 
@@ -83,10 +113,10 @@ namespace Novo.Web.Controllers
         }
 
         // POST: /Patient/Edit/5
-		// To protect from over posting attacks, please enable the specific properties you want to bind to, for 
-		// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-		// 
-		// Example: public ActionResult Update([Bind(Include="ExampleProperty1,ExampleProperty2")] Model model)
+        // To protect from over posting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // 
+        // Example: public ActionResult Update([Bind(Include="ExampleProperty1,ExampleProperty2")] Model model)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Patient patient)
@@ -107,7 +137,7 @@ namespace Novo.Web.Controllers
         {
             if (id == null)
             {
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Patient patient = db.Patients.Find(id);
             if (patient == null)

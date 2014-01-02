@@ -17,11 +17,13 @@ namespace Novo.Web.EF
         public Gender()
         {
             this.MedicalProviders = new HashSet<MedicalProvider>();
+            this.Patients = new HashSet<Patient>();
         }
     
         public int Id { get; set; }
         public string Description { get; set; }
     
         public virtual ICollection<MedicalProvider> MedicalProviders { get; set; }
+        public virtual ICollection<Patient> Patients { get; set; }
     }
 }

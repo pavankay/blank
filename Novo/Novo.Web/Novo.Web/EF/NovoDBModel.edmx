@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="Novo.DatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Novo.DatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AddressType">
           <Key>
             <PropertyRef Name="Id" />
@@ -432,6 +432,18 @@
             </Principal>
             <Dependent Role="MedicalProviderPhone">
               <PropertyRef Name="PhoneTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Patient_Gender">
+          <End Role="Gender" Type="Self.Gender" Multiplicity="1" />
+          <End Role="Patient" Type="Self.Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Gender">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="GenderId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -873,6 +885,10 @@
             <End Role="PhoneType" EntitySet="PhoneType" />
             <End Role="MedicalProviderPhone" EntitySet="MedicalProviderPhone" />
           </AssociationSet>
+          <AssociationSet Name="FK_Patient_Gender" Association="Self.FK_Patient_Gender">
+            <End Role="Gender" EntitySet="Gender" />
+            <End Role="Patient" EntitySet="Patient" />
+          </AssociationSet>
           <AssociationSet Name="FK_Patient_MaritialStatus" Association="Self.FK_Patient_MaritialStatus">
             <End Role="MaritialStatus" EntitySet="MaritialStatus" />
             <End Role="Patient" EntitySet="Patient" />
@@ -994,8 +1010,7 @@
             <End Role="Visit" EntitySet="Visit" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="Novo.DatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -1040,6 +1055,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="MedicalProviders" Relationship="Self.FK_MedicalProvider_Gender" FromRole="Gender" ToRole="MedicalProvider" />
+          <NavigationProperty Name="Patients" Relationship="Novo.DatabaseModel.FK_Patient_Gender" FromRole="Gender" ToRole="Patient" />
         </EntityType>
         <EntityType Name="Investigation">
           <Key>
@@ -1192,6 +1208,7 @@
           <NavigationProperty Name="PatientRelativeProblems" Relationship="Self.FK_PatientRelativeProblemHistory_Patient" FromRole="Patient" ToRole="PatientRelativeProblem" />
           <NavigationProperty Name="Prescriptions" Relationship="Self.FK_Prescription_Patient" FromRole="Patient" ToRole="Prescription" />
           <NavigationProperty Name="Visits" Relationship="Self.FK_Visit_Patient" FromRole="Patient" ToRole="Visit" />
+          <NavigationProperty Name="Gender" Relationship="Novo.DatabaseModel.FK_Patient_Gender" FromRole="Patient" ToRole="Gender" />
         </EntityType>
         <EntityType Name="PatientAddress">
           <Key>
@@ -2069,7 +2086,23 @@
             <End Role="Visit" EntitySet="Visits" />
             <End Role="Prescription" EntitySet="Prescriptions" />
           </AssociationSet>
+          <AssociationSet Name="FK_Patient_Gender" Association="Novo.DatabaseModel.FK_Patient_Gender">
+            <End Role="Gender" EntitySet="Genders" />
+            <End Role="Patient" EntitySet="Patients" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_Patient_Gender">
+          <End Type="Novo.DatabaseModel.Gender" Role="Gender" Multiplicity="1" />
+          <End Type="Novo.DatabaseModel.Patient" Role="Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Gender">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->

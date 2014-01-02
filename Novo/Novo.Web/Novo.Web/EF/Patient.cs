@@ -51,5 +51,6 @@ namespace Novo.Web.EF
         public virtual ICollection<PatientRelativeProblem> PatientRelativeProblems { get; set; }
         public virtual ICollection<Prescription> Prescriptions { get; set; }
         public virtual ICollection<Visit> Visits { get; set; }
+        public virtual Gender Gender { get; set; }
     }
 }
