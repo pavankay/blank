@@ -57,9 +57,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nivarc.DataContext\Nivarc.DataContext.csproj">
+    <ProjectReference Include="..\Nivarc.Data\Nivarc.Data.csproj">
       <Project>{e134766c-ccc0-473d-9cdf-c779a1402ab1}</Project>
-      <Name>Nivarc.DataContext</Name>
+      <Name>Nivarc.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Nivarc.Models\Nivarc.Models.csproj">
       <Project>{e3ad25d5-7908-4b9c-8799-f2516e45b434}</Project>

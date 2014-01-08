@@ -4,28 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{89CB49CA-97D9-4207-8C36-6ACFEAD1041A}</ProjectGuid>
+    <ProjectGuid>{E134766C-CCC0-473D-9CDF-C779A1402AB1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nivarc.Data</RootNamespace>
-    <AssemblyName>Nivarc.Data</AssemblyName>
+    <RootNamespace>Nivarc.DataContext</RootNamespace>
+    <AssemblyName>Nivarc.DataContext</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,7 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,33 +46,52 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\addresstypeMap.cs" />
+    <Compile Include="Mapping\allergyMap.cs" />
+    <Compile Include="Mapping\dosageunittypeMap.cs" />
+    <Compile Include="Mapping\emailtypeMap.cs" />
+    <Compile Include="Mapping\genderMap.cs" />
+    <Compile Include="Mapping\investigationMap.cs" />
+    <Compile Include="Mapping\jobroleMap.cs" />
+    <Compile Include="Mapping\maritalstatuMap.cs" />
+    <Compile Include="Mapping\medicalfacilityMap.cs" />
+    <Compile Include="Mapping\medicalprovideraddressMap.cs" />
+    <Compile Include="Mapping\medicalprovideremailMap.cs" />
+    <Compile Include="Mapping\medicalproviderMap.cs" />
+    <Compile Include="Mapping\medicalprovidermedicalfacilityMap.cs" />
+    <Compile Include="Mapping\medicalproviderphoneMap.cs" />
+    <Compile Include="Mapping\medicalprovidertypeMap.cs" />
+    <Compile Include="Mapping\medicationMap.cs" />
+    <Compile Include="Mapping\patientaddressMap.cs" />
+    <Compile Include="Mapping\patientallergyMap.cs" />
+    <Compile Include="Mapping\patientemailMap.cs" />
+    <Compile Include="Mapping\patientMap.cs" />
+    <Compile Include="Mapping\patientmedicationMap.cs" />
+    <Compile Include="Mapping\patientnoteMap.cs" />
+    <Compile Include="Mapping\patientpersonidentifierMap.cs" />
+    <Compile Include="Mapping\patientphoneMap.cs" />
+    <Compile Include="Mapping\patientproblemMap.cs" />
+    <Compile Include="Mapping\patientrelativeproblemMap.cs" />
+    <Compile Include="Mapping\personidentifiertypeMap.cs" />
+    <Compile Include="Mapping\phonetypeMap.cs" />
+    <Compile Include="Mapping\prescriptionMap.cs" />
+    <Compile Include="Mapping\problemMap.cs" />
+    <Compile Include="Mapping\relationtypeMap.cs" />
+    <Compile Include="Mapping\titleMap.cs" />
+    <Compile Include="Mapping\visitMap.cs" />
+    <Compile Include="nivarcContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Novo.Database.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Novo.Database_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>Novo.Database.mdf</DependentUpon>
-    </Content>
+    <ProjectReference Include="..\Nivarc.Models\Nivarc.Models.csproj">
+      <Project>{e3ad25d5-7908-4b9c-8799-f2516e45b434}</Project>
+      <Name>Nivarc.Models</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
