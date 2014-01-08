@@ -1,0 +1,95 @@
+﻿@model Nivarc.Models.patient
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>patient</legend>
+
+    <dl>
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MiddleName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MiddleName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOfBirth)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfDeath)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOfDeath)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.gender.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.gender.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.maritalstatu.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.maritalstatu.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.medicalprovider.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.medicalprovider.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.title.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.title.Description)
+        </dd>
+
+    </dl>
+</fieldset>
+@using (Html.BeginForm()) {
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions no-color">
+        <input type="submit" value="Delete" class="btn" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+}

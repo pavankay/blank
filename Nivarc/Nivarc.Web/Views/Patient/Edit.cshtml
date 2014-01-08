@@ -1,0 +1,104 @@
+﻿@model Nivarc.Models.patient
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+
+@using (Html.BeginForm()) {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <fieldset class="form-horizontal">
+        <legend>patient</legend>
+
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.TitleId, "TitleId", new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownList("TitleId", String.Empty)
+                @Html.ValidationMessageFor(model => model.TitleId, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+            <div class="controls">
+                @Html.EditorFor(model => model.FirstName)
+                @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
+            <div class="controls">
+                @Html.EditorFor(model => model.LastName)
+                @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.MiddleName, new { @class = "control-label" })
+            <div class="controls">
+                @Html.EditorFor(model => model.MiddleName)
+                @Html.ValidationMessageFor(model => model.MiddleName, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.DateOfBirth, new { @class = "control-label" })
+            <div class="controls">
+                @Html.EditorFor(model => model.DateOfBirth)
+                @Html.ValidationMessageFor(model => model.DateOfBirth, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.DateOfDeath, new { @class = "control-label" })
+            <div class="controls">
+                @Html.EditorFor(model => model.DateOfDeath)
+                @Html.ValidationMessageFor(model => model.DateOfDeath, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.MaritalStatusId, "MaritalStatusId", new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownList("MaritalStatusId", String.Empty)
+                @Html.ValidationMessageFor(model => model.MaritalStatusId, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.PrimaryCareProviderId, "PrimaryCareProviderId", new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownList("PrimaryCareProviderId", String.Empty)
+                @Html.ValidationMessageFor(model => model.PrimaryCareProviderId, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.GenderId, "GenderId", new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownList("GenderId", String.Empty)
+                @Html.ValidationMessageFor(model => model.GenderId, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Save" class="btn" />
+        </div>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

@@ -1,0 +1,89 @@
+﻿@model Nivarc.Models.patient
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>patient</legend>
+    <dl>
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MiddleName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MiddleName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOfBirth)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfDeath)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOfDeath)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.gender.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.gender.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.maritalstatu.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.maritalstatu.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.medicalprovider.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.medicalprovider.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.title.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.title.Description)
+        </dd>
+
+    </dl>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
