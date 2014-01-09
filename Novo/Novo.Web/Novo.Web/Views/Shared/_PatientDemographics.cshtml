@@ -1,0 +1,41 @@
+﻿@model Novo.Web.EF.Patient
+@using Novo.Web.EF
+
+@{
+    var permanentAddress = Model.PatientAddresses.Where(a => a.AddressTypeId.ToString() == ViewData["AddressTypeId"].ToString()).FirstOrDefault();
+    var email = Model.PatientEmails.Where(a => a.EmailTypeId.ToString() == ViewData["EmailTypeId"].ToString()).FirstOrDefault();
+    var contactNumber = Model.PatientPhones.Where(a => a.PhoneTypeId.ToString() == ViewData["PhoneTypeId"].ToString()).FirstOrDefault();
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label class="control-label">Permanent Address </label>
+                <div>
+                    <p class="form-control-static">@string.Format("{0}, {1}", permanentAddress.Line1, permanentAddress.Line2)</p>
+                    <p class="form-control-static">@string.Format("{0}, {1} - {2}", permanentAddress.City, permanentAddress.State, permanentAddress.PostalCode)</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Email </label> 
+                <p class="form-control-static">@email.Number</p>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Contact Number </label>
+                <div >
+                    <p class="form-control-static">@contactNumber.Number</p>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+

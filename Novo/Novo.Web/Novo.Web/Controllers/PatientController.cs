@@ -28,10 +28,12 @@ namespace Novo.Web.Controllers
         }
 
         // GET: /Patient/
-        public ActionResult Index()
+        public ActionResult Index(string searchTerm = null)
         {
-            var patients = db.Patients.Include(p => p.MaritialStatu).Include(p => p.MedicalProvider);
+            var patients = db.Patients.Where(p => p.FirstName.StartsWith(searchTerm) || searchTerm == null).Include(p => p.MaritialStatu).Include(p => p.MedicalProvider);
             patients.ToList().ForEach(item => item.Title = GetTitle(item.Title));
+
+            
             return View(patients.ToList());
         }
 
@@ -144,6 +146,31 @@ namespace Novo.Web.Controllers
             {
                 return HttpNotFound();
             }
+            return View(patient);
+        }
+
+        // GET: /Patient/EHR/5
+        public ActionResult EHR(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Patient patient = db.Patients.Find(id);
+            if (patient == null)
+            {
+                return HttpNotFound();
+            }
+            
+            ViewBag.MaritalStatusId = new SelectList(db.MaritialStatus, "Id", "Description", patient.MaritalStatusId);
+            ViewBag.PrimaryCareProviderId = new SelectList(db.MedicalProviders, "Id", "Title", patient.PrimaryCareProviderId);
+            ViewData["a"] = db.AddressTypes;//.Where(a=> a.Description.Contains("Permanent")).FirstOrDefault();
+            //ViewData["EmailTypeId"] = 1;// db.EmailTypes.Where(a => a.Description == "Perosnal Email").FirstOrDefault().Id;
+            //ViewData["PhoneTypeId"] = 1;// db.PhoneTypes.Where(a => a.Description == "Mobile Phone").FirstOrDefault().Id;
+            ViewBag.AddressTypeId = 14;
+            ViewBag.EmailTypeId = 1;
+            ViewBag.PhoneTypeId = 1;
+
             return View(patient);
         }
 

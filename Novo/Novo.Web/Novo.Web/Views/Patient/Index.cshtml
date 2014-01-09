@@ -1,15 +1,41 @@
 ﻿@model IEnumerable<Novo.Web.EF.Patient>
+@using GridMvc.Html
 
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>Dashboard</h2>
+@Scripts.Render("~/bundles/jquery")
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")"></script>
+
+<form method="get" class="form-inline">
+    <input type="search" name="searchTerm" class="form-control" />
+    <input type="submit" value="Search By Name" class="btn btn-info" />
+
+</form>
+
+<div style="width:1000px;">
+    @Html.Grid(Model).Columns(columns =>
+                    {
+                        columns.Add(c => c.Id).Titled("ID");
+                        columns.Add(c => c.FirstName).Titled("First Name").Filterable(true);
+                        columns.Add(c => c.LastName).Titled("Last Name");
+                        columns.Add(c => c.MiddleName).Titled("Middle Name");
+                        columns.Add(c => c.DateOfBirth).Titled("Date Of Birth");
+                        columns.Add(c => c.Gender.Description).Titled("Gender");
+                        columns.Add(c => c.MaritialStatu.Description).Titled("Marital Status");
+                        columns.Add(c => c.MedicalProvider.FirstName).Titled("Medical Provider");
+                    }).WithPaging(10).Sortable(true)
+</div>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
+
+
+
+@*<table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Title)
@@ -72,4 +98,4 @@
     </tr>
 }
 
-</table>
+</table>*@

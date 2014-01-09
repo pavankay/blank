@@ -1,0 +1,105 @@
+﻿@model Novo.Web.EF.Patient
+@{
+    // Layout = null;
+    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    @Scripts.Render("~/bundles/jquery")
+</head>
+<body>
+    <div>
+
+        <div class="row">
+
+            <!-- Navigation Buttons -->
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked" id="myTabs">
+                    <li class="active"><a href="#patientdemographics">PATIENT DEMOGRAPHICS</a></li>
+                    <li><a href="#patientproblem">PROBLEM LIST</a></li>
+                    <li><a href="#patientnotes">NOTES</a></li>
+                    <li><a href="#PatientOrders">PHYSICIAN'S ORDERS</a></li>
+                    <li><a href="#patientmedication">MEDICATION</a></li>
+                    <li><a href="#PatientVitals">VITALS</a></li>
+                </ul>
+            </div>
+
+            <!-- Content -->
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="patientdemographics">
+                        <div class="col-md-8">
+                            @Html.Partial("_PatientDemographics", Model)
+                        </div>
+                        <div class="col-md-4">
+                            Demographic Sub section
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="patientproblem">
+                        <div class="col-md-8">
+                            @Html.Partial("_PatientProblem", Model.PatientProblems)
+                        </div>
+                        <div class="col-md-4">
+                            Problem Sub section
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="patientnotes">
+
+
+                        <div class="col-md-8">
+                            @Html.Partial("_PatientNotes", Model.Visits)
+                        </div>
+                        <div class="col-md-4">
+                            Notes Sub section
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="PatientOrders">
+                        <div class="col-md-8">
+                            @Html.Partial("edit", Model)
+                        </div>
+                        <div class="col-md-4">
+                            yet to find Sub section
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="patientmedication">
+                        <div class="col-md-8">
+                            @Html.Partial("_PatientMedication", Model.PatientMedications)
+                        </div>
+                        <div class="col-md-2">
+                            medication Sub section
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="PatientVitals">
+                        <div class="col-md-8">
+                            @Html.Partial("edit", Model)
+                        </div>
+                        <div class="col-md-2">
+                            yet to find Sub section
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Enable the tabs -->
+        <script type="text/javascript">
+            $('#myTabs a').click(function (e) {
+                e.preventDefault()
+                $(this).tab('show')
+            });
+        </script>
+
+    </div>
+</body>
+</html>
