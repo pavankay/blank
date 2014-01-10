@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Nivarc.Models.patientproblem>
+@using GridMvc.Html
+
+@{
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+        Patient Problems
+        <div style="width:1000px;">
+            @*@Html.Grid(Model.pr).Columns(columns =>
+                    {
+                        columns.Add(c => c.Id).Titled("ID");
+                        columns.Add(c => c.Problem.PatientProblems).Titled("First Name").Filterable(true);
+                        columns.Add(c => c.LastName).Titled("Last Name");
+                        columns.Add(c => c.MiddleName).Titled("Middle Name");
+                        columns.Add(c => c.DateOfBirth).Titled("Date Of Birth");
+                        columns.Add(c => c.Gender.Description).Titled("Gender");
+                        columns.Add(c => c.MaritialStatu.Description).Titled("Marital Status");
+                        columns.Add(c => c.MedicalProvider.FirstName).Titled("Medical Provider");
+                    }).WithPaging(10).Sortable(true)*@
+            </div>
+    </div>
+</body>
+</html>

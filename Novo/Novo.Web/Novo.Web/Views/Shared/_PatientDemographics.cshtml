@@ -1,5 +1,5 @@
 ﻿@model Novo.Web.EF.Patient
-@using Novo.Web.EF
+
 
 @{
     var permanentAddress = Model.PatientAddresses.Where(a => a.AddressTypeId.ToString() == ViewData["AddressTypeId"].ToString()).FirstOrDefault();

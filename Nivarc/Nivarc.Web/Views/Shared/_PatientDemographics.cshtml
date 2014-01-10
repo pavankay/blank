@@ -1,0 +1,43 @@
+﻿@model Nivarc.Models.patient
+
+@{
+    var permanentAddress = Model.patientaddresses.Where(a => a.AddressTypeId.ToString() == ViewData["AddressTypeId"].ToString()).FirstOrDefault();
+    var email = Model.patientemails.Where(a => a.EmailTypeId.ToString() == ViewData["EmailTypeId"].ToString()).FirstOrDefault();
+    var contactNumber = Model.patientphones.Where(a => a.PhoneTypeId.ToString() == ViewData["PhoneTypeId"].ToString()).FirstOrDefault();
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+        <form class="form-horizontal" role="form">
+            <div class="page-header">
+                <h1 id="btn-groups">Patient Name</h1>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Permanent Address </label>
+                <div>
+                    <p class="form-control-static">@string.Format("{0}, {1}", permanentAddress.Line1, permanentAddress.Line2)</p>
+                    <p class="form-control-static">@string.Format("{0}, {1} - {2}", permanentAddress.City, permanentAddress.State, permanentAddress.PostalCode)</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Email </label> 
+                <p class="form-control-static">@email.EmailAddress</p>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Contact Number </label>
+                <div >
+                    <p class="form-control-static">@contactNumber.Number</p>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+

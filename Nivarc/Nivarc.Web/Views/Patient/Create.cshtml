@@ -7,24 +7,24 @@
 <h2>Create</h2>
 
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
 
     <fieldset class="form-horizontal">
-        <legend>patient</legend>
+        <legend>Patient</legend>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.TitleId, "TitleId", new { @class = "control-label" })
+            @Html.LabelFor(model => model.TitleId, new { @class = "control-label" })
             <div class="controls">
-                @Html.DropDownList("TitleId", String.Empty)
+                @Html.DropDownList("TitleId", "-- Select Title --")
                 @Html.ValidationMessageFor(model => model.TitleId, null, new { @class = "help-inline" })
             </div>
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+            @Html.LabelFor(model => model.FirstName, "First Name", new { @class = "control-label" })
             <div class="controls">
                 @Html.EditorFor(model => model.FirstName)
                 @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "help-inline" })
@@ -32,15 +32,7 @@
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
-            <div class="controls">
-                @Html.EditorFor(model => model.LastName)
-                @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.MiddleName, new { @class = "control-label" })
+            @Html.LabelFor(model => model.MiddleName, "Middle Name", new { @class = "control-label" })
             <div class="controls">
                 @Html.EditorFor(model => model.MiddleName)
                 @Html.ValidationMessageFor(model => model.MiddleName, null, new { @class = "help-inline" })
@@ -48,7 +40,15 @@
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.DateOfBirth, new { @class = "control-label" })
+            @Html.LabelFor(model => model.LastName, "Last Name", new { @class = "control-label" })
+            <div class="controls">
+                @Html.EditorFor(model => model.LastName)
+                @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "help-inline" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            @Html.LabelFor(model => model.DateOfBirth, "Date Of Birth", new { @class = "control-label" })
             <div class="controls">
                 @Html.EditorFor(model => model.DateOfBirth)
                 @Html.ValidationMessageFor(model => model.DateOfBirth, null, new { @class = "help-inline" })
@@ -56,33 +56,25 @@
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.DateOfDeath, new { @class = "control-label" })
+            @Html.LabelFor(model => model.MaritalStatusId, "Marital Status", new { @class = "control-label" })
             <div class="controls">
-                @Html.EditorFor(model => model.DateOfDeath)
-                @Html.ValidationMessageFor(model => model.DateOfDeath, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.MaritalStatusId, "MaritalStatusId", new { @class = "control-label" })
-            <div class="controls">
-                @Html.DropDownList("MaritalStatusId", String.Empty)
+                @Html.DropDownList("MaritalStatusId", "-- Select Marital Status --")
                 @Html.ValidationMessageFor(model => model.MaritalStatusId, null, new { @class = "help-inline" })
             </div>
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.PrimaryCareProviderId, "PrimaryCareProviderId", new { @class = "control-label" })
+            @Html.LabelFor(model => model.PrimaryCareProviderId, "Primary Care Provider", new { @class = "control-label" })
             <div class="controls">
-                @Html.DropDownList("PrimaryCareProviderId", String.Empty)
+                @Html.DropDownList("PrimaryCareProviderId", "-- Select Primary Care Provider --")
                 @Html.ValidationMessageFor(model => model.PrimaryCareProviderId, null, new { @class = "help-inline" })
             </div>
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.GenderId, "GenderId", new { @class = "control-label" })
+            @Html.LabelFor(model => model.GenderId, "Gender", new { @class = "control-label" })
             <div class="controls">
-                @Html.DropDownList("GenderId", String.Empty)
+                @Html.DropDownList("GenderId", "-- Select Gender --")
                 @Html.ValidationMessageFor(model => model.GenderId, null, new { @class = "help-inline" })
             </div>
         </div>

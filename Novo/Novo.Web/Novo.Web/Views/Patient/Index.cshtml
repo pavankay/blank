@@ -33,7 +33,13 @@
     @Html.ActionLink("Create New", "Create")
 </p>
 
-
+<script>
+    $(document).ready(function () {
+        $(".grid-mvc table tbody").delegate('tr', 'click', function () {
+            location.href = '/Patient/EHR/' + $(this).find('td:first').text();
+        });
+    });
+</script>
 
 @*<table class="table">
     <tr>

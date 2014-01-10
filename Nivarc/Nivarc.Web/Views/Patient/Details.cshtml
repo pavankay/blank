@@ -7,8 +7,16 @@
 <h2>Details</h2>
 
 <fieldset>
-    <legend>patient</legend>
+    <legend>Patient</legend>
     <dl>
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.FirstName)
         </dt>
@@ -50,35 +58,27 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.gender.Description)
+            @Html.DisplayNameFor(model => model.GenderId)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.gender.Description)
+            @Html.DisplayFor(model => model.GenderId)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.maritalstatu.Description)
+            @Html.DisplayNameFor(model => model.MaritialStatu.Description)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.maritalstatu.Description)
+            @Html.DisplayFor(model => model.MaritialStatu.Description)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.medicalprovider.FirstName)
+            @Html.DisplayNameFor(model => model.MedicalProvider.Title)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.medicalprovider.FirstName)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.title.Description)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.title.Description)
+            @Html.DisplayFor(model => model.MedicalProvider.Title)
         </dd>
 
     </dl>

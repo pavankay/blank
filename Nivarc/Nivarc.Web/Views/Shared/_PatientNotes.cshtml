@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Nivarc.Models.visit>
+@using GridMvc.Html
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+        Patient Notes
+        
+        @Html.Grid(Model).Columns(columns =>
+        {
+            columns.Add(c => c.Id).Titled("ID");
+            columns.Add(c => c.patientnotes).Titled("Notes").Filterable(true);
+        }).WithPaging(10).Sortable(true)
+    </div>
+</body>
+</html>

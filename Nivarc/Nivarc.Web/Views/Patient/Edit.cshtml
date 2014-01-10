@@ -12,15 +12,15 @@
     @Html.ValidationSummary(true)
 
     <fieldset class="form-horizontal">
-        <legend>patient</legend>
+        <legend>Patient</legend>
 
         @Html.HiddenFor(model => model.Id)
 
         <div class="control-group">
-            @Html.LabelFor(model => model.TitleId, "TitleId", new { @class = "control-label" })
+            @Html.LabelFor(model => model.Title, new { @class = "control-label" })
             <div class="controls">
-                @Html.DropDownList("TitleId", String.Empty)
-                @Html.ValidationMessageFor(model => model.TitleId, null, new { @class = "help-inline" })
+                @Html.EditorFor(model => model.Title)
+                @Html.ValidationMessageFor(model => model.Title, null, new { @class = "help-inline" })
             </div>
         </div>
 
@@ -81,9 +81,9 @@
         </div>
 
         <div class="control-group">
-            @Html.LabelFor(model => model.GenderId, "GenderId", new { @class = "control-label" })
+            @Html.LabelFor(model => model.GenderId, new { @class = "control-label" })
             <div class="controls">
-                @Html.DropDownList("GenderId", String.Empty)
+                @Html.EditorFor(model => model.GenderId)
                 @Html.ValidationMessageFor(model => model.GenderId, null, new { @class = "help-inline" })
             </div>
         </div>

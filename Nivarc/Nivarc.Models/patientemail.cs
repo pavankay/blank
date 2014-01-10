@@ -7,7 +7,7 @@ namespace Nivarc.Models
     {
         public int Id { get; set; }
         public int PatientId { get; set; }
-        public string Number { get; set; }
+        public string EmailAddress { get; set; }
         public int EmailTypeId { get; set; }
         public virtual emailtype emailtype { get; set; }
         public virtual patient patient { get; set; }
