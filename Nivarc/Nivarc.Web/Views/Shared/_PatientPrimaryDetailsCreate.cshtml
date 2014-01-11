@@ -1,0 +1,104 @@
+﻿@model Nivarc.Models.patient
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+        <fieldset class="form-horizontal">
+
+            <div class="control-group">
+                <div class="col-md-12">
+                    <div class="controls">
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.TitleId, "Title", new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.FirstName, "First Name", new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.MiddleName, "Middle Name", new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.LastName, "Last Name", new { @class = "control-label" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="controls">
+                        <div class="col-md-3">
+                            <div class="controls">
+                                @Html.DropDownList("TitleId")
+                                @Html.ValidationMessageFor(model => model.TitleId, null, new { @class = "help-inline" })
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            @Html.EditorFor(model => model.FirstName)
+                            @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "help-inline" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.EditorFor(model => model.MiddleName)
+                            @Html.ValidationMessageFor(model => model.MiddleName, null, new { @class = "help-inline" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.EditorFor(model => model.LastName)
+                            @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "help-inline" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="controls">
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.DateOfBirth, "Date Of Birth", new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.MaritalStatusId, "Marital Status", new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.PrimaryCareProviderId, "Primary Care Provider", new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.GenderId, "Gender", new { @class = "control-label" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="controls">
+                        <div class="col-md-3">
+                            <div class="controls">
+                                @Html.EditorFor(model => model.DateOfBirth)
+                                @Html.ValidationMessageFor(model => model.DateOfBirth, null, new { @class = "help-inline" })
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            @Html.DropDownList("MaritalStatusId")
+                            @Html.ValidationMessageFor(model => model.MaritalStatusId, null, new { @class = "help-inline" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.DropDownList("PrimaryCareProviderId")
+                            @Html.ValidationMessageFor(model => model.PrimaryCareProviderId, null, new { @class = "help-inline" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.DropDownList("GenderId")
+                            @Html.ValidationMessageFor(model => model.GenderId, null, new { @class = "help-inline" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+            
+        </fieldset>
+    </div>
+</body>
+</html>
+

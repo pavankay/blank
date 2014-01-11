@@ -1,0 +1,30 @@
+﻿@model Nivarc.Models.patientaddress
+
+<li>
+
+    @Html.LabelFor(model => model.Line1)
+    @Html.EditorFor(model => model.Line1)
+    @Html.ValidationMessageFor(model => model.Line1)
+
+    @Html.LabelFor(model => model.Line2)
+    @Html.EditorFor(model => model.Line2)
+    @Html.ValidationMessageFor(model => model.Line2)
+
+    @Html.LabelFor(model => model.City)
+    @Html.EditorFor(model => model.City)
+        @Html.ValidationMessageFor(model => model.City)
+
+    @Html.LabelFor(model => model.State)
+    @Html.EditorFor(model => model.State)
+        @Html.ValidationMessageFor(model => model.State)
+
+    @Html.LabelFor(model => model.PostalCode)
+    @Html.EditorFor(model => model.PostalCode)
+        @Html.ValidationMessageFor(model => model.PostalCode)
+
+    @*@Html.LabelFor(model => model.AddressTypeId)
+    @Html.DropDownList(model => model.AddressTypeId)
+    @Html.ValidationMessageFor(model => model.AddressTypeId)*@
+
+    <a href="#" onclick="$(this).parent().remove();">Delete</a>
+</li>

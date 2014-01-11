@@ -94,6 +94,8 @@ namespace Novo.Web.Controllers
             ViewBag.MaritalStatusId = new SelectList(db.MaritialStatus, "Id", "Description", patient.MaritalStatusId);
             ViewBag.PrimaryCareProviderId = new SelectList(db.MedicalProviders, "Id", "Title", patient.PrimaryCareProviderId);
             ViewBag.GenderId = new SelectList(db.Genders, "Id", "Description", patient.GenderId);
+
+            
             return View(patient);
         }
 

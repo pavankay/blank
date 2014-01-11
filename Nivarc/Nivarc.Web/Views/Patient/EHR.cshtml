@@ -1,7 +1,7 @@
 ﻿@model Nivarc.Models.patient
 @{
     // Layout = null;
-    
+
 }
 
 <!DOCTYPE html>
@@ -47,27 +47,22 @@
                         <div class="col-md-4">
                             Problem Sub section
                         </div>
-
                     </div>
                     <div class="tab-pane" id="patientnotes">
-
-
                         <div class="col-md-8">
                             @Html.Partial("_PatientNotes", Model.visits)
                         </div>
                         <div class="col-md-4">
                             Notes Sub section
                         </div>
-
                     </div>
                     <div class="tab-pane" id="PatientOrders">
                         <div class="col-md-8">
-                            @*@Html.Partial("edit", Model)*@
+                            @Html.Partial("_PatientOrders", Model)
                         </div>
                         <div class="col-md-4">
-                            yet to find Sub section
+                            Orders Sub section
                         </div>
-
                     </div>
                     <div class="tab-pane" id="patientmedication">
                         <div class="col-md-8">
@@ -76,20 +71,17 @@
                         <div class="col-md-2">
                             medication Sub section
                         </div>
-
                     </div>
                     <div class="tab-pane" id="PatientVitals">
                         <div class="col-md-8">
-                            @*@Html.Partial("edit", Model)*@
+                            @Html.Partial("_PatientVitals", Model)
                         </div>
                         <div class="col-md-2">
-                            yet to find Sub section
+                            Vitals Sub section
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- Enable the tabs -->

@@ -152,13 +152,9 @@ namespace Nivarc.Controllers
             ViewBag.PrimaryCareProviderId = new SelectList(unitOfWork.Repository<medicalprovider>().Get(), "Id", "FirstName");
             ViewBag.GenderId = new SelectList(unitOfWork.CachedRepository<gender>().Get(), "Id", "Description");
             ViewBag.TitleId = new SelectList(unitOfWork.CachedRepository<title>().Get(), "Id", "Description");
-            ViewData["a"] = unitOfWork.CachedRepository<addresstype>().Get();
-            //.Where(a=> a.Description.Contains("Permanent")).FirstOrDefault();
-            //ViewData["EmailTypeId"] = 1;// db.EmailTypes.Where(a => a.Description == "Perosnal Email").FirstOrDefault().Id;
-            //ViewData["PhoneTypeId"] = 1;// db.PhoneTypes.Where(a => a.Description == "Mobile Phone").FirstOrDefault().Id;
-            ViewBag.AddressTypeId = 1;
-            ViewBag.EmailTypeId = 1;
-            ViewBag.PhoneTypeId = 1;
+            ViewBag.AddressTypeId = unitOfWork.CachedRepository<addresstype>().Get().Where(a => a.Description == "Permanent").FirstOrDefault().Id;
+            ViewBag.EmailTypeId = unitOfWork.CachedRepository<emailtype>().Get().Where(a => a.Description == "Personal").FirstOrDefault().Id;
+            ViewBag.PhoneTypeId = unitOfWork.CachedRepository<phonetype>().Get().Where(a => a.Description == "Mobile").FirstOrDefault().Id;
 
             return View(patient);
         }

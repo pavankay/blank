@@ -239,6 +239,13 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Views\Shared\_PatientProblem.cshtml" />
+    <Content Include="Views\Shared\_PatientOrders.cshtml" />
+    <Content Include="Views\Shared\_PatientVitals.cshtml" />
+    <Content Include="Views\Shared\_PatientPrimaryDetailsCreate.cshtml" />
+    <Content Include="Views\Shared\_PatientAddressCreate.cshtml" />
+    <Content Include="Views\Shared\_PatientContactCreate.cshtml" />
+    <Content Include="Views\Shared\_PatientEmailCreate.cshtml" />
+    <Content Include="Views\Shared\_PatientInsuranceCreate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

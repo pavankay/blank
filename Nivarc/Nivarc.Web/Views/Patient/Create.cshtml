@@ -11,78 +11,97 @@
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
+    
+    @Scripts.Render("~/bundles/jquery")
+    
+    
+    
+    
+    <div>
 
-    <fieldset class="form-horizontal">
-        <legend>Patient</legend>
+        <div class="row">
 
-        <div class="control-group">
-            @Html.LabelFor(model => model.TitleId, new { @class = "control-label" })
-            <div class="controls">
-                @Html.DropDownList("TitleId", "-- Select Title --")
-                @Html.ValidationMessageFor(model => model.TitleId, null, new { @class = "help-inline" })
+            <!-- Navigation Buttons -->
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked" id="myTabs">
+                    <li class="active"><a href="#primarydetails">Primry Details</a></li>
+                    <li><a href="#patientaddress">Address</a></li>
+                    <li><a href="#Patientcontact">Contact</a></li>
+                    <li><a href="#patientemail">Email</a></li>
+                    <li><a href="#patientinsurance">Insurance</a></li>
+                </ul>
             </div>
-        </div>
 
-        <div class="control-group">
-            @Html.LabelFor(model => model.FirstName, "First Name", new { @class = "control-label" })
-            <div class="controls">
-                @Html.EditorFor(model => model.FirstName)
-                @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.MiddleName, "Middle Name", new { @class = "control-label" })
-            <div class="controls">
-                @Html.EditorFor(model => model.MiddleName)
-                @Html.ValidationMessageFor(model => model.MiddleName, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.LastName, "Last Name", new { @class = "control-label" })
-            <div class="controls">
-                @Html.EditorFor(model => model.LastName)
-                @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.DateOfBirth, "Date Of Birth", new { @class = "control-label" })
-            <div class="controls">
-                @Html.EditorFor(model => model.DateOfBirth)
-                @Html.ValidationMessageFor(model => model.DateOfBirth, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.MaritalStatusId, "Marital Status", new { @class = "control-label" })
-            <div class="controls">
-                @Html.DropDownList("MaritalStatusId", "-- Select Marital Status --")
-                @Html.ValidationMessageFor(model => model.MaritalStatusId, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.PrimaryCareProviderId, "Primary Care Provider", new { @class = "control-label" })
-            <div class="controls">
-                @Html.DropDownList("PrimaryCareProviderId", "-- Select Primary Care Provider --")
-                @Html.ValidationMessageFor(model => model.PrimaryCareProviderId, null, new { @class = "help-inline" })
-            </div>
-        </div>
-
-        <div class="control-group">
-            @Html.LabelFor(model => model.GenderId, "Gender", new { @class = "control-label" })
-            <div class="controls">
-                @Html.DropDownList("GenderId", "-- Select Gender --")
-                @Html.ValidationMessageFor(model => model.GenderId, null, new { @class = "help-inline" })
+            <!-- Content -->
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="primarydetails">
+                        <div class="col-md-12">
+                            @Html.Partial("_PatientPrimaryDetailsCreate", Model)
+                                        </div>
+                                        @*<div class="col-md-4">
+                                            Demographic Sub section
+                                        </div>*@
+                                    </div>
+                    <div class="tab-pane" id="patientaddress">
+                        <div class="col-md-12">
+                            @Html.Partial("_PatientAddressCreate", Model)
+                                        </div>
+                                        @*<div class="col-md-4">
+                                            Problem Sub section
+                                        </div>*@
+                                    </div>
+                    <div class="tab-pane" id="Patientcontact">
+                        <div class="col-md-12">
+                            @Html.Partial("_PatientContactCreate", Model)
+                                        </div>
+                                        @*<div class="col-md-4">
+                                            Notes Sub section
+                                        </div>*@
+                                    </div>
+                    <div class="tab-pane" id="patientemail">
+                        <div class="col-md-12">
+                            @Html.Partial("_PatientEmailCreate", Model)
+                                        </div>
+                                        @*<div class="col-md-4">
+                                            Orders Sub section
+                                        </div>*@
+                                    </div>
+                    <div class="tab-pane" id="patientinsurance">
+                        <div class="col-md-12">
+                            @Html.Partial("_PatientInsuranceCreate", Model)
+                                        </div>
+                                        @*<div class="col-md-2">
+                                            medication Sub section
+                                        </div>*@
+                                    </div>
+                </div>
             </div>
         </div>
 
         <div class="form-actions no-color">
-            <input type="submit" value="Create" class="btn" />
+            <div class="col-md-12">
+                <div class="controls">
+                    <input type="submit" value="Create" class="btn btn-info" />
+                </div>
+            </div>
         </div>
-    </fieldset>
+
+        <!-- Enable the tabs -->
+        <script type="text/javascript">
+            $('#myTabs a').click(function (e) {
+                e.preventDefault()
+                $(this).tab('show')
+            });
+        </script>
+
+    </div>
+    
+    
+    
+    
+    
+    
 }
 
 <div>
