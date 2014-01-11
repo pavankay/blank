@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Nivarc</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-
+    
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
@@ -30,12 +30,17 @@
             </nav>
         </div>
     </header>
-        <div class="container">
+    <div class="container">
         @RenderBody()
-        <hr />
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+            <div class="navbar-inner navbar-content-center">
+                <p>&copy; @DateTime.Now.Year - Nivarc</p>
+            </div>
+        </nav>
+        @*<hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - Nivarc</p>
-        </footer>
+        </footer>*@
     </div>
 
     @Scripts.Render("~/bundles/jquery")

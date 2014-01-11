@@ -5,36 +5,36 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Dashboard</h2>
+<h3>Dashboard</h3>
+<hr />
 @Scripts.Render("~/bundles/jquery")
 <script src="@Url.Content("~/Scripts/gridmvc.min.js")"></script>
 
-<form class="navbar-form navbar-left" role="search">
+<form class="navbar-form navbar-right" role="search">
     <div class="form-group">
-        @*<input type="text" class="form-control" placeholder="Search">*@
-        <input type="search" name="searchTerm" class="form-control" />
+        <input type="search" name="searchTerm" placeholder="First Name" class="form-control" />
     </div>
-    @*<button type="submit" class="btn btn-default">Submit</button>*@
-    <input type="submit" value="Search By Name" class="btn btn-info" />
+    <input type="submit" value="Search" class="btn btn-info" />
 </form>
-
-<div style="width:1000px;">
-    @Html.Grid(Model).Columns(columns =>
-                    {
-                        columns.Add(c => c.Id).Titled("ID");
-                        columns.Add(c => c.FirstName).Titled("First Name").Filterable(true);
-                        columns.Add(c => c.LastName).Titled("Last Name");
-                        columns.Add(c => c.MiddleName).Titled("Middle Name");
-                        columns.Add(c => c.DateOfBirth).Titled("Date Of Birth");
-                        columns.Add(c => c.gender.Description).Titled("Gender");
-                        columns.Add(c => c.maritalstatu.Description).Titled("Marital Status");
-                        columns.Add(c => c.medicalprovider.FirstName).Titled("Medical Provider");
-                    }).WithPaging(10).Sortable(true)
-</div>
 
 <p>
     @Html.ActionLink("Create New Patient", "Create")
 </p>
+<div style="width:1000px;">
+    @Html.Grid(Model).Columns(columns =>
+    {
+        columns.Add(c => c.Id).Titled("ID");
+        columns.Add(c => c.FirstName).Titled("First Name").Filterable(true);
+        columns.Add(c => c.LastName).Titled("Last Name");
+        columns.Add(c => c.MiddleName).Titled("Middle Name");
+        columns.Add(c => c.DateOfBirth).Titled("Date Of Birth").Format("{0:dd-MMM-yyyy}");
+        columns.Add(c => c.gender.Description).Titled("Gender");
+        columns.Add(c => c.maritalstatu.Description).Titled("Marital Status");
+        columns.Add(c => c.medicalprovider.FirstName).Titled("Primary Care Provider");
+    }).WithPaging(10).Sortable(true)
+</div>
+
+
 
 <script>
     $(document).ready(function () {
@@ -45,66 +45,66 @@
 </script>
 
 @*<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.MiddleName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.GenderId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.MaritialStatu.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.MedicalProvider.Title)
-        </th>
-        <th></th>
-    </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MiddleName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateOfBirth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GenderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaritialStatu.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MedicalProvider.Title)
+            </th>
+            <th></th>
+        </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Title)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MiddleName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateOfBirth)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Gender.Description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MaritialStatu.Description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MedicalProvider.FirstName)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MiddleName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfBirth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaritialStatu.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MedicalProvider.FirstName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            </td>
+        </tr>
+    }
 
-</table>*@
+    </table>*@
