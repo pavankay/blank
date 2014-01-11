@@ -1,4 +1,5 @@
 ﻿@model Nivarc.Models.patient
+@using Nivarc.Models
 
 @{
     ViewBag.Title = "Create";
@@ -11,12 +12,12 @@
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
-    
+
     @Scripts.Render("~/bundles/jquery")
-    
-    
-    
-    
+
+
+
+
     <div>
 
         <div class="row">
@@ -38,43 +39,109 @@
                     <div class="tab-pane active" id="primarydetails">
                         <div class="col-md-12">
                             @Html.Partial("_PatientPrimaryDetailsCreate", Model)
-                                        </div>
-                                        @*<div class="col-md-4">
-                                            Demographic Sub section
-                                        </div>*@
-                                    </div>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="patientaddress">
                         <div class="col-md-12">
-                            @Html.Partial("_PatientAddressCreate", Model)
-                                        </div>
-                                        @*<div class="col-md-4">
-                                            Problem Sub section
-                                        </div>*@
-                                    </div>
+                            <ul id="addressEditor" style="list-style-type: none">
+                                @if (Model != null && Model.patientaddresses != null)
+                                {
+                                    foreach (patientaddress address in Model.patientaddresses)
+                                    {
+                                        @Html.Partial("_PatientAddressCreate", address)
+                                    }
+                                }
+                            </ul>
+
+                            <a id="addAnotherAddress" href="#">Add another</a>
+
+                            <script type="text/javascript">
+                                $(function () {
+
+                                    if ($("#addressEditor").children().length == 0) {
+                                        $.get('/Patient/PatientAddressEntryRow', function (template) {
+                                            $("#addressEditor").append(template);
+                                        });
+                                    }
+
+                                    $("#addAnotherAddress").click(function () {
+                                        $.get('/Patient/PatientAddressEntryRow', function (template) {
+                                            $("#addressEditor").append(template);
+                                        });
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="Patientcontact">
                         <div class="col-md-12">
-                            @Html.Partial("_PatientContactCreate", Model)
-                                        </div>
-                                        @*<div class="col-md-4">
-                                            Notes Sub section
-                                        </div>*@
-                                    </div>
+                            <ul id="contactEditor" style="list-style-type: none">
+                                @if (Model != null && Model.patientphones != null)
+                                {
+                                    foreach (patientphone phone in Model.patientphones)
+                                    {
+                                        @Html.Partial("_PatientContactCreate", phone)
+                                    }
+                                }
+                            </ul>
+
+                            <a id="addAnotherContact" href="#">Add another</a>
+
+                            <script type="text/javascript">
+                                $(function () {
+
+                                    if ($("#contactEditor").children().length == 0) {
+                                        $.get('/Patient/PatientPhoneEntryRow', function (template) {
+                                            $("#contactEditor").append(template);
+                                        });
+                                    }
+
+                                    $("#addAnotherContact").click(function () {
+                                        $.get('/Patient/PatientPhoneEntryRow', function (template) {
+                                            $("#contactEditor").append(template);
+                                        });
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="patientemail">
                         <div class="col-md-12">
-                            @Html.Partial("_PatientEmailCreate", Model)
-                                        </div>
-                                        @*<div class="col-md-4">
-                                            Orders Sub section
-                                        </div>*@
-                                    </div>
+                            <ul id="emailEditor" style="list-style-type: none">
+                                @if (Model != null && Model.patientemails != null)
+                                {
+                                    foreach (patientemail email in Model.patientemails)
+                                    {
+                                        @Html.Partial("_PatientEmailCreate", email)
+                                    }
+                                }
+                            </ul>
+
+                            <a id="addAnotherEmail" href="#">Add another</a>
+
+                            <script type="text/javascript">
+                                $(function () {
+
+                                    if ($("#emailEditor").children().length == 0) {
+                                        $.get('/Patient/PatientEmailEntryRow', function (template) {
+                                            $("#emailEditor").append(template);
+                                        });
+                                    }
+
+                                    $("#addAnotherEmail").click(function () {
+                                        $.get('/Patient/PatientEmailEntryRow', function (template) {
+                                            $("#emailEditor").append(template);
+                                        });
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="patientinsurance">
                         <div class="col-md-12">
                             @Html.Partial("_PatientInsuranceCreate", Model)
-                                        </div>
-                                        @*<div class="col-md-2">
-                                            medication Sub section
-                                        </div>*@
-                                    </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -96,12 +163,12 @@
         </script>
 
     </div>
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 }
 
 <div>

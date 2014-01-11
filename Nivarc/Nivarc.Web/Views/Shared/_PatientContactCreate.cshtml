@@ -1,15 +1,27 @@
-﻿
+﻿@model Nivarc.Models.patientphone
+@using Nivarc.Infrastructure
+<li>
+    @using (Html.BeginCollectionItem("patientphones"))
+    {
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.Number, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.Number)
+                @Html.ValidationMessageFor(model => model.Number, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.PhoneTypeId, "Phone Type", new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.DropDownList("PhoneTypeId")
+                @Html.ValidationMessageFor(model => model.PhoneTypeId, null, new { @class = "help-inline" })
+            </div>
+        </div>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title></title>
-</head>
-<body>
-    <div>
-        Patient Contact
-    </div>
-</body>
-</html>
-
+        @*<a href="#" onclick="$(this).parent().remove();">Delete</a>*@
+    }
+</li>

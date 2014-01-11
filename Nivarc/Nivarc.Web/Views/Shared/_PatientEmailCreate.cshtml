@@ -1,15 +1,27 @@
-﻿
+﻿@model Nivarc.Models.patientemail
+@using Nivarc.Infrastructure
+<li>
+    @using (Html.BeginCollectionItem("patientemails"))
+    {
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.EmailAddress, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.EmailAddress)
+                @Html.ValidationMessageFor(model => model.EmailAddress, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.EmailTypeId, "Email Type", new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.DropDownList("EmailTypeId")
+                @Html.ValidationMessageFor(model => model.EmailTypeId, null, new { @class = "help-inline" })
+            </div>
+        </div>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title></title>
-</head>
-<body>
-    <div>
-        Patient Email
-    </div>
-</body>
-</html>
-
+        @*<a href="#" onclick="$(this).parent().remove();">Delete</a>*@
+    }
+</li>

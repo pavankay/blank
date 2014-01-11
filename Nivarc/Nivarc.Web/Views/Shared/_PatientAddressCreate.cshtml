@@ -1,30 +1,63 @@
 ﻿@model Nivarc.Models.patientaddress
-
+@using Nivarc.Infrastructure
 <li>
+    @using (Html.BeginCollectionItem("patientaddresses"))
+    {
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.Line1, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.Line1)
+                @Html.ValidationMessageFor(model => model.Line1, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.Line2, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.Line2)
+                @Html.ValidationMessageFor(model => model.Line2, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.City, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.City)
+                @Html.ValidationMessageFor(model => model.City, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.State, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.State)
+                @Html.ValidationMessageFor(model => model.State, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.PostalCode, new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.EditorFor(model => model.PostalCode)
+                @Html.ValidationMessageFor(model => model.PostalCode, null, new { @class = "help-inline" })
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="col-md-2">
+                @Html.LabelFor(model => model.AddressTypeId, "Address Type", new { @class = "control-label" })
+            </div>
+            <div class="controls">
+                @Html.DropDownList("AddressTypeId")
+                @Html.ValidationMessageFor(model => model.AddressTypeId, null, new { @class = "help-inline" })
+            </div>
+        </div>
 
-    @Html.LabelFor(model => model.Line1)
-    @Html.EditorFor(model => model.Line1)
-    @Html.ValidationMessageFor(model => model.Line1)
-
-    @Html.LabelFor(model => model.Line2)
-    @Html.EditorFor(model => model.Line2)
-    @Html.ValidationMessageFor(model => model.Line2)
-
-    @Html.LabelFor(model => model.City)
-    @Html.EditorFor(model => model.City)
-        @Html.ValidationMessageFor(model => model.City)
-
-    @Html.LabelFor(model => model.State)
-    @Html.EditorFor(model => model.State)
-        @Html.ValidationMessageFor(model => model.State)
-
-    @Html.LabelFor(model => model.PostalCode)
-    @Html.EditorFor(model => model.PostalCode)
-        @Html.ValidationMessageFor(model => model.PostalCode)
-
-    @*@Html.LabelFor(model => model.AddressTypeId)
-    @Html.DropDownList(model => model.AddressTypeId)
-    @Html.ValidationMessageFor(model => model.AddressTypeId)*@
-
-    <a href="#" onclick="$(this).parent().remove();">Delete</a>
+        @*<a href="#" onclick="$(this).parent().remove();">Delete</a>*@
+    }
 </li>
