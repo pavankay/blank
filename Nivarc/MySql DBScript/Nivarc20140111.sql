@@ -89,6 +89,32 @@ LOCK TABLES `dosageunittype` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `dosevalue`
+--
+
+DROP TABLE IF EXISTS `dosevalue`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dosevalue` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` longtext NOT NULL,
+  `exatdose` varchar(100) DEFAULT NULL,
+  `mindose` varchar(100) DEFAULT NULL,
+  `maxdose` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `dosevalue`
+--
+
+LOCK TABLES `dosevalue` WRITE;
+/*!40000 ALTER TABLE `dosevalue` DISABLE KEYS */;
+/*!40000 ALTER TABLE `dosevalue` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `emailtype`
 --
 
@@ -137,6 +163,143 @@ INSERT INTO `gender` VALUES (1,'Male'),(2,'Female'),(3,'Other');
 UNLOCK TABLES;
 
 --
+-- Table structure for table `immunization`
+--
+
+DROP TABLE IF EXISTS `immunization`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `immunization` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `PatientId` int(11) NOT NULL,
+  `VaccineId` int(11) NOT NULL,
+  `DoseNumber` int(11) DEFAULT NULL,
+  `AdministeredUnits` int(11) NOT NULL,
+  `ImmunizationRouteId` int(11) NOT NULL,
+  `ImmunizationSiteId` int(11) NOT NULL,
+  `SubstanceLotNumber` varchar(200) DEFAULT NULL,
+  `VaccinationDate` date NOT NULL,
+  `OrderedProviderId` int(11) DEFAULT NULL,
+  `AdministeredProviderId` int(11) DEFAULT NULL,
+  `Note` longtext,
+  PRIMARY KEY (`Id`),
+  KEY `FK_Immunization_Patient` (`PatientId`),
+  KEY `FK_Immunization_Vaccine` (`VaccineId`),
+  KEY `FK_Immunization_ImmunizationRoute` (`ImmunizationRouteId`),
+  KEY `FK_Immunization_ImmunizationSite` (`ImmunizationSiteId`),
+  KEY `FK_Immunization_MedicalProvider1` (`OrderedProviderId`),
+  KEY `FK_Immunization_MedicalProvider2` (`AdministeredProviderId`),
+  CONSTRAINT `FK_Immunization_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Immunization_Vaccine` FOREIGN KEY (`VaccineId`) REFERENCES `vaccine` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Immunization_ImmunizationRoute` FOREIGN KEY (`ImmunizationRouteId`) REFERENCES `immunizationroute` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Immunization_ImmunizationSite` FOREIGN KEY (`ImmunizationSiteId`) REFERENCES `immunizationsite` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Immunization_MedicalProvider1` FOREIGN KEY (`OrderedProviderId`) REFERENCES `medicalprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Immunization_MedicalProvider2` FOREIGN KEY (`AdministeredProviderId`) REFERENCES `medicalprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `immunization`
+--
+
+LOCK TABLES `immunization` WRITE;
+/*!40000 ALTER TABLE `immunization` DISABLE KEYS */;
+/*!40000 ALTER TABLE `immunization` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `immunizationroute`
+--
+
+DROP TABLE IF EXISTS `immunizationroute`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `immunizationroute` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(200) NOT NULL,
+  PRIMARY KEY (`Id`,`Description`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `immunizationroute`
+--
+
+LOCK TABLES `immunizationroute` WRITE;
+/*!40000 ALTER TABLE `immunizationroute` DISABLE KEYS */;
+/*!40000 ALTER TABLE `immunizationroute` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `immunizationsite`
+--
+
+DROP TABLE IF EXISTS `immunizationsite`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `immunizationsite` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(200) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `immunizationsite`
+--
+
+LOCK TABLES `immunizationsite` WRITE;
+/*!40000 ALTER TABLE `immunizationsite` DISABLE KEYS */;
+/*!40000 ALTER TABLE `immunizationsite` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `insuranceplantype`
+--
+
+DROP TABLE IF EXISTS `insuranceplantype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `insuranceplantype` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` longtext NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `insuranceplantype`
+--
+
+LOCK TABLES `insuranceplantype` WRITE;
+/*!40000 ALTER TABLE `insuranceplantype` DISABLE KEYS */;
+/*!40000 ALTER TABLE `insuranceplantype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `insuranceprovider`
+--
+
+DROP TABLE IF EXISTS `insuranceprovider`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `insuranceprovider` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` longtext NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `insuranceprovider`
+--
+
+LOCK TABLES `insuranceprovider` WRITE;
+/*!40000 ALTER TABLE `insuranceprovider` DISABLE KEYS */;
+/*!40000 ALTER TABLE `insuranceprovider` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `investigation`
 --
 
@@ -171,7 +334,7 @@ CREATE TABLE `jobrole` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` varchar(100) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,7 +343,126 @@ CREATE TABLE `jobrole` (
 
 LOCK TABLES `jobrole` WRITE;
 /*!40000 ALTER TABLE `jobrole` DISABLE KEYS */;
+INSERT INTO `jobrole` VALUES (1,'Allergy & Immunology'),(2,'Anesthesiology'),(3,'Audiology'),(4,'Cardiology'),(5,'Cardiovascular Surgery'),(6,'Colon & Rectal Surgery'),(7,'Critical Care Medicine'),(8,'Dermatology'),(9,'Ear, Nose & Throat'),(10,'Emergency Medicine'),(11,'Endocrinology'),(12,'Family Practice'),(13,'Gastroenterology'),(14,'General Surgery'),(15,'Genetics'),(16,'Geriatrics'),(17,'Gynecologic Oncology'),(18,'Gynecology'),(19,'Hand Surgery'),(20,'Hematology/Oncology'),(21,'Immunology'),(22,'Infectious Disease'),(23,'Internal Medicine'),(24,'Licensed Clinical Social Work'),(25,'Licensed Professional Counseling'),(26,'Marriage & Family Therapy'),(27,'Maternal Fetal Medicine'),(28,'Midwifery'),(29,'Neonatal Medicine'),(30,'Nephrology'),(31,'Neurology'),(32,'Neurooncology'),(33,'Neuroophthalmology'),(34,'Neurosurgery'),(35,'Nurse Anesthetist'),(36,'Nurse Midwife'),(37,'Obstetrics & Gynecology'),(38,'Occupational Therapy'),(39,'Oculoplastic Surgery'),(40,'Oncology'),(41,'Ophthalmology'),(42,'Ophthalmology - Retina Vitreous'),(43,'Optometry'),(44,'Oral-Maxillofacial Surgery'),(45,'Orthopedic Surgery'),(46,'Otolaryngology'),(47,'Pain Management'),(48,'Pathology'),(49,'Pediatrics'),(50,'Physical Medicine & Rehabilitation'),(51,'Physical Therapy'),(52,'Plastic Surgery'),(53,'Podiatry'),(54,'Psychiatric Registered Nurse'),(55,'Psychiatry'),(56,'Psychology'),(57,'Pulmonology'),(58,'Radiation Oncology'),(59,'Radiology'),(60,'Reproductive Endocrinology'),(61,'Rheumatology'),(62,'Speech & Language Therapy'),(63,'Sports Medicine'),(64,'Urology'),(65,'Vascular Surgery');
 /*!40000 ALTER TABLE `jobrole` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `labpanel`
+--
+
+DROP TABLE IF EXISTS `labpanel`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `labpanel` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` longtext NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Orders & Observations';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `labpanel`
+--
+
+LOCK TABLES `labpanel` WRITE;
+/*!40000 ALTER TABLE `labpanel` DISABLE KEYS */;
+/*!40000 ALTER TABLE `labpanel` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `labresultflag`
+--
+
+DROP TABLE IF EXISTS `labresultflag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `labresultflag` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `labresultflag`
+--
+
+LOCK TABLES `labresultflag` WRITE;
+/*!40000 ALTER TABLE `labresultflag` DISABLE KEYS */;
+/*!40000 ALTER TABLE `labresultflag` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `labresultstatus`
+--
+
+DROP TABLE IF EXISTS `labresultstatus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `labresultstatus` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `labresultstatus`
+--
+
+LOCK TABLES `labresultstatus` WRITE;
+/*!40000 ALTER TABLE `labresultstatus` DISABLE KEYS */;
+/*!40000 ALTER TABLE `labresultstatus` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `labresultunit`
+--
+
+DROP TABLE IF EXISTS `labresultunit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `labresultunit` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `labresultunit`
+--
+
+LOCK TABLES `labresultunit` WRITE;
+/*!40000 ALTER TABLE `labresultunit` DISABLE KEYS */;
+/*!40000 ALTER TABLE `labresultunit` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `labtest`
+--
+
+DROP TABLE IF EXISTS `labtest`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `labtest` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` longtext NOT NULL,
+  `LabPanelId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `FK_LabTest_LabPanel` (`LabPanelId`),
+  CONSTRAINT `FK_LabTest_LabPanel` FOREIGN KEY (`LabPanelId`) REFERENCES `labpanel` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Orders & Observations';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `labtest`
+--
+
+LOCK TABLES `labtest` WRITE;
+/*!40000 ALTER TABLE `labtest` DISABLE KEYS */;
+/*!40000 ALTER TABLE `labtest` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -208,6 +490,90 @@ INSERT INTO `maritalstatus` VALUES (1,'Single'),(2,'Married'),(3,'Divorced'),(4,
 UNLOCK TABLES;
 
 --
+-- Table structure for table `medicalencounter`
+--
+
+DROP TABLE IF EXISTS `medicalencounter`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `medicalencounter` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `VisitId` int(11) NOT NULL,
+  `MedicalEncounterTypeId` int(11) NOT NULL,
+  `MedicalEncounterPurposeId` int(11) DEFAULT NULL,
+  `PatientProblemID` int(11) DEFAULT NULL,
+  `MedicalProviderId` int(11) DEFAULT NULL,
+  `Notes` longtext,
+  PRIMARY KEY (`Id`),
+  KEY `FK_MedicalEncounter_Vist` (`VisitId`),
+  KEY `FK_MedicalEncounter_MedicalProvider` (`MedicalProviderId`),
+  KEY `FK_MedicalEncounter_MedicalEncounerType` (`MedicalEncounterTypeId`),
+  KEY `FK_MedicalEncounter_MedicalEncounterPurpose` (`MedicalEncounterPurposeId`),
+  KEY `FK_MedicalEncounter_PatientProblem` (`PatientProblemID`),
+  CONSTRAINT `FK_MedicalEncounter_Visit` FOREIGN KEY (`VisitId`) REFERENCES `visit` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_MedicalEncounter_MedicalProvider` FOREIGN KEY (`MedicalProviderId`) REFERENCES `medicalprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_MedicalEncounter_MedicalEncounterType` FOREIGN KEY (`MedicalEncounterTypeId`) REFERENCES `medicalencountertype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_MedicalEncounter_MedicalEncounterPurpose` FOREIGN KEY (`MedicalEncounterPurposeId`) REFERENCES `medicalencounterpurpose` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_MedicalEncounter_PatientProblem` FOREIGN KEY (`PatientProblemID`) REFERENCES `patientproblem` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `medicalencounter`
+--
+
+LOCK TABLES `medicalencounter` WRITE;
+/*!40000 ALTER TABLE `medicalencounter` DISABLE KEYS */;
+/*!40000 ALTER TABLE `medicalencounter` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `medicalencounterpurpose`
+--
+
+DROP TABLE IF EXISTS `medicalencounterpurpose`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `medicalencounterpurpose` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(200) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `medicalencounterpurpose`
+--
+
+LOCK TABLES `medicalencounterpurpose` WRITE;
+/*!40000 ALTER TABLE `medicalencounterpurpose` DISABLE KEYS */;
+/*!40000 ALTER TABLE `medicalencounterpurpose` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `medicalencountertype`
+--
+
+DROP TABLE IF EXISTS `medicalencountertype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `medicalencountertype` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `medicalencountertype`
+--
+
+LOCK TABLES `medicalencountertype` WRITE;
+/*!40000 ALTER TABLE `medicalencountertype` DISABLE KEYS */;
+/*!40000 ALTER TABLE `medicalencountertype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `medicalfacility`
 --
 
@@ -221,7 +587,7 @@ CREATE TABLE `medicalfacility` (
   PRIMARY KEY (`Id`),
   KEY `FK_MedicalFacility_Title` (`TitleId`),
   CONSTRAINT `FK_MedicalFacility_Title` FOREIGN KEY (`TitleId`) REFERENCES `title` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -257,7 +623,7 @@ CREATE TABLE `medicalprovider` (
   CONSTRAINT `FK_MedicalProvider_Gender` FOREIGN KEY (`GenderId`) REFERENCES `gender` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_MedicalProvider_MedicalProviderType` FOREIGN KEY (`MedicalProviderTypeId`) REFERENCES `medicalprovidertype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_MedicalProvider_Title` FOREIGN KEY (`TitleId`) REFERENCES `title` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -441,6 +807,81 @@ LOCK TABLES `medication` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `nivarcroles`
+--
+
+DROP TABLE IF EXISTS `nivarcroles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `nivarcroles` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `nivarcroles`
+--
+
+LOCK TABLES `nivarcroles` WRITE;
+/*!40000 ALTER TABLE `nivarcroles` DISABLE KEYS */;
+INSERT INTO `nivarcroles` VALUES (4,'Patient'),(5,'FamilyMember'),(6,'Doctor'),(7,'Clinician'),(8,'LabTechnician'),(9,'MedicalFacilityAdmin'),(10,'InsuranceFirmAdmin'),(11,'SuperAdmin');
+/*!40000 ALTER TABLE `nivarcroles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `nivarcuserroles`
+--
+
+DROP TABLE IF EXISTS `nivarcuserroles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `nivarcuserroles` (
+  `RoleId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  PRIMARY KEY (`RoleId`,`UserId`),
+  KEY `FK_UserRoles_NivarcRoles` (`RoleId`),
+  KEY `FK_UserRoles_NivarcUsers` (`UserId`),
+  CONSTRAINT `FK_UserRoles_NivarcRoles` FOREIGN KEY (`RoleId`) REFERENCES `nivarcroles` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_UserRoles_NivarcUsers` FOREIGN KEY (`UserId`) REFERENCES `nivarcusers` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `nivarcuserroles`
+--
+
+LOCK TABLES `nivarcuserroles` WRITE;
+/*!40000 ALTER TABLE `nivarcuserroles` DISABLE KEYS */;
+/*!40000 ALTER TABLE `nivarcuserroles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `nivarcusers`
+--
+
+DROP TABLE IF EXISTS `nivarcusers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `nivarcusers` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `UserName` longtext NOT NULL,
+  `Password` varchar(128) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `nivarcusers`
+--
+
+LOCK TABLES `nivarcusers` WRITE;
+/*!40000 ALTER TABLE `nivarcusers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `nivarcusers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `patient`
 --
 
@@ -467,7 +908,7 @@ CREATE TABLE `patient` (
   CONSTRAINT `FK_Patient_MaritalStatus` FOREIGN KEY (`MaritalStatusId`) REFERENCES `maritalstatus` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_Patient_MedicalProvider` FOREIGN KEY (`PrimaryCareProviderId`) REFERENCES `medicalprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_Patient_Title` FOREIGN KEY (`TitleId`) REFERENCES `title` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -501,7 +942,7 @@ CREATE TABLE `patientaddress` (
   KEY `FK_PatientAddress_Patient` (`PatientId`),
   CONSTRAINT `FK_PatientAddress_AddressType` FOREIGN KEY (`AddressTypeId`) REFERENCES `addresstype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientAddress_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -570,6 +1011,40 @@ LOCK TABLES `patientemail` WRITE;
 /*!40000 ALTER TABLE `patientemail` DISABLE KEYS */;
 INSERT INTO `patientemail` VALUES (1,1,'someone@example.com',1);
 /*!40000 ALTER TABLE `patientemail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `patientinsurance`
+--
+
+DROP TABLE IF EXISTS `patientinsurance`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `patientinsurance` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `PatientId` int(11) NOT NULL,
+  `InsuranceProviderId` int(11) NOT NULL,
+  `InsurancePlanTypeId` int(11) DEFAULT NULL,
+  `InsurancePlanId` varchar(60) DEFAULT NULL,
+  `PlanEffectiveDate` date DEFAULT NULL,
+  `PlanExpirationDate` date DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `FK_PatientInsurance_Patient` (`PatientId`),
+  KEY `FK_PatientInsurance_InsuranceProvider` (`InsuranceProviderId`),
+  KEY `FK_PatientInsurance_InsurancePlanType` (`InsurancePlanTypeId`),
+  CONSTRAINT `FK_PatientInsurance_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_PatientInsurance_InsuranceProvider` FOREIGN KEY (`InsuranceProviderId`) REFERENCES `insuranceprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_PatientInsurance_InsurancePlanType` FOREIGN KEY (`InsurancePlanTypeId`) REFERENCES `insuranceplantype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `patientinsurance`
+--
+
+LOCK TABLES `patientinsurance` WRITE;
+/*!40000 ALTER TABLE `patientinsurance` DISABLE KEYS */;
+/*!40000 ALTER TABLE `patientinsurance` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -676,9 +1151,9 @@ CREATE TABLE `patientphone` (
   PRIMARY KEY (`Id`),
   KEY `FK_PatientPhone_PhoneType` (`PhoneTypeId`),
   KEY `FK_PatientPhone_Patient` (`PatientId`),
-  CONSTRAINT `FK_PatientPhone_PhoneType` FOREIGN KEY (`PhoneTypeId`) REFERENCES `phonetype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_PatientPhone_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  CONSTRAINT `FK_PatientPhone_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_PatientPhone_PhoneType` FOREIGN KEY (`PhoneTypeId`) REFERENCES `phonetype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -784,7 +1259,7 @@ CREATE TABLE `phonetype` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` longtext NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -892,7 +1367,7 @@ CREATE TABLE `title` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` varchar(100) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -903,6 +1378,56 @@ LOCK TABLES `title` WRITE;
 /*!40000 ALTER TABLE `title` DISABLE KEYS */;
 INSERT INTO `title` VALUES (1,'Mr.'),(2,'Miss.'),(3,'Mrs.');
 /*!40000 ALTER TABLE `title` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vaccine`
+--
+
+DROP TABLE IF EXISTS `vaccine`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vaccine` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` longtext NOT NULL,
+  `VaccineTypeId` int(11) NOT NULL,
+  `MaxNoOfDoses` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `FK_Vaccine_VaccineType` (`VaccineTypeId`),
+  CONSTRAINT `FK_Vaccine_VaccineType` FOREIGN KEY (`VaccineTypeId`) REFERENCES `vaccinetype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vaccine`
+--
+
+LOCK TABLES `vaccine` WRITE;
+/*!40000 ALTER TABLE `vaccine` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vaccine` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vaccinetype`
+--
+
+DROP TABLE IF EXISTS `vaccinetype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vaccinetype` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(200) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vaccinetype`
+--
+
+LOCK TABLES `vaccinetype` WRITE;
+/*!40000 ALTER TABLE `vaccinetype` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vaccinetype` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -943,6 +1468,79 @@ LOCK TABLES `visit` WRITE;
 /*!40000 ALTER TABLE `visit` DISABLE KEYS */;
 /*!40000 ALTER TABLE `visit` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `vitalsigncode`
+--
+
+DROP TABLE IF EXISTS `vitalsigncode`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vitalsigncode` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Description` varchar(200) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vitalsigncode`
+--
+
+LOCK TABLES `vitalsigncode` WRITE;
+/*!40000 ALTER TABLE `vitalsigncode` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vitalsigncode` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vitalsignobservation`
+--
+
+DROP TABLE IF EXISTS `vitalsignobservation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vitalsignobservation` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `EncounterId` int(11) NOT NULL,
+  `VitalSignCodeId` int(11) NOT NULL,
+  `Value` double DEFAULT NULL,
+  `LabResultUnitId` int(11) DEFAULT NULL,
+  `LabResultFlagId` int(11) DEFAULT NULL,
+  `LabResultStatusId` int(11) DEFAULT NULL,
+  `ReferenceMinimum` double DEFAULT NULL,
+  `ReferenceMaximum` double DEFAULT NULL,
+  `TextValue` longtext,
+  `Notes` longtext,
+  PRIMARY KEY (`Id`),
+  KEY `FK_VitalSignObservation_MedicalEncounter` (`EncounterId`),
+  KEY `FK_VitalSignObservation_VitalSignCode` (`VitalSignCodeId`),
+  KEY `FK_VitalSignObservation_LabResultUnit` (`LabResultUnitId`),
+  KEY `FK_VitalSignObservation_LabResultFlag` (`LabResultFlagId`),
+  KEY `FK_VitalSignObservation_LabResultStatus` (`LabResultStatusId`),
+  CONSTRAINT `FK_VitalSignObservation_MedicalEncounter` FOREIGN KEY (`EncounterId`) REFERENCES `medicalencounter` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_VitalSignObservation_VitalSignCode` FOREIGN KEY (`VitalSignCodeId`) REFERENCES `vitalsigncode` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_VitalSignObservation_LabResultUnit` FOREIGN KEY (`LabResultUnitId`) REFERENCES `labresultunit` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_VitalSignObservation_LabResultFlag` FOREIGN KEY (`LabResultFlagId`) REFERENCES `labresultflag` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_VitalSignObservation_LabResultStatus` FOREIGN KEY (`LabResultStatusId`) REFERENCES `labresultstatus` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vitalsignobservation`
+--
+
+LOCK TABLES `vitalsignobservation` WRITE;
+/*!40000 ALTER TABLE `vitalsignobservation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vitalsignobservation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'nivarc'
+--
+
+--
+-- Dumping routines for database 'nivarc'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -953,4 +1551,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-11  2:04:13
+-- Dump completed on 2014-01-11 13:10:08

@@ -49,11 +49,25 @@
     <Compile Include="allergy.cs" />
     <Compile Include="Common\NivarcCacheAttribute.cs" />
     <Compile Include="dosageunittype.cs" />
+    <Compile Include="dosevalue.cs" />
     <Compile Include="emailtype.cs" />
     <Compile Include="gender.cs" />
+    <Compile Include="immunization.cs" />
+    <Compile Include="immunizationroute.cs" />
+    <Compile Include="immunizationsite.cs" />
+    <Compile Include="insuranceplantype.cs" />
+    <Compile Include="insuranceprovider.cs" />
     <Compile Include="investigation.cs" />
     <Compile Include="jobrole.cs" />
+    <Compile Include="labpanel.cs" />
+    <Compile Include="labresultflag.cs" />
+    <Compile Include="labresultstatu.cs" />
+    <Compile Include="labresultunit.cs" />
+    <Compile Include="labtest.cs" />
     <Compile Include="maritalstatu.cs" />
+    <Compile Include="medicalencounter.cs" />
+    <Compile Include="medicalencounterpurpose.cs" />
+    <Compile Include="medicalencountertype.cs" />
     <Compile Include="medicalfacility.cs" />
     <Compile Include="medicalprovider.cs" />
     <Compile Include="medicalprovideraddress.cs" />
@@ -62,10 +76,13 @@
     <Compile Include="medicalproviderphone.cs" />
     <Compile Include="medicalprovidertype.cs" />
     <Compile Include="medication.cs" />
+    <Compile Include="nivarcrole.cs" />
+    <Compile Include="nivarcuser.cs" />
     <Compile Include="patient.cs" />
     <Compile Include="patientaddress.cs" />
     <Compile Include="patientallergy.cs" />
     <Compile Include="patientemail.cs" />
+    <Compile Include="patientinsurance.cs" />
     <Compile Include="patientmedication.cs" />
     <Compile Include="patientnote.cs" />
     <Compile Include="patientpersonidentifier.cs" />
@@ -79,7 +96,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="relationtype.cs" />
     <Compile Include="title.cs" />
+    <Compile Include="vaccine.cs" />
+    <Compile Include="vaccinetype.cs" />
     <Compile Include="visit.cs" />
+    <Compile Include="vitalsigncode.cs" />
+    <Compile Include="vitalsignobservation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

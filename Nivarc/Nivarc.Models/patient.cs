@@ -7,9 +7,11 @@ namespace Nivarc.Models
     {
         public patient()
         {
+            this.immunizations = new List<immunization>();
             this.patientaddresses = new List<patientaddress>();
             this.patientallergies = new List<patientallergy>();
             this.patientemails = new List<patientemail>();
+            this.patientinsurances = new List<patientinsurance>();
             this.patientmedications = new List<patientmedication>();
             this.patientpersonidentifiers = new List<patientpersonidentifier>();
             this.patientphones = new List<patientphone>();
@@ -30,12 +32,14 @@ namespace Nivarc.Models
         public Nullable<int> PrimaryCareProviderId { get; set; }
         public int GenderId { get; set; }
         public virtual gender gender { get; set; }
+        public virtual ICollection<immunization> immunizations { get; set; }
         public virtual maritalstatu maritalstatu { get; set; }
         public virtual medicalprovider medicalprovider { get; set; }
         public virtual title title { get; set; }
         public virtual ICollection<patientaddress> patientaddresses { get; set; }
         public virtual ICollection<patientallergy> patientallergies { get; set; }
         public virtual ICollection<patientemail> patientemails { get; set; }
+        public virtual ICollection<patientinsurance> patientinsurances { get; set; }
         public virtual ICollection<patientmedication> patientmedications { get; set; }
         public virtual ICollection<patientpersonidentifier> patientpersonidentifiers { get; set; }
         public virtual ICollection<patientphone> patientphones { get; set; }

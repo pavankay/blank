@@ -7,6 +7,7 @@ namespace Nivarc.Models
     {
         public visit()
         {
+            this.medicalencounters = new List<medicalencounter>();
             this.patientnotes = new List<patientnote>();
             this.prescriptions = new List<prescription>();
         }
@@ -19,6 +20,7 @@ namespace Nivarc.Models
         public int VisitTypeId { get; set; }
         public Nullable<int> ReferredByMedicalProviderId { get; set; }
         public Nullable<int> ReferredByMedicalFacilityId { get; set; }
+        public virtual ICollection<medicalencounter> medicalencounters { get; set; }
         public virtual medicalfacility medicalfacility { get; set; }
         public virtual medicalfacility medicalfacility1 { get; set; }
         public virtual medicalprovider medicalprovider { get; set; }

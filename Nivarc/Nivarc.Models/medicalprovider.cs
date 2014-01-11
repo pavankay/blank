@@ -7,6 +7,9 @@ namespace Nivarc.Models
     {
         public medicalprovider()
         {
+            this.immunizations = new List<immunization>();
+            this.immunizations1 = new List<immunization>();
+            this.medicalencounters = new List<medicalencounter>();
             this.medicalprovideraddresses = new List<medicalprovideraddress>();
             this.medicalprovideremails = new List<medicalprovideremail>();
             this.medicalprovidermedicalfacilities = new List<medicalprovidermedicalfacility>();
@@ -26,6 +29,9 @@ namespace Nivarc.Models
         public int GenderId { get; set; }
         public string WebUrl { get; set; }
         public virtual gender gender { get; set; }
+        public virtual ICollection<immunization> immunizations { get; set; }
+        public virtual ICollection<immunization> immunizations1 { get; set; }
+        public virtual ICollection<medicalencounter> medicalencounters { get; set; }
         public virtual medicalprovidertype medicalprovidertype { get; set; }
         public virtual title title { get; set; }
         public virtual ICollection<medicalprovideraddress> medicalprovideraddresses { get; set; }

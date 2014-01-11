@@ -13,7 +13,7 @@ namespace Nivarc.Models.Mapping
             // Properties
             this.Property(t => t.EmailAddress)
                 .IsRequired()
-                .HasMaxLength(64);
+                .HasMaxLength(200);
 
             // Table & Column Mappings
             this.ToTable("patientemail", "nivarc");
