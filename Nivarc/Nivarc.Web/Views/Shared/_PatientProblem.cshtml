@@ -20,6 +20,7 @@
                     {
                         columns.Add(c => c.Id).Titled("ID");
                         columns.Add(c => c.problem.SnoMedCode).Titled("Problem Code").Filterable(true);
+                        columns.Add(c => c.OnsetDate).Titled("OnSet Date").Format("{0:dd-MMM-yyyy}");
                     }).WithPaging(10)
             </div>
     </div>
