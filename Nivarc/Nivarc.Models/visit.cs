@@ -28,5 +28,6 @@ namespace Nivarc.Models
         public virtual patient patient { get; set; }
         public virtual ICollection<patientnote> patientnotes { get; set; }
         public virtual ICollection<prescription> prescriptions { get; set; }
+        public virtual visittype visittype { get; set; }
     }
 }

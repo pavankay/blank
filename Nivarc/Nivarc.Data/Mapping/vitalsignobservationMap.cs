@@ -28,6 +28,7 @@ namespace Nivarc.Models.Mapping
             this.Property(t => t.LabResultStatusId).HasColumnName("LabResultStatusId");
             this.Property(t => t.ReferenceMinimum).HasColumnName("ReferenceMinimum");
             this.Property(t => t.ReferenceMaximum).HasColumnName("ReferenceMaximum");
+            this.Property(t => t.ObservationDate).HasColumnName("ObservationDate");
             this.Property(t => t.TextValue).HasColumnName("TextValue");
             this.Property(t => t.Notes).HasColumnName("Notes");
 

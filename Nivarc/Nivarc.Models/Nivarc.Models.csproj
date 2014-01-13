@@ -99,6 +99,7 @@
     <Compile Include="vaccine.cs" />
     <Compile Include="vaccinetype.cs" />
     <Compile Include="visit.cs" />
+    <Compile Include="visittype.cs" />
     <Compile Include="vitalsigncode.cs" />
     <Compile Include="vitalsignobservation.cs" />
   </ItemGroup>

@@ -13,9 +13,8 @@ namespace Nivarc.Models
         }
 
         public int Id { get; set; }
-        public int TitleId { get; set; }
+        public string FacilityName { get; set; }
         public string WebUrl { get; set; }
-        public virtual title title { get; set; }
         public virtual ICollection<medicalprovidermedicalfacility> medicalprovidermedicalfacilities { get; set; }
         public virtual ICollection<visit> visits { get; set; }
         public virtual ICollection<visit> visits1 { get; set; }

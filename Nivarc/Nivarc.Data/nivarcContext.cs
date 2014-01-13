@@ -69,6 +69,7 @@ namespace Nivarc.Context
         public DbSet<vaccine> vaccines { get; set; }
         public DbSet<vaccinetype> vaccinetypes { get; set; }
         public DbSet<visit> visits { get; set; }
+        public DbSet<visittype> visittypes { get; set; }
         public DbSet<vitalsigncode> vitalsigncodes { get; set; }
         public DbSet<vitalsignobservation> vitalsignobservations { get; set; }
 
@@ -126,6 +127,7 @@ namespace Nivarc.Context
             modelBuilder.Configurations.Add(new vaccineMap());
             modelBuilder.Configurations.Add(new vaccinetypeMap());
             modelBuilder.Configurations.Add(new visitMap());
+            modelBuilder.Configurations.Add(new visittypeMap());
             modelBuilder.Configurations.Add(new vitalsigncodeMap());
             modelBuilder.Configurations.Add(new vitalsignobservationMap());
         }

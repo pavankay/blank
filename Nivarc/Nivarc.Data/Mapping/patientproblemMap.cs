@@ -16,6 +16,7 @@ namespace Nivarc.Models.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.PatientId).HasColumnName("PatientId");
             this.Property(t => t.ProblemId).HasColumnName("ProblemId");
+            this.Property(t => t.OnsetDate).HasColumnName("OnsetDate");
 
             // Relationships
             this.HasRequired(t => t.patient)

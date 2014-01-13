@@ -23,7 +23,7 @@ namespace Nivarc.Models.Mapping
             this.Property(t => t.MaxNoOfDoses).HasColumnName("MaxNoOfDoses");
 
             // Relationships
-            this.HasRequired(t => t.vaccinetype)
+            this.HasRequired(t => t.visittype)
                 .WithMany(t => t.vaccines)
                 .HasForeignKey(d => d.VaccineTypeId);
 

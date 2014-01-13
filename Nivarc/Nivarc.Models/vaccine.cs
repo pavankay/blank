@@ -15,6 +15,6 @@ namespace Nivarc.Models
         public int VaccineTypeId { get; set; }
         public Nullable<int> MaxNoOfDoses { get; set; }
         public virtual ICollection<immunization> immunizations { get; set; }
-        public virtual vaccinetype vaccinetype { get; set; }
+        public virtual visittype visittype { get; set; }
     }
 }

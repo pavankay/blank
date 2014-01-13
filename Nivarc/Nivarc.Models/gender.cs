@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Nivarc.Models
 {
-    [NivarcCache]
     public partial class gender
     {
         public gender()

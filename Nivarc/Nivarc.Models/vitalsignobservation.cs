@@ -14,6 +14,7 @@ namespace Nivarc.Models
         public Nullable<int> LabResultStatusId { get; set; }
         public Nullable<double> ReferenceMinimum { get; set; }
         public Nullable<double> ReferenceMaximum { get; set; }
+        public System.DateTime ObservationDate { get; set; }
         public string TextValue { get; set; }
         public string Notes { get; set; }
         public virtual labresultflag labresultflag { get; set; }

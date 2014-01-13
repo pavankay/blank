@@ -98,6 +98,7 @@
     <Compile Include="Mapping\vaccineMap.cs" />
     <Compile Include="Mapping\vaccinetypeMap.cs" />
     <Compile Include="Mapping\visitMap.cs" />
+    <Compile Include="Mapping\visittypeMap.cs" />
     <Compile Include="Mapping\vitalsigncodeMap.cs" />
     <Compile Include="Mapping\vitalsignobservationMap.cs" />
     <Compile Include="nivarcContext.cs" />

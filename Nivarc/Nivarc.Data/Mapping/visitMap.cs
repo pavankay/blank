@@ -38,6 +38,9 @@ namespace Nivarc.Models.Mapping
             this.HasRequired(t => t.patient)
                 .WithMany(t => t.visits)
                 .HasForeignKey(d => d.PatientId);
+            this.HasRequired(t => t.visittype)
+                .WithMany(t => t.visits)
+                .HasForeignKey(d => d.VisitTypeId);
 
         }
     }
