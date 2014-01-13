@@ -14,9 +14,7 @@
 </head>
 <body>
     <div>
-
         <div class="row">
-
             <!-- Navigation Buttons -->
             <div class="col-md-3">
                 <ul class="nav nav-pills nav-stacked" id="myTabs">
@@ -31,55 +29,30 @@
 
             <!-- Content -->
             <div class="col-md-9">
-                <div class="tab-content">
+                <div class="tab-content col-md-8">
                     <div class="tab-pane active" id="patientdemographics">
-                        <div class="col-md-8">
                             @Html.Partial("_PatientDemographics", Model)
-                        </div>
-                        <div class="col-md-4">
-                            Demographic Sub section
-                        </div>
                     </div>
                     <div class="tab-pane" id="patientproblem">
                         <div class="col-md-8">
                             @Html.Partial("_PatientProblem", Model.patientproblems)
                         </div>
-                        <div class="col-md-4">
-                            Problem Sub section
-                        </div>
                     </div>
                     <div class="tab-pane" id="patientnotes">
-                        <div class="col-md-8">
                             @Html.Partial("_PatientNotes", Model.visits)
-                        </div>
-                        <div class="col-md-4">
-                            Notes Sub section
-                        </div>
                     </div>
                     <div class="tab-pane" id="PatientOrders">
-                        <div class="col-md-8">
                             @Html.Partial("_PatientOrders", Model)
-                        </div>
-                        <div class="col-md-4">
-                            Orders Sub section
-                        </div>
                     </div>
                     <div class="tab-pane" id="patientmedication">
-                        <div class="col-md-8">
                             @Html.Partial("_PatientMedication", Model.patientmedications)
-                        </div>
-                        <div class="col-md-2">
-                            medication Sub section
-                        </div>
                     </div>
                     <div class="tab-pane" id="PatientVitals">
-                        <div class="col-md-8">
                             @Html.Partial("_PatientVitals", Model)
-                        </div>
-                        <div class="col-md-2">
-                            Vitals Sub section
-                        </div>
                     </div>
+                </div>
+                <div class="col-md-4">
+                    <h4>Recommendations</h4>
                 </div>
             </div>
         </div>
@@ -91,7 +64,6 @@
                 $(this).tab('show')
             });
         </script>
-
     </div>
 </body>
 </html>

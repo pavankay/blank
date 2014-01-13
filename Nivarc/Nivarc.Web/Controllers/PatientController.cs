@@ -19,7 +19,7 @@ namespace Nivarc.Controllers
 
         public ActionResult Autocomplete(string term)
         {
-            int x=0;
+            int x = 0;
             var model = unitOfWork.Repository<medicalprovider>().Filter(m => m.FirstName.StartsWith(term)).GetPage(1, 10, out x).Select(m => m.FirstName + m.LastName);
             //return Json(model, JsonRequestBehavior.AllowGet);
 
