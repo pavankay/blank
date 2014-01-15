@@ -20,7 +20,7 @@
 <p>
     @Html.ActionLink("Create New Patient", "Create")
 </p>
-<div style="width:1000px;">
+<div>
     @Html.Grid(Model).Columns(columns =>
     {
         columns.Add(c => c.Id).Titled("ID");
