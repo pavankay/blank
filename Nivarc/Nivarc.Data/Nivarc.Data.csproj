@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Mapping\addresstypeMap.cs" />
     <Compile Include="Mapping\allergyMap.cs" />
+    <Compile Include="Mapping\allergyreactionMap.cs" />
+    <Compile Include="Mapping\allergytypeMap.cs" />
     <Compile Include="Mapping\dosageunittypeMap.cs" />
     <Compile Include="Mapping\dosevalueMap.cs" />
     <Compile Include="Mapping\emailtypeMap.cs" />

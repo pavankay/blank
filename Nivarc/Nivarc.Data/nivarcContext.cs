@@ -18,7 +18,8 @@ namespace Nivarc.Context
         }
 
         public DbSet<addresstype> addresstypes { get; set; }
-        public DbSet<allergy> allergies { get; set; }
+        public DbSet<allergyreaction> allergyreactions { get; set; }
+        public DbSet<allergytype> allergytypes { get; set; }
         public DbSet<dosageunittype> dosageunittypes { get; set; }
         public DbSet<dosevalue> dosevalues { get; set; }
         public DbSet<emailtype> emailtypes { get; set; }
@@ -76,7 +77,8 @@ namespace Nivarc.Context
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new addresstypeMap());
-            modelBuilder.Configurations.Add(new allergyMap());
+            modelBuilder.Configurations.Add(new allergyreactionMap());
+            modelBuilder.Configurations.Add(new allergytypeMap());
             modelBuilder.Configurations.Add(new dosageunittypeMap());
             modelBuilder.Configurations.Add(new dosevalueMap());
             modelBuilder.Configurations.Add(new emailtypeMap());

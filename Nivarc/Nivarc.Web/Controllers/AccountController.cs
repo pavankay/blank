@@ -16,7 +16,9 @@ namespace Nivarc.Web.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController() 
+        ApplicationDbContext dbContext = new ApplicationDbContext();
+
+        public AccountController()
         {
             IdentityManager = new AuthenticationIdentityManager(new IdentityStore());
         }
@@ -65,6 +67,21 @@ namespace Nivarc.Web.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [Authorize(Roles="Admin")]
+        public ActionResult Index(string searchName = null)
+        {
+            var model = searchName == null ? dbContext.Users.ToList() : dbContext.Users.Where(x => x.UserName.Contains(searchName)).ToList();
+            return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult Edit(string id)
+        {
+            var user = dbContext.Users.Where(x => x.Id == id).Single();
+            var model = new { Roles = dbContext.Roles.ToList(), User = user };
             return View(model);
         }
 

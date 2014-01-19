@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="addresstype.cs" />
     <Compile Include="allergy.cs" />
+    <Compile Include="allergyreaction.cs" />
+    <Compile Include="allergytype.cs" />
     <Compile Include="Common\NivarcCacheAttribute.cs" />
     <Compile Include="dosageunittype.cs" />
     <Compile Include="dosevalue.cs" />

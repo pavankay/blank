@@ -11,16 +11,26 @@ namespace Nivarc.Models.Mapping
             this.HasKey(t => t.Id);
 
             // Properties
+            this.Property(t => t.Description)
+                .IsRequired()
+                .HasMaxLength(1073741823);
+
             // Table & Column Mappings
             this.ToTable("patientallergy", "nivarc");
             this.Property(t => t.Id).HasColumnName("Id");
+            this.Property(t => t.Description).HasColumnName("Description");
             this.Property(t => t.PatientId).HasColumnName("PatientId");
-            this.Property(t => t.AllergyId).HasColumnName("AllergyId");
+            this.Property(t => t.AllergyTypeId).HasColumnName("AllergyTypeId");
+            this.Property(t => t.AllergyReactionId).HasColumnName("AllergyReactionId");
+            this.Property(t => t.FirstObserved).HasColumnName("FirstObserved");
 
             // Relationships
-            this.HasRequired(t => t.allergy)
+            this.HasOptional(t => t.allergyreaction)
                 .WithMany(t => t.patientallergies)
-                .HasForeignKey(d => d.AllergyId);
+                .HasForeignKey(d => d.AllergyReactionId);
+            this.HasRequired(t => t.allergytype)
+                .WithMany(t => t.patientallergies)
+                .HasForeignKey(d => d.AllergyTypeId);
             this.HasRequired(t => t.patient)
                 .WithMany(t => t.patientallergies)
                 .HasForeignKey(d => d.PatientId);

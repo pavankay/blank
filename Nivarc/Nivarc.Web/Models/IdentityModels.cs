@@ -7,7 +7,7 @@ namespace Nivarc.Web.Models
     {  
     }
 
-    public class ApplicationDbContext : IdentityDbContextWithCustomUser<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<User, UserClaim, UserSecret, UserLogin, Role, UserRole, Token, UserManagement>
     {
     }
 }
