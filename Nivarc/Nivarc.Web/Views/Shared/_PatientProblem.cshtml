@@ -14,15 +14,24 @@
 </head>
 <body>
     <div>
-        <h4>Patient Problems</h4>
+        <ol class="breadcrumb">
+            <li><a href="../">Home</a></li>
+            <li class="active">E.H.R</li>
+        </ol>
+        <legend>Patient Problems</legend>
+        <div class="form-actions no-color">
+            <div class="controls">
+                <input type="submit" value="Add Problem" class="btn btn-primary" />
+            </div>
+        </div>
         <div>
             @Html.Grid(Model).Columns(columns =>
-                    {
-                        columns.Add(c => c.Id).Titled("ID");
-                        columns.Add(c => c.problem.SnoMedCode).Titled("Problem Code").Filterable(true);
-                        columns.Add(c => c.OnsetDate).Titled("OnSet Date").Format("{0:dd-MMM-yyyy}");
-                    }).WithPaging(10)
-            </div>
+            {
+                columns.Add(c => c.Id).Titled("ID");
+                columns.Add(c => c.problem.SnoMedCode).Titled("Problem Code").Filterable(true);
+                columns.Add(c => c.OnsetDate).Titled("OnSet Date").Format("{0:dd-MMM-yyyy}");
+            }).WithPaging(10).Sortable(true)
+        </div>
     </div>
 </body>
 </html>
