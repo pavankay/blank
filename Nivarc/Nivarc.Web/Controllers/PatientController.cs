@@ -195,6 +195,13 @@ namespace Nivarc.Controllers
             return PartialView("_PatientEmailCreate");
         }
 
+        public ActionResult PatientInsuranceEntryRow()
+        {
+            ViewBag.InsuranceProviderId = new SelectList(unitOfWork.CachedRepository<insuranceprovider>().Get(), "Id", "Description");
+            ViewBag.InsurancePlanTypeId = new SelectList(unitOfWork.CachedRepository<insuranceplantype>().Get(), "Id", "Description");
+            return PartialView("_PatientInsuranceCreate");
+        }
+
         protected override void Dispose(bool disposing)
         {
             unitOfWork.Dispose();

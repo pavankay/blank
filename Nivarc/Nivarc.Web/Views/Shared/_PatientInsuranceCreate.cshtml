@@ -1,15 +1,72 @@
-﻿
+﻿@model Nivarc.Models.patientinsurance
+@using Nivarc.Infrastructure
+<li>
+    @using (Html.BeginCollectionItem("patientinsurances"))
+    {
+        <fieldset>
+            <legend>Insurance Plan</legend>
+            <div class="control-group col-md-12">
+                <div class="col-md-3">
+                    @Html.LabelFor(model => model.InsuranceProviderId, "Insurance Provider", new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    <div class="col-md-9">
+                        @Html.DropDownList("InsuranceProviderId")
+                        @Html.ValidationMessageFor(model => model.InsuranceProviderId, null, new { @class = "help-inline" })
+                    </div>
+                </div>
+            </div>
+            <div class="control-group col-md-12">
+                <div class="col-md-3">
+                    @Html.LabelFor(model => model.InsurancePlanTypeId, "Insurance PlanType", new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    <div class="col-md-9">
+                        @Html.DropDownList("InsurancePlanTypeId")
+                        @Html.ValidationMessageFor(model => model.InsurancePlanTypeId, null, new { @class = "help-inline" })
+                    </div>
+                </div>
+            </div>
+            <div class="control-group col-md-12">
+                <div class="col-md-3">
+                    @Html.LabelFor(model => model.InsurancePlanId, "Policy Number", new { @class = "control-label" })
+                </div>
+                <div class="controls">
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title></title>
-</head>
-<body>
-    <div>
-        Patient Insurance
-    </div>
-</body>
-</html>
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.InsurancePlanId)
+                        @Html.ValidationMessageFor(model => model.InsurancePlanId, null, new { @class = "help-inline" })
+                    </div>
+                </div>
+            </div>
 
+            <div class="control-group col-md-12">
+                <div class="col-md-3">
+
+                    @Html.LabelFor(model => model.PlanEffectiveDate, "Effective Date", new { @class = "control-label" })
+                </div>
+                <div class="controls">
+
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.PlanEffectiveDate)
+                        @Html.ValidationMessageFor(model => model.PlanEffectiveDate, null, new { @class = "help-inline" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group col-md-12">
+                <div class="col-md-3">
+                    @Html.LabelFor(model => model.PlanExpirationDate, "Expiration Date", new { @class = "control-label" })
+                </div>
+                <div class="controls">
+
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.PlanExpirationDate)
+                        @Html.ValidationMessageFor(model => model.PlanExpirationDate, null, new { @class = "help-inline" })
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        @*<a href="#" onclick="$(this).parent().remove();">Delete</a>*@
+    }
+</li>

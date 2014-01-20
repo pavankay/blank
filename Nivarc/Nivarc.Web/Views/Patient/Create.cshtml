@@ -152,7 +152,34 @@
                     </div>
                     <div class="tab-pane" id="patientinsurance">
                         <div class="col-md-12">
-                            @Html.Partial("_PatientInsuranceCreate", Model)
+                            <ul id="insuranceEditor" style="list-style-type: none">
+                                @if (Model != null && Model.patientinsurances != null)
+                                {
+                                    foreach (patientinsurance insurance in Model.patientinsurances)
+                                    {
+                                        @Html.Partial("_PatientInsuranceCreate", insurance)
+                                    }
+                                }
+                            </ul>
+
+                            <a id="addAnotherInsurance" href="#">Add another</a>
+
+                            <script type="text/javascript">
+                                $(function () {
+
+                                    if ($("#insuranceEditor").children().length == 0) {
+                                        $.get('/Patient/PatientInsuranceEntryRow', function (template) {
+                                            $("#insuranceEditor").append(template);
+                                        });
+                                    }
+
+                                    $("#addAnotherInsurance").click(function () {
+                                        $.get('/Patient/PatientInsuranceEntryRow', function (template) {
+                                            $("#insuranceEditor").append(template);
+                                        });
+                                    });
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>
@@ -161,9 +188,9 @@
 
         @*<div class="form-actions no-color">*@
         <div class="form-actions no-color">
-            @*<div class="col-md-12">*@
+            @*<div class="col-sm-offset-3 col-md-9">*@
                 <div class="controls">
-                    <input type="submit" value="Create Patient" class="btn btn-info" />
+                    <input type="submit" value="Create Patient" class="btn btn-primary" />
                 </div>
             @*</div>*@
         </div>

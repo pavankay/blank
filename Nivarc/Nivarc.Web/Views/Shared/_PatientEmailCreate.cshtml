@@ -3,6 +3,8 @@
 <li>
     @using (Html.BeginCollectionItem("patientemails"))
     {
+         <fieldset>
+            <legend>Email</legend>
         <div class="control-group">
             <div class="col-md-2">
                 @Html.LabelFor(model => model.EmailAddress, new { @class = "control-label" })
@@ -21,7 +23,7 @@
                 @Html.ValidationMessageFor(model => model.EmailTypeId, null, new { @class = "help-inline" })
             </div>
         </div>
-
+             </fieldset>
         @*<a href="#" onclick="$(this).parent().remove();">Delete</a>*@
     }
 </li>

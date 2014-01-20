@@ -3,6 +3,8 @@
 <li>
     @using (Html.BeginCollectionItem("patientphones"))
     {
+         <fieldset>
+            <legend>Contact Details</legend>
         <div class="control-group">
             <div class="col-md-2">
                 @Html.LabelFor(model => model.Number, new { @class = "control-label" })
@@ -21,7 +23,7 @@
                 @Html.ValidationMessageFor(model => model.PhoneTypeId, null, new { @class = "help-inline" })
             </div>
         </div>
-
+             </fieldset>
         @*<a href="#" onclick="$(this).parent().remove();">Delete</a>*@
     }
 </li>
