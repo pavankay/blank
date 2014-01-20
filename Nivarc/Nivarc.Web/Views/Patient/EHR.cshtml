@@ -13,8 +13,8 @@
     @Scripts.Render("~/bundles/jquery")
 </head>
 <body>
-    <div>
-        <div class="row">
+    <div class="container-fluid">
+        <div class="row-fluid">
             <!-- Navigation Buttons -->
             <div class="col-md-3">
                 <ul class="nav nav-pills nav-stacked" id="myTabs">
@@ -29,14 +29,12 @@
 
             <!-- Content -->
             <div class="col-md-9">
-                <div class="tab-content col-md-8">
+                <div class="tab-content col-md-9">
                     <div class="tab-pane active" id="patientdemographics">
                             @Html.Partial("_PatientDemographics", Model)
                     </div>
                     <div class="tab-pane" id="patientproblem">
-                        <div class="col-md-8">
                             @Html.Partial("_PatientProblem", Model.patientproblems)
-                        </div>
                     </div>
                     <div class="tab-pane" id="patientnotes">
                             @Html.Partial("_PatientNotes", Model.visits)
@@ -51,8 +49,18 @@
                             @Html.Partial("_PatientVitals", Model)
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <h4>Recommendations</h4>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h1 class="panel-title">RECOMMENDATIONS</h1>
+                        </div>
+                        <div class="panel-body">
+                            Recommendations...
+                            Recommendations...
+                            Recommendations...
+                        </div>
+                    </div>
+                    @*<h4>Recommendations</h4>*@
                 </div>
             </div>
         </div>
