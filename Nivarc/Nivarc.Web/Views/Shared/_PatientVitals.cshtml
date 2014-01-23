@@ -1,4 +1,6 @@
-﻿
+﻿@model IEnumerable<Nivarc.Models.vitalsignobservation>
+@using GridMvc.Html
+
 
 <!DOCTYPE html>
 
@@ -9,9 +11,31 @@
 </head>
 <body>
     <div>
-        <h4>Vital Signs</h4>
+        <ol class="breadcrumb">
+            <li><a href="../">Home</a></li>
+            <li class="active">E.H.R</li>
+        </ol>
+        <legend>Vital Sign Observations</legend>
+        <div class="form-actions no-color">
+            <div class="controls">
+                <input type="submit" value="Add Vital Sign Observation" class="btn btn-primary" />
+            </div>
+        </div>
+        <div>
+            @Html.Grid(Model).Columns(columns =>
+            {
+                //columns.Add(c => c.Id).Titled("ID");
+                columns.Add(c => c.vitalsigncode.Description).Titled("Vital Sign").Filterable(true);
+                columns.Add(c => c.labresultflag.Description).Titled("Observation").Filterable(true);
+                columns.Add(c => c.Value).Titled("Value").Filterable(true);
+                columns.Add(c => c.labresultunit.Description).Titled("Units").Filterable(true);
+                columns.Add(c => c.ReferenceMinimum).Titled("Ref. Min.").Filterable(true);
+                columns.Add(c => c.ReferenceMaximum).Titled("Ref. Max.").Filterable(true);
+                //columns.Add(c => c.Notes).Titled("Notes").Filterable(true);
+            }).WithPaging(10).Sortable(true)
+        </div>
 
-    </div>
+        </div>
 </body>
 </html>
 

@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Nivarc.Models.patientmedication>
+@using GridMvc.Html
 
 <!DOCTYPE html>
 
@@ -9,7 +10,27 @@
 </head>
 <body>
     <div>
-        <h4>Patient Medictions</h4>
+        <ol class="breadcrumb">
+            <li><a href="../">Home</a></li>
+            <li class="active">E.H.R</li>
+        </ol>
+        <legend>Patient Medication</legend>
+        <div class="form-actions no-color">
+            <div class="controls">
+                <input type="submit" value="Add Medication" class="btn btn-primary" />
+            </div>
+        </div>
+        <div>
+            @Html.Grid(Model).Columns(columns =>
+            {
+                columns.Add(c => c.Id).Titled("ID");
+                columns.Add(c => c.medication.Name).Titled("Medication Name").Filterable(true);
+                columns.Add(c => c.medication.Brand).Titled("Strength").Filterable(true);
+                columns.Add(c => c.prescription.Dosage).Titled("Dosage").Filterable(true);
+                columns.Add(c => c.prescription.dosageunittype.Description).Titled("Dosage Unit").Filterable(true);
+                columns.Add(c => c.prescription.visit.medicalprovider.FirstName).Titled("Prescribed By").Filterable(true);
+            }).WithPaging(10).Sortable(true)
+        </div>
     </div>
 </body>
 </html>
