@@ -44,7 +44,11 @@
                         @Html.Partial("_PatientOrders", Model)
                     </div>
                     <div class="tab-pane" id="patientmedication">
-                        @Html.Partial("_PatientMedication", Model.patientmedications)
+                        <div id="patientmedicationHolder">
+                            @Html.Partial("_PatientMedication", Model.patientmedications)
+                        </div>
+                        <div id="editPatientMedicationHolder">
+                        </div>
                     </div>
                     <div class="tab-pane" id="PatientVitals">
                         @foreach (visit vst in Model.visits.Reverse())
@@ -70,7 +74,6 @@
                             Recommendations...
                         </div>
                     </div>
-                    @*<h4>Recommendations</h4>*@
                 </div>
             </div>
         </div>
@@ -80,6 +83,15 @@
             $('#myTabs a').click(function (e) {
                 e.preventDefault()
                 $(this).tab('show')
+            });
+
+            $(function () {
+                $("#addmedication").click(function () {
+                    $.get('/Patient/AddPatientMedication', function (template) {
+                        $("#patientmedicationHolder").hide();
+                        $("#editPatientMedicationHolder").append(template);
+                    });
+                });
             });
         </script>
     </div>
