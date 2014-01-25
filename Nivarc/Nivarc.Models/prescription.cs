@@ -12,14 +12,9 @@ namespace Nivarc.Models
 
         public int Id { get; set; }
         public Nullable<int> PatientId { get; set; }
-        public Nullable<int> VisitId { get; set; }
-        public int MedicationId { get; set; }
-        public string Dosage { get; set; }
-        public Nullable<int> DosageUnitTypeId { get; set; }
-        public virtual dosageunittype dosageunittype { get; set; }
-        public virtual medication medication { get; set; }
+        public Nullable<int> MedicalEncounterId { get; set; }
+        public virtual medicalencounter medicalencounter { get; set; }
         public virtual patient patient { get; set; }
         public virtual ICollection<patientmedication> patientmedications { get; set; }
-        public virtual visit visit { get; set; }
     }
 }

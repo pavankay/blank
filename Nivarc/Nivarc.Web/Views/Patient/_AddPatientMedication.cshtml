@@ -7,22 +7,36 @@
         @Html.AntiForgeryToken()
         <fieldset>
             <legend>Add patient medication</legend>
-            <div class="control-group">
-                @*<div class="controls">
-                       Medication Name: @Html.EditorFor(m =>m.medication.Name, new { @class = "control-label" })
-                    </div>*@
-                <div class="col-md-3">
+            <div class="control-group col-md-12">
+                <div class="col-md-4">
                     @Html.LabelFor(m => m.medication.Name, "Medication Name", new { @class = "control-label" })
                 </div>
-                <div class="controls">
+                <div class="controls col-md-8">
                     @Html.Hidden("PatientId", this.ViewContext.RouteData.Values["id"])
                     @Html.DropDownList("MedicationId")
                 </div>
             </div>
-        </fieldset>
-        <input id="btnMedication" type="button" value="Save" class="btn btn-primary" />
-        <input type="reset" value="Reset" class="btn btn-primary" />
-        <input type="button" id="cancelPatientMedication" value="Cancel" class="btn btn-primary" />
+            <div class="control-group col-md-12">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.Dosage, new { @class = "control-label" })
+                </div>
+                <div class="controls col-md-8">
+                    @Html.EditorFor(m => m.Dosage)
+                </div>
+            </div>
+            <div class="control-group col-md-12">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.Frequency, new { @class = "control-label" })
+                </div>
+                <div class="controls  col-md-8">
+                    @Html.EditorFor(m => m.Frequency)
+                </div>
+            </div><br />
+            <input id="btnMedication" type="button" value="Save" class="btn btn-primary" />
+            <input type="reset" value="Reset" class="btn btn-primary" />
+            <input type="button" id="cancelPatientMedication" value="Cancel" class="btn btn-primary" />
+         </fieldset>
+
     }
     <script type="text/javascript">
         $(function () {
