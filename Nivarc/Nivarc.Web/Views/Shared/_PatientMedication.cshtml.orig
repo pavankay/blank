@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Nivarc.Models.patientmedication>
+@using GridMvc.Html
+    <div>
+        <ol class="breadcrumb">
+            <li><a href="../">Home</a></li>
+            <li class="active">E.H.R</li>
+        </ol>
+        <legend>Patient Medication</legend>
+        <div class="form-actions no-color">
+            <div class="controls">
+<<<<<<< HEAD
+                <input type="submit" value="Add Medication" class="btn btn-primary" />
+                @*@using (Ajax.BeginForm("AddMedication", "Patient", null , new AjaxOptions { UpdateTargetId = "_PatientMedicationCreate" }))
+                {
+                    <button type="submit">Add Medication</button>
+                }*@
+=======
+                <a href="#" id="addmedication" class="btn btn-primary">Add Medication</a>
+>>>>>>> 34d8e7167482c2c005eb7d4f6ec5597a8b9fb888
+            </div>
+        </div>
+        <div>
+            @Html.Grid(Model).Columns(columns =>
+            {
+                columns.Add(c => c.Id).Titled("ID");
+                columns.Add(c => c.medication.Name).Titled("Medication Name").Filterable(true);
+                columns.Add(c => c.medication.Brand).Titled("Brand").Filterable(true);
+                columns.Add(c => c.medication.Strength).Titled("Strength").Filterable(true);
+                columns.Add(c => c.prescription.Dosage).Titled("Dosage").Filterable(true);
+                columns.Add(c => c.prescription.dosageunittype.Description).Titled("Dosage Unit").Filterable(true);
+                columns.Add(c => c.prescription.visit.medicalprovider.FirstName).Titled("Prescribed By").Filterable(true);
+            }).WithPaging(10).Sortable(true)
+        </div>
+    </div>
+
