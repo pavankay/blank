@@ -57,10 +57,14 @@
                             {
                                 if (encounter.vitalsignobservations.Count > 0)
                                 {
-                                    @Html.Partial("_PatientVitals", encounter.vitalsignobservations);
+                                    <div id="patientVitalSignHolder">
+                                        @Html.Partial("_PatientVitals", encounter.vitalsignobservations);
+                                    </div>
                                 }
                             }
                         }
+                        <div id="editPatientVitalSignHolder">
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3">

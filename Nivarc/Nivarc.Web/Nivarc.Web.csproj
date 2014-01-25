@@ -255,6 +255,7 @@
     <Content Include="Views\Account\Index.cshtml" />
     <Content Include="Views\Account\Edit.cshtml" />
     <Content Include="Views\Patient\_AddPatientMedication.cshtml" />
+    <Content Include="Views\Shared\_AddPatientVitalSigns.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Shared\EditorTemplates\" />

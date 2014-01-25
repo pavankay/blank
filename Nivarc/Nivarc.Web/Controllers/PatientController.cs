@@ -192,6 +192,14 @@ namespace Nivarc.Controllers
             return PartialView("_PatientMedication", unitOfWork.Repository<patientmedication>().Filter(x => x.PatientId == medication.PatientId).Get());
         }
 
+        public ActionResult AddPatientVitalSign(vitalsignobservation vitalsign)
+        {
+            unitOfWork.Repository<vitalsignobservation>().Insert(vitalsign);
+            unitOfWork.Save();
+            unitOfWork = new UnitOfWork();
+            return PartialView("_PatientVitals", unitOfWork.Repository<vitalsignobservation>().Filter(x => x.medicalencounter.visit.PatientId == vitalsign.medicalencounter.visit.PatientId).Get());
+        }
+
         public ActionResult PatientAddressEntryRow()
         {
             ViewBag.AddressTypeId = new SelectList(unitOfWork.CachedRepository<addresstype>().Get(), "Id", "Description");
