@@ -17,7 +17,11 @@
         <legend>Patient Medication</legend>
         <div class="form-actions no-color">
             <div class="controls">
-                <input type="submit" value="Add Medication" class="btn btn-primary" />
+                @*<input type="submit" value="Add Medication" class="btn btn-primary" />*@
+                @using (Ajax.BeginForm("AddMedication", "Patient", null , new AjaxOptions { UpdateTargetId = "_PatientMedicationCreate" }))
+                {
+                    <button type="submit">Add Medication</button>
+                }
             </div>
         </div>
         <div>
