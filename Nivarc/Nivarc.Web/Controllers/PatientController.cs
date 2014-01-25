@@ -179,7 +179,17 @@ namespace Nivarc.Controllers
 
         public ActionResult AddPatientMedication()
         {
+            ViewBag.MedicationId = new SelectList(unitOfWork.Repository<medication>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0}-{1}", x.Name, x.Strength) }), "Id", "Name");
             return PartialView("_AddPatientMedication");
+        }
+
+        [HttpPost]
+        public ActionResult AddPatientMedication(patientmedication medication)
+        {
+            unitOfWork.Repository<patientmedication>().Insert(medication);
+            unitOfWork.Save();
+            unitOfWork = new UnitOfWork();
+            return PartialView("_PatientMedication", unitOfWork.Repository<patientmedication>().Filter(x => x.PatientId == medication.PatientId).Get());
         }
 
         public ActionResult PatientAddressEntryRow()
