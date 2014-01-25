@@ -7,11 +7,11 @@ namespace Nivarc.Models
     {
         public dosageunittype()
         {
-            this.prescriptions = new List<prescription>();
+            this.patientmedications = new List<patientmedication>();
         }
 
         public int Id { get; set; }
         public string Description { get; set; }
-        public virtual ICollection<prescription> prescriptions { get; set; }
+        public virtual ICollection<patientmedication> patientmedications { get; set; }
     }
 }

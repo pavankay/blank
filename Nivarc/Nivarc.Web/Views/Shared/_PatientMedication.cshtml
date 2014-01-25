@@ -16,11 +16,10 @@
             {
                 columns.Add(c => c.Id).Titled("ID");
                 columns.Add(c => c.medication.Name).Titled("Medication Name").Filterable(true);
-                columns.Add(c => c.medication.Brand).Titled("Brand").Filterable(true);
                 columns.Add(c => c.medication.Strength).Titled("Strength").Filterable(true);
-                columns.Add(c => c.prescription.Dosage).Titled("Dosage").RenderValueAs(c => c.prescription != null ? c.prescription.Dosage : string.Empty).Filterable(true);
-                columns.Add(c => c.prescription.dosageunittype.Description).Titled("Dosage Unit").RenderValueAs(c => c.prescription != null ? c.prescription.dosageunittype.Description : string.Empty);
-                columns.Add(c => c.prescription.visit.medicalprovider.FirstName).Titled("Prescribed By").RenderValueAs(c => c.prescription != null ? c.prescription.visit.medicalprovider.FirstName : string.Empty);
+                columns.Add(c => c.Dosage).Titled("Dosage").Filterable(true);
+                columns.Add(c => c.Frequency).Titled("Frequency").Filterable(true);
+                columns.Add(c => c.prescription.medicalencounter.medicalprovider.FirstName).Titled("Prescribed By").RenderValueAs(c => c.prescription != null ? c.prescription.medicalencounter.medicalprovider.FirstName : string.Empty);
             }).WithPaging(10).Sortable(true)
         </div>
     </div>

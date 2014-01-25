@@ -7,6 +7,7 @@ namespace Nivarc.Models
     {
         public medicalencounter()
         {
+            this.prescriptions = new List<prescription>();
             this.vitalsignobservations = new List<vitalsignobservation>();
         }
 
@@ -22,6 +23,7 @@ namespace Nivarc.Models
         public virtual medicalprovider medicalprovider { get; set; }
         public virtual patientproblem patientproblem { get; set; }
         public virtual visit visit { get; set; }
+        public virtual ICollection<prescription> prescriptions { get; set; }
         public virtual ICollection<vitalsignobservation> vitalsignobservations { get; set; }
     }
 }

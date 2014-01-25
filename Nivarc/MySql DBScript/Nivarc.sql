@@ -1,10 +1,10 @@
-CREATE DATABASE  IF NOT EXISTS `nivarc` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE  IF NOT EXISTS `nivarc` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `nivarc`;
 -- MySQL dump 10.13  Distrib 5.6.13, for Win32 (x86)
 --
--- Host: localhost    Database: nivarc
+-- Host: nivarc.c80ahiejdcfc.us-west-2.rds.amazonaws.com    Database: nivarc
 -- ------------------------------------------------------
--- Server version	5.6.15
+-- Server version	5.6.13-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -52,7 +52,7 @@ CREATE TABLE `allergyreaction` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` longtext NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,7 +76,7 @@ CREATE TABLE `allergytype` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` longtext NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,7 +100,7 @@ CREATE TABLE `dosageunittype` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` longtext NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -109,6 +109,7 @@ CREATE TABLE `dosageunittype` (
 
 LOCK TABLES `dosageunittype` WRITE;
 /*!40000 ALTER TABLE `dosageunittype` DISABLE KEYS */;
+INSERT INTO `dosageunittype` VALUES (1,'Applicatorfuls'),(2,'Bags'),(3,'Bars'),(4,'Capsules'),(5,'Doses'),(6,'Dropperfuls'),(7,'Drops'),(8,'Grams (g)'),(9,'Inhalations'),(10,'Lozenges'),(11,'Micrograms (mcg)'),(12,'Milligrams (mg)'),(13,'Milliliters (ml)'),(14,'Packets'),(15,'Pads'),(16,'Patches'),(17,'Percent (%)'),(18,'Puffs'),(19,'Scoops'),(20,'Shots'),(21,'Sprays'),(22,'Suppositories'),(23,'Syringe'),(24,'Tablets'),(25,'Tablespoons (tbsp)'),(26,'Tablespoons (tbsp)'),(27,'Units (U)');
 /*!40000 ALTER TABLE `dosageunittype` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,7 +127,7 @@ CREATE TABLE `dosevalue` (
   `mindose` varchar(100) DEFAULT NULL,
   `maxdose` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,6 +136,7 @@ CREATE TABLE `dosevalue` (
 
 LOCK TABLES `dosevalue` WRITE;
 /*!40000 ALTER TABLE `dosevalue` DISABLE KEYS */;
+INSERT INTO `dosevalue` VALUES (1,'2 Capsules','2','1','2');
 /*!40000 ALTER TABLE `dosevalue` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -288,7 +290,7 @@ CREATE TABLE `insuranceplantype` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` longtext NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,6 +299,7 @@ CREATE TABLE `insuranceplantype` (
 
 LOCK TABLES `insuranceplantype` WRITE;
 /*!40000 ALTER TABLE `insuranceplantype` DISABLE KEYS */;
+INSERT INTO `insuranceplantype` VALUES (1,'Health Plan');
 /*!40000 ALTER TABLE `insuranceplantype` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -311,7 +314,7 @@ CREATE TABLE `insuranceprovider` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Description` longtext NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -320,6 +323,7 @@ CREATE TABLE `insuranceprovider` (
 
 LOCK TABLES `insuranceprovider` WRITE;
 /*!40000 ALTER TABLE `insuranceprovider` DISABLE KEYS */;
+INSERT INTO `insuranceprovider` VALUES (1,'Life Insurance Corporation of India'),(2,'Tata AIG Insurance Solutions'),(3,'AVIVA Life Insurance'),(4,'MetLife Insurance'),(5,'ING Vysya Life Insurance'),(6,'Birla Sun Life Financial Services'),(7,'MAX New York Life'),(8,'Bajaj Allianz'),(9,'Bharti AXA Life Insurance');
 /*!40000 ALTER TABLE `insuranceprovider` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -821,9 +825,10 @@ DROP TABLE IF EXISTS `medication`;
 CREATE TABLE `medication` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(100) NOT NULL,
-  `Brand` varchar(100) NOT NULL,
+  `Brand` varchar(100) DEFAULT NULL,
+  `Strength` varchar(100) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -832,6 +837,7 @@ CREATE TABLE `medication` (
 
 LOCK TABLES `medication` WRITE;
 /*!40000 ALTER TABLE `medication` DISABLE KEYS */;
+INSERT INTO `medication` VALUES (1,'Medicine1','Cipla','100mg'),(2,'Medicine2','Ranbaxy','100ml'),(3,'Medicine3','BlueCross','75ml'),(4,'Medicine4','Cipla','75mg');
 /*!40000 ALTER TABLE `medication` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -937,7 +943,7 @@ CREATE TABLE `patient` (
   CONSTRAINT `FK_Patient_MaritalStatus` FOREIGN KEY (`MaritalStatusId`) REFERENCES `maritalstatus` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_Patient_MedicalProvider` FOREIGN KEY (`PrimaryCareProviderId`) REFERENCES `medicalprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_Patient_Title` FOREIGN KEY (`TitleId`) REFERENCES `title` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -946,7 +952,7 @@ CREATE TABLE `patient` (
 
 LOCK TABLES `patient` WRITE;
 /*!40000 ALTER TABLE `patient` DISABLE KEYS */;
-INSERT INTO `patient` VALUES (1,1,'First Name','Last Name','Middle name','1980-01-01',NULL,1,1,1);
+INSERT INTO `patient` VALUES (1,1,'First Name','Last Name','Middle name','1980-01-01',NULL,1,1,1),(2,1,'Test',NULL,NULL,'2011-11-11',NULL,1,1,1);
 /*!40000 ALTER TABLE `patient` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -971,7 +977,7 @@ CREATE TABLE `patientaddress` (
   KEY `FK_PatientAddress_Patient` (`PatientId`),
   CONSTRAINT `FK_PatientAddress_AddressType` FOREIGN KEY (`AddressTypeId`) REFERENCES `addresstype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientAddress_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -980,7 +986,7 @@ CREATE TABLE `patientaddress` (
 
 LOCK TABLES `patientaddress` WRITE;
 /*!40000 ALTER TABLE `patientaddress` DISABLE KEYS */;
-INSERT INTO `patientaddress` VALUES (1,'Line1','Line2','City','AP','123456',1,4);
+INSERT INTO `patientaddress` VALUES (1,'Line1','Line2','City','AP','123456',1,4),(2,'xyz 2','xyz','xyz','xyz','1233',2,1);
 /*!40000 ALTER TABLE `patientaddress` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1034,7 +1040,7 @@ CREATE TABLE `patientemail` (
   KEY `FK_PatientEmail_Patient` (`PatientId`),
   CONSTRAINT `FK_PatientEmail_EmailType` FOREIGN KEY (`EmailTypeId`) REFERENCES `emailtype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientEmail_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1043,7 +1049,7 @@ CREATE TABLE `patientemail` (
 
 LOCK TABLES `patientemail` WRITE;
 /*!40000 ALTER TABLE `patientemail` DISABLE KEYS */;
-INSERT INTO `patientemail` VALUES (1,1,'someone@example.com',2);
+INSERT INTO `patientemail` VALUES (1,1,'someone@example.com',2),(2,2,'213@12.dd',1);
 /*!40000 ALTER TABLE `patientemail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1069,7 +1075,7 @@ CREATE TABLE `patientinsurance` (
   CONSTRAINT `FK_PatientInsurance_InsurancePlanType` FOREIGN KEY (`InsurancePlanTypeId`) REFERENCES `insuranceplantype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientInsurance_InsuranceProvider` FOREIGN KEY (`InsuranceProviderId`) REFERENCES `insuranceprovider` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientInsurance_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1078,6 +1084,7 @@ CREATE TABLE `patientinsurance` (
 
 LOCK TABLES `patientinsurance` WRITE;
 /*!40000 ALTER TABLE `patientinsurance` DISABLE KEYS */;
+INSERT INTO `patientinsurance` VALUES (1,2,1,1,'1232','2011-11-11','2011-11-11');
 /*!40000 ALTER TABLE `patientinsurance` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1092,15 +1099,20 @@ CREATE TABLE `patientmedication` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `PatientId` int(11) NOT NULL,
   `MedicationId` int(11) NOT NULL,
+  `Dosage` longtext,
+  `DosageUnitTypeId` int(11) DEFAULT NULL,
+  `Frequency` longtext,
   `PrescriptionId` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   KEY `FK_PatientMedication_Medication` (`MedicationId`),
   KEY `FK_PatientMedication_Patient` (`PatientId`),
   KEY `FK_PatientMedication_Prescription` (`PrescriptionId`),
+  KEY `FK_PatientMedication_DosageUnitType_idx` (`DosageUnitTypeId`),
+  CONSTRAINT `FK_PatientMedication_DosageUnitType` FOREIGN KEY (`DosageUnitTypeId`) REFERENCES `dosageunittype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientMedication_Medication` FOREIGN KEY (`MedicationId`) REFERENCES `medication` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientMedication_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientMedication_Prescription` FOREIGN KEY (`PrescriptionId`) REFERENCES `prescription` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1109,6 +1121,7 @@ CREATE TABLE `patientmedication` (
 
 LOCK TABLES `patientmedication` WRITE;
 /*!40000 ALTER TABLE `patientmedication` DISABLE KEYS */;
+INSERT INTO `patientmedication` VALUES (1,1,1,'50 ml',13,'2 every 6 hours',NULL),(2,1,4,'50 ml',13,'1 every 12 hours',NULL);
 /*!40000 ALTER TABLE `patientmedication` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1187,7 +1200,7 @@ CREATE TABLE `patientphone` (
   KEY `FK_PatientPhone_Patient` (`PatientId`),
   CONSTRAINT `FK_PatientPhone_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_PatientPhone_PhoneType` FOREIGN KEY (`PhoneTypeId`) REFERENCES `phonetype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1196,7 +1209,7 @@ CREATE TABLE `patientphone` (
 
 LOCK TABLES `patientphone` WRITE;
 /*!40000 ALTER TABLE `patientphone` DISABLE KEYS */;
-INSERT INTO `patientphone` VALUES (1,1,'8867286836',3);
+INSERT INTO `patientphone` VALUES (1,1,'8867286836',3),(2,2,'12333',1);
 /*!40000 ALTER TABLE `patientphone` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1318,19 +1331,12 @@ DROP TABLE IF EXISTS `prescription`;
 CREATE TABLE `prescription` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `PatientId` int(11) DEFAULT NULL,
-  `VisitId` int(11) DEFAULT NULL,
-  `MedicationId` int(11) NOT NULL,
-  `Dosage` varchar(100) DEFAULT NULL,
-  `DosageUnitTypeId` int(11) DEFAULT NULL,
+  `MedicalEncounterId` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`),
-  KEY `FK_Prescription_DosageUnitType` (`DosageUnitTypeId`),
-  KEY `FK_Prescription_Medication` (`MedicationId`),
   KEY `FK_Prescription_Patient` (`PatientId`),
-  KEY `FK_Prescription_Visit` (`VisitId`),
-  CONSTRAINT `FK_Prescription_DosageUnitType` FOREIGN KEY (`DosageUnitTypeId`) REFERENCES `dosageunittype` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_Prescription_Medication` FOREIGN KEY (`MedicationId`) REFERENCES `medication` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_Prescription_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_Prescription_Visit` FOREIGN KEY (`VisitId`) REFERENCES `visit` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FK_Prescription_MedicalEncounter` (`MedicalEncounterId`),
+  CONSTRAINT `FK_Prescription_MedicalEncounter` FOREIGN KEY (`MedicalEncounterId`) REFERENCES `medicalencounter` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Prescription_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1566,7 +1572,8 @@ DROP TABLE IF EXISTS `vitalsignobservation`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `vitalsignobservation` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `EncounterId` int(11) NOT NULL,
+  `PatientId` int(11) NOT NULL,
+  `EncounterId` int(11) DEFAULT NULL,
   `VitalSignCodeId` int(11) NOT NULL,
   `Value` double DEFAULT NULL,
   `LabResultUnitId` int(11) DEFAULT NULL,
@@ -1583,6 +1590,8 @@ CREATE TABLE `vitalsignobservation` (
   KEY `FK_VitalSignObservation_LabResultUnit` (`LabResultUnitId`),
   KEY `FK_VitalSignObservation_LabResultFlag` (`LabResultFlagId`),
   KEY `FK_VitalSignObservation_LabResultStatus` (`LabResultStatusId`),
+  KEY `FK_VitalSignObservation_Patient` (`PatientId`),
+  CONSTRAINT `FK_VitalSignObservation_Patient` FOREIGN KEY (`PatientId`) REFERENCES `patient` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_VitalSignObservation_LabResultFlag` FOREIGN KEY (`LabResultFlagId`) REFERENCES `labresultflag` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_VitalSignObservation_LabResultStatus` FOREIGN KEY (`LabResultStatusId`) REFERENCES `labresultstatus` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_VitalSignObservation_LabResultUnit` FOREIGN KEY (`LabResultUnitId`) REFERENCES `labresultunit` (`Id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -1597,7 +1606,7 @@ CREATE TABLE `vitalsignobservation` (
 
 LOCK TABLES `vitalsignobservation` WRITE;
 /*!40000 ALTER TABLE `vitalsignobservation` DISABLE KEYS */;
-INSERT INTO `vitalsignobservation` VALUES (1,1,1,99,3,6,1,NULL,NULL,'2014-01-13',NULL,NULL);
+INSERT INTO `vitalsignobservation` VALUES (1,1,1,1,99,3,6,1,NULL,NULL,'2014-01-13',NULL,NULL);
 /*!40000 ALTER TABLE `vitalsignobservation` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -1610,4 +1619,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-19 13:13:58
+-- Dump completed on 2014-01-25 20:09:22

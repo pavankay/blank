@@ -8,7 +8,6 @@ namespace Nivarc.Models
         public medication()
         {
             this.patientmedications = new List<patientmedication>();
-            this.prescriptions = new List<prescription>();
         }
 
         public int Id { get; set; }
@@ -16,6 +15,5 @@ namespace Nivarc.Models
         public string Brand { get; set; }
         public string Strength { get; set; }
         public virtual ICollection<patientmedication> patientmedications { get; set; }
-        public virtual ICollection<prescription> prescriptions { get; set; }
     }
 }
