@@ -177,6 +177,11 @@ namespace Nivarc.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult AddPatientMedication()
+        {
+            return PartialView("_AddPatientMedication");
+        }
+
         public ActionResult PatientAddressEntryRow()
         {
             ViewBag.AddressTypeId = new SelectList(unitOfWork.CachedRepository<addresstype>().Get(), "Id", "Description");

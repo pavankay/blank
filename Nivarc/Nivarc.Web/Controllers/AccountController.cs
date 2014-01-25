@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Nivarc.Web.Models;
+using System.Data.Entity;
 
 namespace Nivarc.Web.Controllers
 {
@@ -78,11 +79,46 @@ namespace Nivarc.Web.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(string id)
         {
             var user = dbContext.Users.Where(x => x.Id == id).Single();
-            var model = new { Roles = dbContext.Roles.ToList(), User = user };
-            return View(model);
+            ViewBag.Roles = dbContext.Roles.ToList();
+            //AccountViewModel model = new AccountViewModel { Roles = dbContext.Roles.ToList(), User = user };
+            return View(user);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(User user)
+        {
+            var userEdit = dbContext.Users.Where(x => x.Id == user.Id).Single();
+            var roles = dbContext.Roles.ToList();
+            ViewBag.Roles = roles;
+
+            var selectedRoles = user.Roles.Where(x => x.RoleId != "false");
+            var currentRoles = userEdit.Roles;
+            if (ModelState.IsValid)
+            {
+                foreach (var role in roles)
+                {
+                    if (selectedRoles.Any(x => x.RoleId == role.Id) && !currentRoles.Any(x => x.RoleId == role.Id))
+                    {
+                        var newRole = new UserRole { RoleId = role.Id, UserId = user.Id };
+                        currentRoles.Add(newRole);
+                    }
+                    if (currentRoles.Any(x => x.RoleId == role.Id) && !selectedRoles.Any(x => x.RoleId == role.Id))
+                    {
+                        var cRole = currentRoles.First(x => x.RoleId == role.Id);
+                        currentRoles.Remove(cRole);
+                    }
+                }
+                dbContext.Entry(userEdit).State = EntityState.Modified;
+                dbContext.SaveChanges();
+            }
+            ViewBag.SuccessString = "Roles updated successfully";
+            return View();
         }
 
         //

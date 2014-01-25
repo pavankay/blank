@@ -1,5 +1,42 @@
 ﻿@model Microsoft.AspNet.Identity.EntityFramework.User
+@using Microsoft.AspNet.Identity.EntityFramework
 
-<div>
-
+<br /><br />
+@if(Model!=null)
+{ 
+    using (Html.BeginForm())
+{ 
+    @Html.AntiForgeryToken()
+    var roles = (List<Role>)ViewBag.Roles;
+<div class="col-md-6 col-md-offset-3">
+    <fieldset class="form-horizontal">
+        <legend>Change user role</legend>
+        <div class="control-group">
+            <span>User Name:</span> @Html.Label(Model.UserName)
+            @Html.HiddenFor(model => model.Id)
+        </div>
+        <div class="col-md-12">
+            <div>Roles</div>
+            <div class="col-md-10 col-md-offset-1">
+                @{    var i = 0;  }
+                @foreach (var role in roles)
+                {
+                    <div>&nbsp;</div>
+                    @Html.CheckBox(string.Format("Roles[{0}].RoleId", (i++).ToString()), Model.Roles.Any(x => x.RoleId == role.Id), new { @value = role.Id }); <span></span>@role.Name;
+                }
+                </div>
+        </div>
+        <div class="col-md-12">
+            <input type="submit" class="btn btn-primary" value="Save" />
+        </div>
+    </fieldset>
 </div>
+}
+}
+else
+{
+    <div class="col-md-6 col-md-offset-3">
+        <h4>@ViewBag.SuccessString.</h4><br />
+        <a href="/Account/Index" class="btn btn-primary">Back</a>
+    </div>
+}

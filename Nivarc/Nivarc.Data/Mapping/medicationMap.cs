@@ -16,6 +16,9 @@ namespace Nivarc.Models.Mapping
                 .HasMaxLength(100);
 
             this.Property(t => t.Brand)
+                .HasMaxLength(100);
+
+            this.Property(t => t.Strength)
                 .IsRequired()
                 .HasMaxLength(100);
 
@@ -24,6 +27,7 @@ namespace Nivarc.Models.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
             this.Property(t => t.Brand).HasColumnName("Brand");
+            this.Property(t => t.Strength).HasColumnName("Strength");
         }
     }
 }

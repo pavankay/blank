@@ -1,0 +1,23 @@
+﻿@model Nivarc.Models.patientmedication
+
+<br /><br />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <fieldset>
+        <legend>Add patient medication</legend>
+
+    </fieldset>
+    <input type="submit" value="Save" class="btn btn-primary" />
+    <input type="reset" value="Reset" class="btn btn-primary" />
+    <input type="button" id="cancelPatientMedication" value="Cancel" class="btn btn-primary" />
+}
+<script type="text/javascript">
+    $(function () {
+        $("#cancelPatientMedication").click(function () {
+            $("#patientmedicationHolder").show();
+            $("#editPatientMedicationHolder").empty();
+        });
+    });
+</script>
