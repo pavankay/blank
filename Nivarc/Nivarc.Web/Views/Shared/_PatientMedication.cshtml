@@ -18,10 +18,20 @@
                 columns.Add(c => c.medication.Name).Titled("Medication Name").Filterable(true);
                 columns.Add(c => c.medication.Brand).Titled("Brand").Filterable(true);
                 columns.Add(c => c.medication.Strength).Titled("Strength").Filterable(true);
-                columns.Add(c => c.prescription.Dosage).Titled("Dosage").Filterable(true);
-                columns.Add(c => c.prescription.dosageunittype.Description).Titled("Dosage Unit").Filterable(true);
-                columns.Add(c => c.prescription.visit.medicalprovider.FirstName).Titled("Prescribed By").Filterable(true);
+                columns.Add(c => c.prescription.Dosage).Titled("Dosage").RenderValueAs(c => c.prescription != null ? c.prescription.Dosage : string.Empty).Filterable(true);
+                columns.Add(c => c.prescription.dosageunittype.Description).Titled("Dosage Unit").RenderValueAs(c => c.prescription != null ? c.prescription.dosageunittype.Description : string.Empty);
+                columns.Add(c => c.prescription.visit.medicalprovider.FirstName).Titled("Prescribed By").RenderValueAs(c => c.prescription != null ? c.prescription.visit.medicalprovider.FirstName : string.Empty);
             }).WithPaging(10).Sortable(true)
         </div>
     </div>
+<script type="text/javascript">
+    $(function () {
+        $("#addmedication").click(function () {
+            $.get('/Patient/AddPatientMedication/@this.ViewContext.RouteData.Values["id"]', function (template) {
+                $("#patientmedicationHolder").hide();
+                $("#editPatientMedicationHolder").append(template);
+            });
+        });
+    });
+</script>
 

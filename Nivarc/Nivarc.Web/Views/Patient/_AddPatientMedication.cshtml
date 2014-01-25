@@ -1,23 +1,50 @@
 ﻿@model Nivarc.Models.patientmedication
 
 <br /><br />
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
+<div id="addMedicationContainer">
+  @using (Html.BeginForm("AddPatientMedication", "patient", null, FormMethod.Post,  new { id = "addMdedicationForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <fieldset>
+            <legend>Add patient medication</legend>
+            <div class="control-group">
+                @*<div class="controls">
+                       Medication Name: @Html.EditorFor(m =>m.medication.Name, new { @class = "control-label" })
+                    </div>*@
+                <div class="col-md-3">
+                    @Html.LabelFor(m => m.medication.Name, "Medication Name", new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.Hidden("PatientId", this.ViewContext.RouteData.Values["id"])
+                    @Html.DropDownList("MedicationId")
+                </div>
+            </div>
+        </fieldset>
+        <input id="btnMedication" type="button" value="Save" class="btn btn-primary" />
+        <input type="reset" value="Reset" class="btn btn-primary" />
+        <input type="button" id="cancelPatientMedication" value="Cancel" class="btn btn-primary" />
+    }
+    <script type="text/javascript">
+        $(function () {
+            $("#cancelPatientMedication").click(function () {
+                $("#patientmedicationHolder").show();
+                $("#editPatientMedicationHolder").empty();
+            });
 
-    <fieldset>
-        <legend>Add patient medication</legend>
+            $("#btnMedication").click(function () {
+                $.ajax({
+                    url: "/patient/AddPatientMedication/@this.ViewContext.RouteData.Values["id"]",
+                    type: "post",
+                    data: $("#addMdedicationForm").serialize(),
+                    success: function (result) {
+                        $("#editPatientMedicationHolder").empty();
+                        $("#patientmedicationHolder").html(result);
+                        $("#patientmedicationHolder").show();
+                    }
+                });
+            });
 
-    </fieldset>
-    <input type="submit" value="Save" class="btn btn-primary" />
-    <input type="reset" value="Reset" class="btn btn-primary" />
-    <input type="button" id="cancelPatientMedication" value="Cancel" class="btn btn-primary" />
-}
-<script type="text/javascript">
-    $(function () {
-        $("#cancelPatientMedication").click(function () {
-            $("#patientmedicationHolder").show();
-            $("#editPatientMedicationHolder").empty();
         });
-    });
-</script>
+    </script>
+</div>  
+

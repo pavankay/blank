@@ -84,15 +84,6 @@
                 e.preventDefault()
                 $(this).tab('show')
             });
-
-            $(function () {
-                $("#addmedication").click(function () {
-                    $.get('/Patient/AddPatientMedication', function (template) {
-                        $("#patientmedicationHolder").hide();
-                        $("#editPatientMedicationHolder").append(template);
-                    });
-                });
-            });
         </script>
     </div>
 </body>
