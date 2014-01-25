@@ -19,6 +19,7 @@ namespace Nivarc.Models
             this.patientrelativeproblems = new List<patientrelativeproblem>();
             this.prescriptions = new List<prescription>();
             this.visits = new List<visit>();
+            this.vitalsignobservations = new List<vitalsignobservation>();
         }
 
         public int Id { get; set; }
@@ -47,5 +48,6 @@ namespace Nivarc.Models
         public virtual ICollection<patientrelativeproblem> patientrelativeproblems { get; set; }
         public virtual ICollection<prescription> prescriptions { get; set; }
         public virtual ICollection<visit> visits { get; set; }
+        public virtual ICollection<vitalsignobservation> vitalsignobservations { get; set; }
     }
 }

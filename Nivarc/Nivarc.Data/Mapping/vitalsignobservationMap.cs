@@ -20,6 +20,7 @@ namespace Nivarc.Models.Mapping
             // Table & Column Mappings
             this.ToTable("vitalsignobservation", "nivarc");
             this.Property(t => t.Id).HasColumnName("Id");
+            this.Property(t => t.PatientId).HasColumnName("PatientId");
             this.Property(t => t.EncounterId).HasColumnName("EncounterId");
             this.Property(t => t.VitalSignCodeId).HasColumnName("VitalSignCodeId");
             this.Property(t => t.Value).HasColumnName("Value");
@@ -42,9 +43,12 @@ namespace Nivarc.Models.Mapping
             this.HasOptional(t => t.labresultunit)
                 .WithMany(t => t.vitalsignobservations)
                 .HasForeignKey(d => d.LabResultUnitId);
-            this.HasRequired(t => t.medicalencounter)
+            this.HasOptional(t => t.medicalencounter)
                 .WithMany(t => t.vitalsignobservations)
                 .HasForeignKey(d => d.EncounterId);
+            this.HasRequired(t => t.patient)
+                .WithMany(t => t.vitalsignobservations)
+                .HasForeignKey(d => d.PatientId);
             this.HasRequired(t => t.vitalsigncode)
                 .WithMany(t => t.vitalsignobservations)
                 .HasForeignKey(d => d.VitalSignCodeId);

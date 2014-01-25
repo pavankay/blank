@@ -6,7 +6,8 @@ namespace Nivarc.Models
     public partial class vitalsignobservation
     {
         public int Id { get; set; }
-        public int EncounterId { get; set; }
+        public int PatientId { get; set; }
+        public Nullable<int> EncounterId { get; set; }
         public int VitalSignCodeId { get; set; }
         public Nullable<double> Value { get; set; }
         public Nullable<int> LabResultUnitId { get; set; }
@@ -21,6 +22,7 @@ namespace Nivarc.Models
         public virtual labresultstatu labresultstatu { get; set; }
         public virtual labresultunit labresultunit { get; set; }
         public virtual medicalencounter medicalencounter { get; set; }
+        public virtual patient patient { get; set; }
         public virtual vitalsigncode vitalsigncode { get; set; }
     }
 }
