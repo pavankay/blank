@@ -51,7 +51,7 @@
                         </div>
                     </div>
                     <div class="tab-pane" id="PatientVitals">
-                        @foreach (visit vst in Model.visits.Reverse())
+                        @*@foreach (visit vst in Model.visits.Reverse())
                         {
                             foreach (medicalencounter encounter in vst.medicalencounters.Reverse())
                             {
@@ -62,7 +62,11 @@
                                     </div>
                                 }
                             }
-                        }
+                        }*@
+                        
+                        <div id="patientVitalSignHolder">
+                            @Html.Partial("_PatientVitals", Model.vitalsignobservations);
+                        </div>
                         <div id="editPatientVitalSignHolder">
                         </div>
                     </div>

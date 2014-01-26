@@ -2,92 +2,92 @@
 @using Nivarc.Infrastructure
 @model Nivarc.Models.vitalsignobservation
 <li id="vitalSignEditor">
-    @using (Html.BeginCollectionItem("vitalsignobservation"))
+    @*@using (Html.BeginCollectionItem("vitalsignobservation"))*@
+    @using (Html.BeginForm("AddPatientVitalSign", "patient", null, FormMethod.Post, new { id = "addMdedicationForm" }))
     {
-    <legend>Vital Sign Observations</legend>
+        <legend>Vital Sign Observations</legend>
 
-    <fieldset>
+        <fieldset>
 
-        <div class="control-row">
-            <div class="col-md-2">
-                @Html.LabelFor(model => model.vitalsigncode.Description, new { @class = "control-label" })
+            <div class="control-row">
+                <div class="col-md-2">
+                    @Html.LabelFor(model => model.vitalsigncode.Description, new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.DropDownList("VitalSignCodeId")
+                    @Html.ValidationMessageFor(model => model.VitalSignCodeId, null, new { @class = "help-inline" })
+                </div>
             </div>
-            <div class="controls">
-                @Html.DropDownList("VitalSignCodeId")
-                @Html.ValidationMessageFor(model => model.VitalSignCodeId, null, new { @class = "help-inline" })
+            <div class="control-row">
+                <div class="col-md-2">
+                    @Html.LabelFor(model => model.labresultstatu.Description, new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.DropDownList("LabResultStatusId")
+                    @Html.ValidationMessageFor(model => model.LabResultStatusId, null, new { @class = "help-inline" })
+                </div>
             </div>
-        </div>
-        <div class="control-row">
-            <div class="col-md-2">
-                @Html.LabelFor(model => model.labresultstatu.Description, new { @class = "control-label" })
+            <div class="control-row">
+                <div class="col-md-2">
+                    @Html.LabelFor(model => model.Value, new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.EditorFor(model => model.Value)
+                    @Html.ValidationMessageFor(model => model.Value, null, new { @class = "help-inline" })
+                </div>
             </div>
-            <div class="controls">
-                @Html.DropDownList("LabResultStatusId")
-                @Html.ValidationMessageFor(model => model.LabResultStatusId, null, new { @class = "help-inline" })
+            <div class="control-row">
+                <div class="col-md-2">
+                    @Html.LabelFor(model => model.labresultunit.Description, new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.DropDownList("LabResultUnitId")
+                    @Html.ValidationMessageFor(model => model.LabResultUnitId, null, new { @class = "help-inline" })
+                </div>
             </div>
-        </div>
-        <div class="control-row">
-            <div class="col-md-2">
-                @Html.LabelFor(model => model.Value, new { @class = "control-label" })
+            <div class="control-row">
+                <div class="col-md-2">
+                    @Html.LabelFor(model => model.ReferenceMinimum, new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.EditorFor(model => model.ReferenceMinimum)
+                    @Html.ValidationMessageFor(model => model.ReferenceMinimum, null, new { @class = "help-inline" })
+                </div>
             </div>
-            <div class="controls">
-                @Html.EditorFor(model => model.Value)
-                @Html.ValidationMessageFor(model => model.Value, null, new { @class = "help-inline" })
+            <div class="control-row">
+                <div class="col-md-2">
+                    @Html.LabelFor(model => model.ReferenceMaximum, new { @class = "control-label" })
+                </div>
+                <div class="controls">
+                    @Html.EditorFor(model => model.ReferenceMaximum)
+                    @Html.ValidationMessageFor(model => model.ReferenceMaximum, null, new { @class = "help-inline" })
+                </div>
             </div>
-        </div>
-        <div class="control-row">
-            <div class="col-md-2">
-                @Html.LabelFor(model => model.labresultunit.Description, new { @class = "control-label" })
-            </div>
-            <div class="controls">
-                @Html.DropDownList("LabResultUnitId")
-                @Html.ValidationMessageFor(model => model.LabResultUnitId, null, new { @class = "help-inline" })
-            </div>
-        </div>
-        <div class="control-row">
-            <div class="col-md-2">
-                @Html.LabelFor(model => model.ReferenceMinimum, new { @class = "control-label" })
-            </div>
-            <div class="controls">
-                @Html.EditorFor(model => model.ReferenceMinimum)
-                @Html.ValidationMessageFor(model => model.ReferenceMinimum, null, new { @class = "help-inline" })
-            </div>
-        </div>
-        <div class="control-row">
-            <div class="col-md-2">
-                @Html.LabelFor(model => model.ReferenceMaximum, new { @class = "control-label" })
-            </div>
-            <div class="controls">
-                @Html.EditorFor(model => model.ReferenceMaximum)
-                @Html.ValidationMessageFor(model => model.ReferenceMaximum, null, new { @class = "help-inline" })
-            </div>
-        </div>
 
-        <br />
-        <a id="addAnotherVitalSign" href="#">Add Another Vital Sign</a>
+            <br />
+            <a id="addAnotherVitalSign" href="#">Add Another Vital Sign</a>
 
-        <script type="text/javascript">
-            $(function () {
+            <script type="text/javascript">
+                $(function () {
 
-                if ($("#vitalSignEditor").children().length == 0) {
-                    $.get('/Patient/AddPatientVitalSign', function (template) {
-                        $("#vitalSignEditor").append(template);
-                    });
-                }
+                    if ($("#vitalSignEditor").children().length == 0) {
+                        $.get('/Patient/AddPatientVitalSign', function (template) {
+                            $("#vitalSignEditor").append(template);
+                        });
+                    }
 
-                $("#addAnotherVitalSign").click(function () {
-                    $.get('/Patient/AddPatientVitalSign', function (template) {
-                        $("#vitalSignEditor").append(template);
+                    $("#addAnotherVitalSign").click(function () {
+                        $.get('/Patient/AddPatientVitalSign', function (template) {
+                            $("#vitalSignEditor").append(template);
+                        });
                     });
                 });
-            });
-        </script>
+            </script>
 
-        <br />
-        <input id="addPatientVitalSign" type="button" value="Save" class="btn btn-primary" />
-        <input type="reset" value="Reset" class="btn btn-primary" />
-        <input id="cancelPatientVitalSign" type="button" value="Cancel" class="btn btn-primary" />
-    </fieldset>
+            <br />
+            <input id="addPatientVitalSign" type="button" value="Save" class="btn btn-primary" />
+            <input type="reset" value="Reset" class="btn btn-primary" />
+            <input id="cancelPatientVitalSign" type="button" value="Cancel" class="btn btn-primary" />
+        </fieldset>
     }
 </li>
-

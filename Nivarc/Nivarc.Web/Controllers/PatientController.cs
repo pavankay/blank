@@ -192,12 +192,12 @@ namespace Nivarc.Controllers
             return PartialView("_PatientMedication", unitOfWork.Repository<patientmedication>().Filter(x => x.PatientId == medication.PatientId).Get());
         }
 
-        public ActionResult AddPatientVitalSign(vitalsignobservation vitalsign)
+        public ActionResult AddPatientVitalSign()
         {
-            unitOfWork.Repository<vitalsignobservation>().Insert(vitalsign);
-            unitOfWork.Save();
-            unitOfWork = new UnitOfWork();
-            return PartialView("_PatientVitals", unitOfWork.Repository<vitalsignobservation>().Filter(x => x.medicalencounter.visit.PatientId == vitalsign.medicalencounter.visit.PatientId).Get());
+            ViewBag.VitalSignCodeId = new SelectList(unitOfWork.Repository<vitalsigncode>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");
+            ViewBag.LabResultStatusId = new SelectList(unitOfWork.Repository<labresultstatu>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");
+            ViewBag.LabResultUnitId = new SelectList(unitOfWork.Repository<labresultunit>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");
+            return PartialView("_AddPatientVitalSigns");
         }
 
         public ActionResult PatientAddressEntryRow()
