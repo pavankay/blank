@@ -2,44 +2,46 @@
 @using GridMvc.Html
 @using Nivarc.Models
 
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title></title>
-</head>
-<body>
     <div>
-        <ol class="breadcrumb">
-            <li><a href="../">Home</a></li>
-            <li class="active">E.H.R</li>
-        </ol>
-        <legend>Patient Visits & Notes</legend>
-        <div class="form-actions no-color">
-            <div class="controls">
-                <input type="submit" value="Add a Visit" class="btn btn-primary" />
-            </div>
-        </div>
-        <div>
-            @foreach (visit vst in Model.Reverse())
-            {<br />
-                <span><b>Visit Facility: </b>@vst.medicalfacility1.FacilityName</span><br />
-                <span><b>Visit Purpose: </b>@vst.visittype.Description [@vst.StartDateTime.ToShortDateString()]</span>
-
-                @Html.Grid(vst.medicalencounters).Columns(columns =>
-            {
-                columns.Add(c => c.Id).Titled("ID");
-                columns.Add(c => c.medicalencountertype.Description).Titled("Type").Filterable(true);
-                columns.Add(c => c.medicalencounterpurpose.Description).Titled("Purpose").Filterable(true);
-                columns.Add(c => c.patientproblem.problem.SnoMedCode).Titled("Problem").Filterable(true);
-                columns.Add(c => c.patientproblem.OnsetDate).Titled("OnSet Date").Format("{0:dd-MMM-yyyy}");
-                columns.Add(c => c.Notes).Titled("Notes").Filterable(true);
-
-            }).WithPaging(10).Sortable(true)
-            }
+    <ol class="breadcrumb">
+        <li><a href="../">Home</a></li>
+        <li class="active">E.H.R</li>
+    </ol>
+    <legend>Patient Visits & Notes</legend>
+    <div class="form-actions no-color">
+        <div class="controls">
+            <button id="btnCreateVisit" type="button" class="btn btn-primary" data-toggle="modal" data-target="#createVisitHolder">Add a Visit</button>
         </div>
     </div>
-</body>
-</html>
+        @foreach (visit vst in Model.Reverse())
+        {
+            <br />
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span><b>Visit Facility: </b>@vst.medicalfacility.FacilityName</span><br />
+                    <span><b>Visit Purpose: </b>@vst.visittype.Description [@vst.StartDateTime.ToShortDateString()]</span>
+                </div>
+                <div class="panel-body">
+                    @Html.Grid(vst.medicalencounters).Columns(columns =>
+                    {
+                        columns.Add(c => c.Id).Titled("ID");
+                        columns.Add(c => c.medicalencountertype.Description).Titled("Type").Filterable(true);
+                        columns.Add(c => c.medicalencounterpurpose.Description).Titled("Purpose").Filterable(true);
+                        columns.Add(c => c.patientproblem.problem.SnoMedCode).Titled("Problem").Filterable(true);
+                        columns.Add(c => c.patientproblem.OnsetDate).Titled("OnSet Date").Format("{0:dd-MMM-yyyy}");
+                        columns.Add(c => c.Notes).Titled("Notes").Filterable(true);
+
+                    }).WithPaging(10).Sortable(true)
+                </div>
+            </div>
+        }
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#btnCreateVisit").click(function () {
+            $.get('/Patient/CreateVisit/@this.ViewContext.RouteData.Values["id"]', function (template) {
+                $("#createVisitHolder").append(template);
+            });
+        });
+    });
+</script>

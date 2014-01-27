@@ -194,27 +194,29 @@ namespace Nivarc.Controllers
 
         public ActionResult CreateVisit()
         {
-            var medicalFacilityList = new SelectList(unitOfWork.CachedRepository<medicalfacility>().Get(), "Id", "FacilityName");
-            var medicalProviderList = new SelectList(unitOfWork.CachedRepository<medicalprovider>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0} {1}", x.FirstName, x.LastName) }), "Id", "Name");
-
+            int patientId = int.Parse(RouteData.Values["id"].ToString());
             ViewBag.MedicalFacilityId = new SelectList(unitOfWork.CachedRepository<medicalfacility>().Get(), "Id", "FacilityName");
             ViewBag.MedicalProviderId = new SelectList(unitOfWork.CachedRepository<medicalprovider>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0} {1}", x.FirstName, x.LastName) }), "Id", "Name");
             ViewBag.VisitTypeId = new SelectList(unitOfWork.CachedRepository<visittype>().Get(), "Id", "Description");
             ViewBag.ReferredByMedicalFacilityId = new SelectList(unitOfWork.CachedRepository<medicalfacility>().Get(), "Id", "FacilityName");
             ViewBag.ReferredByMedicalProviderId = new SelectList(unitOfWork.CachedRepository<medicalprovider>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0} {1}", x.FirstName, x.LastName) }), "Id", "Name");
+            ViewBag.MedicalEncounterTypeId = new SelectList(unitOfWork.CachedRepository<medicalencountertype>().Get(), "Id", "Description");
+            ViewBag.MedicalEncounterPurposeId = new SelectList(unitOfWork.CachedRepository<medicalencounterpurpose>().Get(), "Id", "Description");
+            ViewBag.ProblemId = new SelectList(unitOfWork.CachedRepository<problem>().Get(), "Id", "SnoMedCode");
+            ViewBag.PatientProblemID = new SelectList(unitOfWork.Repository<patientproblem>().Filter(x => x.PatientId == patientId).Get().Select(x => new { Id = x.Id, ProblemName = x.problem.SnoMedCode }), "Id", "ProblemName");
             return PartialView("_CreateVisit");
         }
 
         [HttpPost]
-        public ActionResult CreateVisit(visit patientVisit)
+        public ActionResult CreateVisit([Bind(Exclude="Id")] medicalencounter patientVisit)
         {
-            unitOfWork.Repository<visit>().Insert(patientVisit);
+            unitOfWork.Repository<medicalencounter>().Insert(patientVisit);
             unitOfWork.Save();
             unitOfWork = new UnitOfWork();
-            return PartialView("_PatientNotes", unitOfWork.Repository<visit>().Filter(x => x.PatientId == patientVisit.PatientId).Get());
+            return PartialView("_PatientNotes", unitOfWork.Repository<visit>().Filter(x => x.PatientId == patientVisit.visit.PatientId).Get());
         }
 
-public ActionResult AddPatientVitalSign()
+        public ActionResult AddPatientVitalSign()
         {
             ViewBag.VitalSignCodeId = new SelectList(unitOfWork.Repository<vitalsigncode>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");
             ViewBag.LabResultStatusId = new SelectList(unitOfWork.Repository<labresultstatu>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");

@@ -23,12 +23,12 @@ namespace Nivarc.Models.Mapping
             this.Property(t => t.ReferredByMedicalFacilityId).HasColumnName("ReferredByMedicalFacilityId");
 
             // Relationships
-            this.HasOptional(t => t.medicalfacility)
+            this.HasRequired(t => t.medicalfacility)
                 .WithMany(t => t.visits)
-                .HasForeignKey(d => d.ReferredByMedicalFacilityId);
-            this.HasRequired(t => t.medicalfacility1)
-                .WithMany(t => t.visits1)
                 .HasForeignKey(d => d.MedicalFacilityId);
+            this.HasOptional(t => t.medicalfacility1)
+                .WithMany(t => t.visits1)
+                .HasForeignKey(d => d.ReferredByMedicalFacilityId);
             this.HasRequired(t => t.medicalprovider)
                 .WithMany(t => t.visits)
                 .HasForeignKey(d => d.MedicalProviderId);
