@@ -192,7 +192,29 @@ namespace Nivarc.Controllers
             return PartialView("_PatientMedication", unitOfWork.Repository<patientmedication>().Filter(x => x.PatientId == medication.PatientId).Get());
         }
 
-        public ActionResult AddPatientVitalSign()
+        public ActionResult CreateVisit()
+        {
+            var medicalFacilityList = new SelectList(unitOfWork.CachedRepository<medicalfacility>().Get(), "Id", "FacilityName");
+            var medicalProviderList = new SelectList(unitOfWork.CachedRepository<medicalprovider>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0} {1}", x.FirstName, x.LastName) }), "Id", "Name");
+
+            ViewBag.MedicalFacilityId = new SelectList(unitOfWork.CachedRepository<medicalfacility>().Get(), "Id", "FacilityName");
+            ViewBag.MedicalProviderId = new SelectList(unitOfWork.CachedRepository<medicalprovider>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0} {1}", x.FirstName, x.LastName) }), "Id", "Name");
+            ViewBag.VisitTypeId = new SelectList(unitOfWork.CachedRepository<visittype>().Get(), "Id", "Description");
+            ViewBag.ReferredByMedicalFacilityId = new SelectList(unitOfWork.CachedRepository<medicalfacility>().Get(), "Id", "FacilityName");
+            ViewBag.ReferredByMedicalProviderId = new SelectList(unitOfWork.CachedRepository<medicalprovider>().Get().Select(x => new { Id = x.Id, Name = string.Format("{0} {1}", x.FirstName, x.LastName) }), "Id", "Name");
+            return PartialView("_CreateVisit");
+        }
+
+        [HttpPost]
+        public ActionResult CreateVisit(visit patientVisit)
+        {
+            unitOfWork.Repository<visit>().Insert(patientVisit);
+            unitOfWork.Save();
+            unitOfWork = new UnitOfWork();
+            return PartialView("_PatientNotes", unitOfWork.Repository<visit>().Filter(x => x.PatientId == patientVisit.PatientId).Get());
+        }
+
+public ActionResult AddPatientVitalSign()
         {
             ViewBag.VitalSignCodeId = new SelectList(unitOfWork.Repository<vitalsigncode>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");
             ViewBag.LabResultStatusId = new SelectList(unitOfWork.Repository<labresultstatu>().Get().Select(x => new { Id = x.Id, Description = string.Format("{0}", x.Description) }), "Id", "Description");
