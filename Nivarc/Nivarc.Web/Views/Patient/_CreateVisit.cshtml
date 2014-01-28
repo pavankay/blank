@@ -150,6 +150,9 @@
                 $("#btnPatientVisitReset").click(function () {
                     $("#createVisitForm").trigger('reset');
                     $("#patientvisitproblemPanel").removeAttr('disabled');
+                    $("#patientproblem_PatientId").removeAttr('disabled');
+                    $("#patientproblem_ProblemId").removeAttr('disabled');
+                    $("#patientproblem_OnsetDate").removeAttr('disabled');
                 });
 
                 $("#PatientProblemID").change(function () {

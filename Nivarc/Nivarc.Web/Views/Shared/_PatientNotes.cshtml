@@ -17,9 +17,14 @@
         {
             <br />
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <span><b>Visit Facility: </b>@vst.medicalfacility.FacilityName</span><br />
-                    <span><b>Visit Purpose: </b>@vst.visittype.Description [@vst.StartDateTime.ToShortDateString()]</span>
+                <div class="panel-heading col-md-12">
+                    <div class="col-md-8">
+                        <span><b>Visit Facility: </b>@vst.medicalfacility.FacilityName</span><br />
+                        <span><b>Visit Purpose: </b>@vst.visittype.Description [@vst.StartDateTime.ToShortDateString()]</span>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <button id="btnCreateEncounter" type="button" class="btn btn-primary" onclick="addEncounter('@vst.Id');" data-toggle="modal" data-target="#createVisitHolder">Add Medical Encounter</button>
+                    </div>
                 </div>
                 <div class="panel-body">
                     @Html.Grid(vst.medicalencounters).Columns(columns =>
@@ -43,5 +48,12 @@
                 $("#createVisitHolder").append(template);
             });
         });
+
     });
+
+    var addEncounter = function (visitid) {
+        $.get('/Patient/CreateMedicalEncounter/@this.ViewContext.RouteData.Values["id"]/' + visitid, function (template) {
+            $("#createVisitHolder").append(template);
+        });
+    }
 </script>

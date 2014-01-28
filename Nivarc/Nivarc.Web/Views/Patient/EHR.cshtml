@@ -68,10 +68,15 @@
                             }
                         }*@
                         
-                        <div id="patientVitalSignHolder">
-                            @Html.Partial("_PatientVitals", Model.vitalsignobservations);
-                        </div>
+                        <ol class="breadcrumb">
+                            <li><a href="../">Home</a></li>
+                            <li class="active">E.H.R</li>
+                        </ol>
+                        <legend>Vital Sign Observations</legend>
                         <div id="editPatientVitalSignHolder">
+                        </div>
+                        <div id="patientVitalSignHolder">
+                            @Html.Partial("_PatientVitals", Model.vitalsignobservations)
                         </div>
                     </div>
                 </div>

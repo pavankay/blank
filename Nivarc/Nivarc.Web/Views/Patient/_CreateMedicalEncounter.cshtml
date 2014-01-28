@@ -1,0 +1,132 @@
+﻿@model Nivarc.Models.medicalencounter
+
+<div class="modal-dialog">
+    <div class="modal-content" id="createMedicalEncounterContainer">
+        <div class="modal-header">
+            <h4 class="modal-title">Create Medical Encounter</h4>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm("CreateMedicalEncounter", "patient", null, FormMethod.Post, new { id = "createMedicalEncounterForm" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("VisitId", this.ViewContext.RouteData.Values["visit"])
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Problem Details
+                        <div class="pull-right">
+                            Choose Problem @Html.DropDownList("PatientProblemID", "----------Select----------")
+                        </div>
+                    </div>
+                    <div id="encounterPatientProblemPanel" class="panel-body">
+                        <div class="control-group col-md-12">
+                            <div class="col-md-4">
+                                @Html.Hidden("patientproblem.PatientId", this.ViewContext.RouteData.Values["id"])
+                                @Html.LabelFor(m => m.patientproblem.ProblemId, "Patient Problem", new { @class = "control-label" })
+                            </div>
+                            <div class="controls  col-md-8">
+                                @Html.DropDownList("patientproblem.ProblemId", ViewBag.ProblemId as SelectList, "----------Select----------")
+                            </div>
+                        </div>
+                        <div class="control-group col-md-12">
+                            <div class="col-md-4">
+                                @Html.LabelFor(m => m.patientproblem.OnsetDate, "Onset Date", new { @class = "control-label" })
+                            </div>
+                            <div class="controls  col-md-8">
+                                @Html.EditorFor(m => m.patientproblem.OnsetDate)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Encounter Details
+                    </div>
+                    <div class="panel-body">
+                        <div class="control-group col-md-12">
+                            <div class="col-md-4">
+                                @Html.LabelFor(m => m.MedicalEncounterTypeId, "Encounter Type", new { @class = "control-label" })
+                            </div>
+                            <div class="controls  col-md-8">
+                                @Html.DropDownList("MedicalEncounterTypeId")
+                            </div>
+                        </div>
+                        <div class="control-group col-md-12">
+                            <div class="col-md-4">
+                                @Html.LabelFor(m => m.MedicalEncounterPurposeId, "Encounter Purpose", new { @class = "control-label" })
+                            </div>
+                            <div class="controls  col-md-8">
+                                @Html.DropDownList("MedicalEncounterPurposeId")
+                            </div>
+                        </div>
+                        <div class="control-group col-md-12">
+                            <div class="col-md-4">
+                                @Html.LabelFor(m => m.MedicalProviderId, "Medical Provider", new { @class = "control-label" })
+                            </div>
+                            <div class="controls  col-md-8">
+                                @Html.DropDownList("MedicalProviderId")
+                            </div>
+                        </div>
+                        <div class="control-group col-md-12">
+                            <div class="col-md-4">
+                                @Html.LabelFor(m => m.Notes, new { @class = "control-label" })
+                            </div>
+                            <div class="controls  col-md-8">
+                                @Html.EditorFor(m => m.Notes)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <input id="btnMedicalEncounter" type="button" value="Save" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" />
+                    <input id="btnMedicalEncounterReset" type="reset" value="Reset" class="btn btn-primary" />
+                    <input type="button" id="cancelMedicalEncounter" value="Cancel" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" />
+                </div>
+            }
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $("#cancelMedicalEncounter").click(function () {
+                    $('#createVisitHolder').modal('hide');
+                    $("#createVisitHolder").empty();
+                });
+
+                $("#btnMedicalEncounterReset").click(function () {
+                    $("#createMedicalEncounterForm").trigger('reset');
+                    $("#patientvisitproblemPanel").removeAttr('disabled');
+                    $("#patientproblem_PatientId").removeAttr('disabled');
+                    $("#patientproblem_ProblemId").removeAttr('disabled');
+                    $("#patientproblem_OnsetDate").removeAttr('disabled');
+                });
+
+                $("#PatientProblemID").change(function () {
+                    if($("#PatientProblemID").val())
+                    {
+                        $("#encounterPatientProblemPanel").attr('disabled', true);
+                        $("#patientproblem_PatientId").attr('disabled', true);
+                        $("#patientproblem_ProblemId").attr('disabled', true);
+                        $("#patientproblem_OnsetDate").attr('disabled', true);
+                    }
+                    else
+                    {
+                        $("#encounterPatientProblemPanel").removeAttr('disabled');
+                        $("#patientproblem_PatientId").removeAttr('disabled');
+                        $("#patientproblem_ProblemId").removeAttr('disabled');
+                        $("#patientproblem_OnsetDate").removeAttr('disabled');
+                    }
+                });
+                $("#btnMedicalEncounter").click(function () {
+                    $.ajax({
+                        url: "/patient/CreateVisit/@this.ViewContext.RouteData.Values["id"]",
+                        type: "post",
+                        data: $("#createMedicalEncounterForm").serialize(),
+                        success: function (result) {
+                            $('#createVisitHolder').modal('hide');
+                            $("#createVisitHolder").empty();
+                            $("#patientVisitHolder").html(result);
+                        }
+                    });
+                });
+            });
+        </script>
+    </div>
+</div>

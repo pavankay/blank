@@ -2,27 +2,23 @@
 @using GridMvc.Html
 
 <div>
-    <ol class="breadcrumb">
-        <li><a href="../">Home</a></li>
-        <li class="active">E.H.R</li>
-    </ol>
-    <legend>Vital Sign Observations</legend>
-    <div class="form-actions no-color">
+    <div id="addVitalSignBtnHolder" class="form-actions no-color">
         <div class="controls">
             <a href="#" id="addvitalsign" class="btn btn-primary">Add Vital Sign Observation</a>
         </div>
     </div>
+    <br />
     <div>
         @Html.Grid(Model).Columns(columns =>
             {
                 //columns.Add(c => c.Id).Titled("ID");
                 columns.Add(c => c.vitalsigncode.Description).Titled("Vital Sign").Filterable(true);
-                columns.Add(c => c.labresultflag.Description).Titled("Observation").Filterable(true);
+                columns.Add(c => c.labresultflag.Description).Titled("Observation").RenderValueAs(c => c.labresultflag!=null ? c.labresultflag.Description : string.Empty).Filterable(true);
                 columns.Add(c => c.Value).Titled("Value").Filterable(true);
                 columns.Add(c => c.labresultunit.Description).Titled("Units").Filterable(true);
-                columns.Add(c => c.ReferenceMinimum).Titled("Ref. Min.").Filterable(true);
-                columns.Add(c => c.ReferenceMaximum).Titled("Ref. Max.").Filterable(true);
-                //columns.Add(c => c.Notes).Titled("Notes").Filterable(true);
+                columns.Add(c => c.ReferenceMinimum).Titled("Ref. Min.").RenderValueAs(c => c.ReferenceMinimum.HasValue ? c.ReferenceMinimum.Value.ToString() : string.Empty).Filterable(true);
+                columns.Add(c => c.ReferenceMaximum).Titled("Ref. Max.").RenderValueAs(c => c.ReferenceMaximum.HasValue ? c.ReferenceMaximum.Value.ToString() : string.Empty).Filterable(true);
+                columns.Add(c => c.ObservationDate).Titled("Observation Date").Format("{0:dd-MMM-yyyy}").Filterable(true);
             }).WithPaging(10).Sortable(true)
     </div>
 </div>
@@ -30,7 +26,7 @@
     $(function () {
         $("#addvitalsign").click(function () {
             $.get('/Patient/AddPatientVitalSign/@this.ViewContext.RouteData.Values["id"]', function (template) {
-                $("#patientVitalSignHolder").hide();
+                $("#addVitalSignBtnHolder").hide();
                 $("#editPatientVitalSignHolder").append(template);
             });
         });

@@ -18,6 +18,12 @@ namespace Nivarc.Web
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Patient", action = "Index", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+                name: "Patient",
+                url: "Patient/CreateMedicalEncounter/{id}/{visit}",
+                defaults: new { controller = "Patient", action = "CreateMedicalEncounter" }
+            );
         }
     }
 }
