@@ -35,7 +35,16 @@
                         @Html.Partial("_PatientDemographics", Model)
                     </div>
                     <div class="tab-pane" id="patientproblem">
-                        @Html.Partial("_PatientProblem", Model.patientproblems)
+                        <ol class="breadcrumb">
+                            <li><a href="../">Home</a></li>
+                            <li class="active">E.H.R</li>
+                        </ol>
+                        <legend>Patient Problems</legend>
+                        <div id="createPatientProblemHolder">
+                        </div>
+                        <div id="patientProblemListHolder">
+                            @Html.Partial("_PatientProblem", Model.patientproblems)
+                        </div>
                     </div>
                     <div class="tab-pane" id="patientnotes">
                         <div id="patientVisitHolder">

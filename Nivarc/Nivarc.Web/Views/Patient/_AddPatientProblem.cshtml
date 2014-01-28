@@ -1,0 +1,57 @@
+﻿@model Nivarc.Models.patientproblem
+<div id="PatientProblemEditor">
+@using (Html.BeginForm("AddPatientProblem", "patient", null, FormMethod.Post, new { id = "addPatientProblemForm" }))
+{
+    <div id="encounterPatientProblemPanel">
+        <div class="control-group col-md-12">
+            <div class="col-md-4">
+                @Html.Hidden("PatientId", this.ViewContext.RouteData.Values["id"])
+                @Html.LabelFor(m => m.ProblemId, "Patient Problem", new { @class = "control-label" })
+            </div>
+            <div class="controls  col-md-8">
+                @Html.DropDownList("ProblemId")
+            </div>
+        </div>
+        <div class="control-group col-md-12">
+            <div class="col-md-4">
+                @Html.LabelFor(m => m.OnsetDate, "Onset Date", new { @class = "control-label" })
+            </div>
+            <div class="controls  col-md-8">
+                @Html.EditorFor(m => m.OnsetDate)
+            </div>
+        </div>
+    </div>
+    <div>
+        <input id="btnAddPatientProblem" type="button" value="Save" class="btn btn-primary" />
+        <input id="btnPatientProblemReset" type="reset" value="Reset" class="btn btn-primary" />
+        <input type="button" id="cancelPatientProblem" value="Cancel" class="btn btn-primary" />
+    </div>
+}
+    <script type="text/javascript">
+        $(function () {
+            if ($("#createPatientProblemHolder").children().length > 0) {
+                $("#addPatientProblemBtnHolder").hide();
+            }
+
+            $("#cancelPatientProblem").click(function () {
+                $("#addPatientProblemBtnHolder").show();
+                $("#createPatientProblemHolder").empty();
+            });
+
+            $("#btnAddPatientProblem").click(function () {
+                $.ajax({
+                    url: "/patient/AddPatientProblem/@this.ViewContext.RouteData.Values["id"]",
+                    type: "post",
+                    data: $("#addPatientProblemForm").serialize(),
+                    success: function (result) {
+                        $("#patientProblemListHolder").html(result);
+                        $("#createPatientProblemHolder").empty();
+                        $.get('/Patient/AddPatientProblem/@this.ViewContext.RouteData.Values["id"]', function (template) {
+                            $("#createPatientProblemHolder").append(template);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</div>

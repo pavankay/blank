@@ -1,29 +1,13 @@
 ﻿@model IEnumerable<Nivarc.Models.patientproblem>
 @using GridMvc.Html
 
-@{
-
-}
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title></title>
-</head>
-<body>
     <div>
-        <ol class="breadcrumb">
-            <li><a href="../">Home</a></li>
-            <li class="active">E.H.R</li>
-        </ol>
-        <legend>Patient Problems</legend>
-        <div class="form-actions no-color">
+        <div id="addPatientProblemBtnHolder" class="form-actions no-color">
             <div class="controls">
-                <input type="submit" value="Add Problem" class="btn btn-primary" />
+                <a href="#" id="addPatientProblem" class="btn btn-primary">Add Problem</a>
             </div>
         </div>
+        <br />
         <div>
             @Html.Grid(Model).Columns(columns =>
             {
@@ -33,5 +17,13 @@
             }).WithPaging(10).Sortable(true)
         </div>
     </div>
-</body>
-</html>
+<script type="text/javascript">
+    $(function () {
+        $("#addPatientProblemBtnHolder").click(function () {
+            $.get('/Patient/AddPatientProblem/@this.ViewContext.RouteData.Values["id"]', function (template) {
+                $("#addPatientProblemBtnHolder").hide();
+                $("#createPatientProblemHolder").append(template);
+            });
+        });
+    });
+</script>

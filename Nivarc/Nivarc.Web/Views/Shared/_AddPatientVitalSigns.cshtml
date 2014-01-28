@@ -79,20 +79,6 @@
                 </div>
             </div>
             <br />
-            <script type="text/javascript">
-                $(function () {
-                    if ($("#vitalSignEditor").children().length == 0) {
-                        $.get('/Patient/AddPatientVitalSign', function (template) {
-                            $("#vitalSignEditor").append(template);
-                        });
-                    }
-                    if($("#editPatientVitalSignHolder").children().length>0)
-                    {
-                        $("#addVitalSignBtnHolder").hide();
-                    }
-                });
-            </script>
-            <br />
             <input id="addPatientVitalSign" type="button" value="Save" class="btn btn-primary" />
             <input type="reset" value="Reset" class="btn btn-primary" />
             <input id="cancelPatientVitalSign" type="button" value="Cancel" class="btn btn-primary" />
@@ -100,6 +86,16 @@
     }
     <script type="text/javascript">
         $(function () {
+            if ($("#vitalSignEditor").children().length == 0) {
+                $.get('/Patient/AddPatientVitalSign', function (template) {
+                    $("#vitalSignEditor").append(template);
+                });
+            }
+
+            if ($("#editPatientVitalSignHolder").children().length > 0) {
+                $("#addVitalSignBtnHolder").hide();
+            }
+
             $("#cancelPatientVitalSign").click(function () {
                 $("#addVitalSignBtnHolder").show();
                 $("#editPatientVitalSignHolder").empty();

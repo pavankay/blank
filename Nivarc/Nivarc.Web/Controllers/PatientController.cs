@@ -246,6 +246,22 @@ namespace Nivarc.Controllers
             return PartialView("_PatientVitals", unitOfWork.Repository<vitalsignobservation>().Filter(x => x.PatientId == patientId).Get());
         }
 
+        public ActionResult AddPatientProblem()
+        {
+            ViewBag.ProblemId = new SelectList(unitOfWork.CachedRepository<problem>().Get(), "Id", "SnoMedCode");
+            return PartialView("_AddPatientProblem");
+        }
+
+        [HttpPost]
+        public ActionResult AddPatientProblem([Bind(Exclude = "Id")]patientproblem patientProblem)
+        {
+            int patientId = int.Parse(RouteData.Values["id"].ToString());
+            unitOfWork.Repository<patientproblem>().Insert(patientProblem);
+            unitOfWork.Save();
+            unitOfWork = new UnitOfWork();
+            return PartialView("_PatientProblem", unitOfWork.Repository<patientproblem>().Filter(x => x.PatientId == patientId).Get());
+        }
+
         public ActionResult PatientAddressEntryRow()
         {
             ViewBag.AddressTypeId = new SelectList(unitOfWork.CachedRepository<addresstype>().Get(), "Id", "Description");

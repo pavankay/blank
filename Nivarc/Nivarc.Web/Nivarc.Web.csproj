@@ -259,6 +259,7 @@
     <Content Include="Views\Patient\_CreateVisit.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Patient\_CreateMedicalEncounter.cshtml" />
+    <Content Include="Views\Patient\_AddPatientProblem.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Shared\EditorTemplates\" />
