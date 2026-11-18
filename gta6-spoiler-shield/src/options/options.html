@@ -15,15 +15,16 @@
         <img src="../../icons/icon128.png" width="40" height="40" alt="">
         <div>
           <div class="name">Spoiler Shield</div>
-          <div class="edition">GTA VI edition</div>
+          <div class="edition" id="edition">&nbsp;</div>
         </div>
       </div>
       <nav class="nav" aria-label="Sections">
         <a href="#protection">🛡️ Protection</a>
+        <a href="#packs">📦 Topic packs</a>
         <a href="#categories">🗂️ Categories</a>
         <a href="#rules">🧩 Custom rules</a>
         <a href="#words">🔑 Words</a>
-        <a href="#sites">🌍 Sites</a>
+        <a href="#sites">🌍 Sites & site rules</a>
         <a href="#lab">🧪 Test lab</a>
         <a href="#stats">📊 Stats</a>
         <a href="#backup">💾 Backup</a>
@@ -32,14 +33,14 @@
         <label class="switch big"><input type="checkbox" id="enabled" aria-label="Shield on"><span class="track"><span class="thumb"></span></span></label>
         <span id="sideStatusText">Shield on</span>
       </div>
-      <p class="disclaimer">Unofficial fan tool. Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
+      <p class="disclaimer">Unofficial fan tool. The bundled GTA VI pack is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
     </aside>
 
     <main class="main">
       <section class="welcome" id="welcome" hidden>
         <div>
-          <h1>You're shielded. Go enjoy Leonida blind.</h1>
-          <p>Spoiler Shield is already running on every site. Pick what counts as a spoiler for you below, or keep the defaults: story, characters, missions, map, footage, leaks and secrets are hidden; trailers, reviews and gameplay news stay visible.</p>
+          <h1>You're shielded.</h1>
+          <p>Spoiler Shield is already running on every site with the <b id="welcomePacks">installed</b> topic pack. Keep the defaults, pick what counts as a spoiler under Categories, or add packs for other games and shows under Topic packs.</p>
         </div>
         <button class="btn" id="dismissWelcome">Got it</button>
       </section>
@@ -59,11 +60,11 @@
           </button>
           <button role="radio" data-v="balanced">
             <span class="rc-title">⚖️ Balanced <em>recommended</em></span>
-            <span class="rc-desc">Anything about GTA VI that touches one of your chosen categories.</span>
+            <span class="rc-desc">Anything about one of your topics that touches a category you chose.</span>
           </button>
           <button role="radio" data-v="strict">
             <span class="rc-title">🌑 Blackout</span>
-            <span class="rc-desc">Every mention of GTA VI, even plain news. For the truly spoiler-proof.</span>
+            <span class="rc-desc">Every mention of your topics, even plain news. For the truly spoiler-proof.</span>
           </button>
         </div>
 
@@ -100,7 +101,7 @@
             <span class="switch"><input type="checkbox" data-key="pageShield"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <label class="toggle-row">
-            <span><b>Smart page context</b><small>On pages that are about GTA VI (like r/GTA6 or a GTA VI video), judge every post as GTA VI even if it never names the game.</small></span>
+            <span><b>Smart page context</b><small>On a page that is about one of your topics (a subreddit, a video, a stream, a fan wiki), judge every comment as being about it, even if it never names it.</small></span>
             <span class="switch"><input type="checkbox" data-key="pageContext"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <label class="toggle-row">
@@ -122,11 +123,34 @@
         </div>
       </section>
 
+      <!-- Topic packs -->
+      <section class="card" id="packs">
+        <header class="card-head">
+          <h2>Topic packs</h2>
+          <p>Everything the shield knows about a game or show (names, places, spoiler words, categories) lives in a pack, not in the extension's code. Packs with an update link refresh themselves every few hours, so new spoiler words arrive without an extension update.</p>
+        </header>
+        <div class="pack-list" id="packList"></div>
+        <div class="pack-add">
+          <form class="row" id="subscribeForm">
+            <input type="url" id="subscribeUrl" class="grow" placeholder="https://… link to a pack .json" aria-label="Pack link" required>
+            <button class="btn accent" type="submit">Install from link</button>
+          </form>
+          <div class="row">
+            <label class="btn" for="packFile">⬆ Install from file</label>
+            <input type="file" id="packFile" accept="application/json,.json" class="sr-only">
+            <button class="btn" id="newPackBtn" type="button">✨ Create a pack</button>
+            <span class="grow"></span>
+            <button class="btn" id="updateAllBtn" type="button">↻ Check for updates</button>
+          </div>
+          <p class="hint" id="packMsg" aria-live="polite"></p>
+        </div>
+      </section>
+
       <!-- Categories -->
       <section class="card" id="categories">
         <header class="card-head">
           <h2>Categories</h2>
-          <p>Turn whole topics on or off, then fine-tune the exact words each one listens for. Words marked ★ are "clear spoiler" words used by Relaxed mode.</p>
+          <p>Each pack's categories, with the exact words they listen for. Your edits are kept separately, so they survive pack updates. Words marked ★ are "clear spoiler" words used by Relaxed mode.</p>
         </header>
         <div class="cat-list" id="catList"></div>
       </section>
@@ -145,7 +169,7 @@
           <label><span>Words or phrases, one per line or comma-separated</span>
             <textarea id="ruleTerms" rows="3" placeholder="final, muere, traición*, /capitulo \d+/" required></textarea>
           </label>
-          <label class="check"><input type="checkbox" id="ruleContext" checked> Only when the text is about GTA VI</label>
+          <label class="check"><input type="checkbox" id="ruleContext" checked> Only when the text is about one of your topics</label>
           <div class="row-end">
             <button type="button" class="btn" id="ruleCancel" hidden>Cancel</button>
             <button class="btn accent" type="submit" id="ruleSubmit">Add rule</button>
@@ -162,18 +186,13 @@
         </header>
         <div class="word-block">
           <h3>🔑 Always shield</h3>
-          <p class="hint">Shielded anywhere, even when the page never mentions GTA VI.</p>
+          <p class="hint">Shielded anywhere, even when the text is not about any of your topics.</p>
           <div class="tags" id="keywords"></div>
         </div>
         <div class="word-block">
           <h3>🕊️ Never shield</h3>
           <p class="hint">Text containing any of these is always left alone. Use it to fix false alarms.</p>
           <div class="tags" id="exceptions"></div>
-        </div>
-        <div class="word-block">
-          <h3>📍 Also means GTA VI</h3>
-          <p class="hint">Extra words that tell the shield a text is about the game, like a nickname or a translation.</p>
-          <div class="tags" id="extraContext"></div>
         </div>
       </section>
 
@@ -184,6 +203,20 @@
           <p>The shield runs everywhere except the sites listed here. Subdomains are included.</p>
         </header>
         <div class="tags" id="disabledSites"></div>
+
+        <h3 class="label spaced">Site rules</h3>
+        <p class="hint">How each network structures a post, video, comment or chat line, so the whole card gets covered. These are data too: subscribe to a link to get fixes when a site changes its layout, or add your own.</p>
+        <div class="site-status" id="siteStatus"></div>
+        <form class="row" id="sitesForm">
+          <input type="url" id="sitesUrl" class="grow" placeholder="https://… link to a site rules .json (optional)" aria-label="Site rules link">
+          <button class="btn" type="submit">Save link & update</button>
+        </form>
+        <div class="row">
+          <button class="btn" id="editMySites" type="button">✏️ My site rules</button>
+          <button class="btn" id="viewSites" type="button">👁 View shared rules</button>
+          <span class="grow"></span>
+          <button class="btn danger" id="resetSites" type="button">Reset to built-in</button>
+        </div>
       </section>
 
       <!-- Lab -->
@@ -192,8 +225,8 @@
           <h2>Test lab</h2>
           <p>Paste any headline, tweet or comment to see what the shield would do with your current settings.</p>
         </header>
-        <textarea id="labInput" rows="3" placeholder="GTA 6 ending explained: what happens to Lucia"></textarea>
-        <label class="check"><input type="checkbox" id="labContext"> Pretend this is on a GTA VI page</label>
+        <textarea id="labInput" rows="3" placeholder="Paste a headline, tweet or comment"></textarea>
+        <label class="check"><input type="checkbox" id="labContext"> Pretend this is on a page about one of my topics</label>
         <div class="lab-out" id="labOut" aria-live="polite"></div>
         <div class="examples" id="labExamples"></div>
       </section>
@@ -230,11 +263,29 @@
     </main>
   </div>
 
+  <dialog class="editor" id="editor" aria-labelledby="editorTitle">
+    <form method="dialog" class="editor-inner" id="editorForm">
+      <header class="editor-head">
+        <h2 id="editorTitle">Edit</h2>
+        <button class="link" value="cancel" aria-label="Close">✕</button>
+      </header>
+      <p class="hint" id="editorHint"></p>
+      <textarea id="editorText" spellcheck="false" aria-label="JSON"></textarea>
+      <div class="editor-msg" id="editorMsg" aria-live="polite"></div>
+      <footer class="row-end">
+        <button class="btn" value="cancel">Cancel</button>
+        <button class="btn" type="button" id="editorCheck">Check</button>
+        <button class="btn accent" type="button" id="editorSave">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="../shared/defaults.js"></script>
   <script src="../shared/matcher.js"></script>
   <script src="../shared/settings.js"></script>
+  <script src="../shared/packs.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

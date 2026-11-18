@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Spoiler Shield for GTA VI",
   "short_name": "Spoiler Shield",
-  "version": "1.1.0",
-  "description": "Block GTA VI spoilers across the web. Choose exactly what to hide: story, map, missions, characters, leaks, footage and more.",
+  "version": "1.2.0",
+  "description": "Block game and show spoilers across the web with editable, auto-updating topic packs. Ships with a GTA VI pack: story, map, missions, characters, leaks, footage and more.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -52,6 +52,7 @@
         "src/shared/defaults.js",
         "src/shared/matcher.js",
         "src/shared/settings.js",
+        "src/shared/packs.js",
         "src/content/content.js"
       ],
       "css": [

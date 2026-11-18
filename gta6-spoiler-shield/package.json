@@ -1,13 +1,14 @@
 {
   "name": "gta6-spoiler-shield",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "private": true,
-  "description": "Chrome extension that shields GTA VI spoilers by category.",
+  "description": "Chrome extension that shields spoilers using editable, auto-updating topic packs. Ships with a GTA VI pack.",
   "scripts": {
     "test": "node --test tests/matcher.test.js",
     "test:e2e": "node tests/e2e.js",
     "test:social": "node tests/social.e2e.js",
+    "test:packs": "node tests/packs.e2e.js",
     "icons": "node tools/render-icons.js",
-    "zip": "rm -f spoiler-shield.zip && zip -r spoiler-shield.zip manifest.json icons/*.png src -x '*.DS_Store'"
+    "zip": "rm -f spoiler-shield.zip && zip -r spoiler-shield.zip manifest.json icons/*.png src packs rules -x '*.DS_Store'"
   }
 }

@@ -104,7 +104,7 @@ h1, h2, h3 { margin: 0; line-height: 1.2; }
 .chip-toggle:hover { border-color: var(--pink); }
 .chip-toggle:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 
-input[type="text"], input[type="date"], input[type="search"], textarea, select {
+input[type="text"], input[type="url"], input[type="date"], input[type="search"], textarea, select {
   background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 8px 10px; outline: none; min-width: 0;
 }
 input:focus, textarea:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 20%, transparent); }

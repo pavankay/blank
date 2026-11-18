@@ -1,6 +1,7 @@
 /*
- * Spoiler Shield matcher: turns settings into compiled regular expressions and judges text.
+ * Spoiler Shield matcher: turns settings + topic packs into compiled regular expressions and judges text.
  * Pure logic, no DOM, so it runs in content scripts, the options page, the service worker and Node tests.
+ * It knows nothing about any particular game: every word it looks for comes from a pack or from the user.
  */
 (function (root) {
   'use strict';
@@ -31,7 +32,6 @@
       .replace(/[\u2018\u2019\u02bc\u2032]/g, "'")
       .replace(/([#@])([\p{L}\p{N}_]{3,})/gu, (m, p, t) => p + splitTag(t))
       .toLowerCase()
-      .replace(/#(gta ?vi(?!ce)|gta ?six|grand ?theft ?auto ?(?:vi|6))(?=[a-z])/g, '#$1 ')
       .replace(/([\p{L}])'s(?![\p{L}\p{N}])/gu, '$1')
       .replace(/\s+/g, ' ');
   }
@@ -103,149 +103,216 @@
   }
 
   /**
-   * Build a matcher from settings. The result is cheap to call many times per page.
+   * Build a matcher from settings and the installed packs. Cheap to call many times per page.
+   * @param {object} settings  merged settings (settings.packs holds per-pack state)
+   * @param {object[]} packs   validated packs; disabled ones are skipped
    */
-  function compile(settings) {
+  function compile(settings, packs) {
     const s = Object.assign({}, D.DEFAULT_SETTINGS, settings || {});
-    const catState = s.categories || {};
+    const sensitivity = ['relaxed', 'balanced', 'strict'].includes(s.sensitivity) ? s.sensitivity : 'balanced';
+    const active = (packs || []).filter((p) => !(s.packs && s.packs[p.id] && s.packs[p.id].enabled === false));
+    const multi = active.length > 1;
 
-    const context = {
-      strong: compileEach(D.CONTEXT.strong.concat(s.extraContext || [])),
-      weak: compileEach(D.CONTEXT.weak),
-      names: compileEach(D.CONTEXT.names)
-    };
+    const compiled = [];
+    const allTriggers = [];
+    const everything = [];
+    const compactPrefixes = [];
+    const spoilerWords = [];
 
-    const categories = [];
-    for (const c of D.CATEGORIES) {
-      const st = catState[c.id] || { enabled: c.defaultOn };
-      if (!st.enabled) continue;
-      const terms = applyEdits(c.terms, st);
-      categories.push({
-        id: c.id,
-        label: c.label,
-        emoji: c.emoji,
-        builtin: true,
-        requireContext: true,
-        re: compileList(terms),
-        strongRe: compileList(c.strong.concat((st && st.extra) || [])),
-        soloRe: compileList(c.solo)
+    for (const p of active) {
+      const st = (s.packs && s.packs[p.id]) || {};
+      const extraCtx = st.extraContext || [];
+      const ctx = {
+        strong: compileEach(p.context.strong.concat(extraCtx)),
+        weak: compileEach(p.context.weak),
+        names: compileEach(p.context.names)
+      };
+      const urls = (p.context.urls || []).map((u) => { try { return new RegExp(u, 'i'); } catch (_) { return null; } }).filter(Boolean);
+      const cats = [];
+      for (const c of p.categories) {
+        const cs = (st.categories && st.categories[c.id]) || { enabled: c.defaultOn };
+        if (!cs.enabled) continue;
+        const terms = applyEdits(c.terms, cs);
+        cats.push({
+          key: `${p.id}/${c.id}`, id: c.id, pack: p.id,
+          label: multi ? `${p.short} · ${c.label}` : c.label, emoji: c.emoji, liveStream: !!c.liveStream,
+          re: compileList(terms),
+          strongRe: compileList(c.strong.concat(cs.extra || [])),
+          soloRe: compileList(c.solo)
+        });
+        everything.push(...terms, ...c.solo);
+        allTriggers.push(...c.solo);
+        spoilerWords.push(...terms);
+      }
+      const ctxTerms = p.context.strong.concat(extraCtx, p.context.weak, p.context.names);
+      allTriggers.push(...ctxTerms);
+      everything.push(...ctxTerms);
+      for (const t of p.context.strong.concat(extraCtx)) {
+        if (/^\/|\*/.test(t)) continue;
+        const compact = normalize(t).replace(/[^\p{L}\p{N}]/gu, '');
+        if (compact.length >= 3) compactPrefixes.push(compact);
+      }
+      compiled.push({
+        id: p.id, name: p.name, short: p.short, ctx, urls, cats,
+        threshold: ((p.threshold || D.CONTEXT_THRESHOLD)[sensitivity])
       });
     }
 
+    // Rules that belong to no pack: the user's custom rules and "always shield" keywords.
+    const globalCats = [];
     for (const r of s.customRules || []) {
       if (!r || !r.enabled) continue;
       const re = compileList(r.terms);
       if (!re) continue;
-      categories.push({
-        id: r.id, label: r.label || 'Custom rule', emoji: r.emoji || '🧩', builtin: false,
-        requireContext: r.requireContext !== false, re, strongRe: re, soloRe: null
-      });
+      globalCats.push({ key: `custom/${r.id}`, id: r.id, pack: 'custom', label: r.label || 'Custom rule', emoji: r.emoji || '🧩', requireContext: r.requireContext !== false, re });
+      everything.push(...(r.terms || []));
+      if (r.requireContext === false) allTriggers.push(...(r.terms || []));
     }
-
     const keywordRe = compileList(s.keywords);
     if (keywordRe) {
-      categories.push({
-        id: 'keywords', label: 'Your keywords', emoji: '🔑', builtin: false,
-        requireContext: false, re: keywordRe, strongRe: keywordRe, soloRe: null
-      });
+      globalCats.push({ key: 'custom/keywords', id: 'keywords', pack: 'custom', label: 'Your keywords', emoji: '🔑', requireContext: false, re: keywordRe });
+      allTriggers.push(...s.keywords);
+      everything.push(...s.keywords);
     }
 
     const exceptionRe = compileList(s.exceptions);
+    const triggerRe = compileList(allTriggers);
+    const everythingRe = compileList(everything);
 
-    // Fast prefilter: if a text node does not hit this, nothing in it can trigger on its own.
-    const anyContextSources = []
-      .concat(D.CONTEXT.strong, s.extraContext || [], D.CONTEXT.weak, D.CONTEXT.names)
-      .concat(...D.CATEGORIES.map((c) => c.solo))
-      .concat(s.keywords || []);
-    for (const r of s.customRules || []) if (r && r.enabled && r.requireContext === false) anyContextSources.push(...(r.terms || []));
-    const triggerRe = compileList(anyContextSources);
+    // Glued lowercase hashtags: "#gta6spoilers" -> "#gta6 spoilers" when the tail starts with a spoiler word.
+    compactPrefixes.sort((a, b) => b.length - a.length);
+    const spoilerStart = compileList(spoilerWords);
+    const spoilerStartRe = spoilerStart ? new RegExp('^(?:' + spoilerStart.source + ')', 'iu') : null;
 
-    // When the whole page is about GTA VI, any category word is a trigger.
-    const everythingRe = compileList(
-      anyContextSources.concat(...categories.filter((c) => c.builtin).map((c) => {
-        const base = D.CATEGORIES.find((x) => x.id === c.id);
-        return applyEdits(base.terms, catState[c.id]);
-      })).concat(...(s.customRules || []).filter((r) => r && r.enabled).map((r) => r.terms || []))
-    );
+    function prep(raw) {
+      let text = normalize(raw);
+      if (spoilerStartRe && compactPrefixes.length && text.includes('#')) {
+        text = text.replace(/#([\p{L}\p{N}]{4,})/gu, (m, tag) => {
+          for (const pre of compactPrefixes) {
+            if (tag.length > pre.length && tag.startsWith(pre) && spoilerStartRe.test(tag.slice(pre.length))) return `#${pre} ${tag.slice(pre.length)}`;
+          }
+          return m;
+        });
+      }
+      return text;
+    }
 
-    const sensitivity = ['relaxed', 'balanced', 'strict'].includes(s.sensitivity) ? s.sensitivity : 'balanced';
+    function scorePack(P, text) {
+      let score = 0;
+      const hits = [];
+      for (const tier of ['strong', 'weak', 'names']) {
+        for (const { term, re } of P.ctx[tier]) {
+          if (re.test(text)) { score += D.CONTEXT_WEIGHT[tier]; hits.push(term); }
+        }
+        if (tier === 'strong' && score >= 2) break;
+      }
+      return { score, hits };
+    }
+
+    const asSet = (v) => (v instanceof Set ? v : new Set(v || []));
 
     return {
       sensitivity,
-      threshold: D.CONTEXT_THRESHOLD[sensitivity],
-      context, categories, exceptionRe, triggerRe, everythingRe,
+      packs: compiled,
+      globalCats,
+      hasPacks: compiled.length > 0,
+      prep,
 
-      contextScore(text) {
-        let score = 0;
-        const hits = [];
-        for (const tier of ['strong', 'weak', 'names']) {
-          for (const { term, re } of context[tier]) {
-            if (re.test(text)) { score += D.CONTEXT_WEIGHT[tier]; hits.push(term); }
-          }
-          if (tier === 'strong' && score >= 2) break; // already certain, skip the rest
-        }
-        return { score, hits };
+      /** Which packs is this text about? [{ id, name, score, threshold, hits, about }] */
+      contextReport(raw) {
+        const text = prep(raw);
+        return compiled.map((P) => {
+          const r = scorePack(P, text);
+          return { id: P.id, name: P.name, score: r.score, threshold: P.threshold, hits: r.hits, about: r.score >= P.threshold };
+        });
+      },
+
+      /** Ids of the packs this text is about. */
+      contextPacks(raw) {
+        return this.contextReport(raw).filter((r) => r.about).map((r) => r.id);
+      },
+
+      /** Ids of the packs whose URL patterns match. */
+      urlPacks(url) {
+        return compiled.filter((P) => P.urls.some((re) => re.test(url || ''))).map((P) => P.id);
+      },
+
+      /** The category that covers live streams of a pack (or a general one in Blackout). */
+      liveCategory(packId) {
+        const P = compiled.find((x) => x.id === packId);
+        if (!P) return null;
+        const c = P.cats.find((x) => x.liveStream);
+        if (c) return { id: c.key, pack: P.id, label: `Live ${P.short} gameplay`, emoji: c.emoji, term: '' };
+        if (sensitivity === 'strict') return { id: `${P.id}/general`, pack: P.id, label: `Live ${P.short}`, emoji: '🛡️', term: '' };
+        return null;
       },
 
       /**
        * Judge a piece of text.
        * @param {string} raw
-       * @param {{assumeContext?: boolean}} opts  assumeContext: the page itself is about GTA VI
-       * @returns {null | {categories: Array<{id,label,emoji,term}>, context: string[], score: number}}
+       * @param {{assume?: Iterable<string>}} opts  assume: packs the page itself is about
+       * @returns {null | {categories: Array<{id,pack,label,emoji,term}>, context: string[]}}
        */
       evaluate(raw, opts) {
-        const text = normalize(raw).replace(NEGATED_SPOILER, ' ');
+        const text = prep(raw).replace(NEGATED_SPOILER, ' ');
         if (!text || text.length < 2) return null;
         if (exceptionRe && exceptionRe.test(text)) return null;
+        const assume = asSet(opts && opts.assume);
 
-        const ctx = this.contextScore(text);
-        const hasContext = ctx.score >= this.threshold || !!(opts && opts.assumeContext);
         const found = [];
+        const context = [];
+        let anyContext = assume.size > 0;
 
-        for (const c of categories) {
-          if (!c.re) continue;
-          if (c.requireContext && !hasContext) {
-            const solo = c.soloRe && c.soloRe.exec(text);
-            if (solo) found.push({ id: c.id, label: c.label, emoji: c.emoji, term: solo[0] });
-            continue;
+        for (const P of compiled) {
+          const ctx = scorePack(P, text);
+          const has = ctx.score >= P.threshold || assume.has(P.id);
+          if (has) { anyContext = true; context.push(...ctx.hits); }
+          const before = found.length;
+          for (const c of P.cats) {
+            if (!c.re && !c.soloRe) continue;
+            if (!has) {
+              const solo = c.soloRe && c.soloRe.exec(text);
+              if (solo) found.push({ id: c.key, pack: P.id, label: c.label, emoji: c.emoji, term: solo[0] });
+              continue;
+            }
+            const m = c.re && c.re.exec(text);
+            if (!m) continue;
+            if (sensitivity === 'relaxed') {
+              const sm = (c.strongRe && c.strongRe.exec(text)) || (c.soloRe && c.soloRe.exec(text));
+              if (!sm) continue;
+              found.push({ id: c.key, pack: P.id, label: c.label, emoji: c.emoji, term: sm[0] });
+              continue;
+            }
+            found.push({ id: c.key, pack: P.id, label: c.label, emoji: c.emoji, term: m[0] });
           }
-          const m = c.re.exec(text);
-          if (!m) continue;
-          if (sensitivity === 'relaxed' && c.builtin) {
-            const sm = (c.strongRe && c.strongRe.exec(text)) || (c.soloRe && c.soloRe.exec(text));
-            if (!sm) continue;
-            found.push({ id: c.id, label: c.label, emoji: c.emoji, term: sm[0] });
-            continue;
+          if (found.length === before && sensitivity === 'strict' && ctx.score >= P.threshold) {
+            found.push({ id: `${P.id}/general`, pack: P.id, label: `Anything ${P.short}`, emoji: '🛡️', term: ctx.hits[0] });
           }
-          found.push({ id: c.id, label: c.label, emoji: c.emoji, term: m[0] });
         }
 
-        if (!found.length && sensitivity === 'strict' && ctx.score >= this.threshold) {
-          found.push({ id: 'general', label: 'Anything GTA VI', emoji: '🛡️', term: ctx.hits[0] });
+        for (const g of globalCats) {
+          if (g.requireContext && !anyContext) continue;
+          const m = g.re.exec(text);
+          if (m) found.push({ id: g.key, pack: 'custom', label: g.label, emoji: g.emoji, term: m[0] });
         }
 
-        return found.length ? { categories: found, context: ctx.hits, score: ctx.score } : null;
+        return found.length ? { categories: found, context } : null;
       },
 
       /** Cheap test used before doing any DOM work. */
-      mightTrigger(raw, assumeContext) {
-        const text = normalize(raw);
-        const re = assumeContext ? everythingRe : triggerRe;
-        return !!(re && re.test(text));
+      mightTrigger(raw, assume) {
+        const re = assume && asSet(assume).size ? everythingRe : triggerRe;
+        return !!(re && re.test(prep(raw)));
       }
     };
   }
 
-  /** Does a URL by itself say the page is about GTA VI? */
-  function urlHasContext(url) {
-    return (D.CONTEXT_URL_PATTERNS || []).some((re) => re.test(url || ''));
+  /** Is this URL a search results page (shielded result by result, never as a whole page)? */
+  function isSearchPage(url, patterns) {
+    return (patterns || []).some((p) => { try { return new RegExp(p, 'i').test(url || ''); } catch (_) { return false; } });
   }
 
-  function isSearchPage(url) {
-    return (D.SEARCH_PAGE_PATTERNS || []).some((re) => re.test(url || ''));
-  }
-
-  const api = { normalize, termToSource, compile, urlHasContext, isSearchPage };
+  const api = { normalize, termToSource, compile, isSearchPage };
   root.GSS = Object.assign(root.GSS || {}, api);
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -1,8 +1,9 @@
 /* Spoiler Shield background: badge counts, lifetime stats, context menus, shortcuts. */
-importScripts('../shared/defaults.js', '../shared/matcher.js', '../shared/settings.js');
+importScripts('../shared/defaults.js', '../shared/matcher.js', '../shared/settings.js', '../shared/packs.js');
 
 const G = globalThis.GSS;
 const S = G.settings;
+const P = G.packs;
 
 const BADGE_BG = '#ff5fa2';
 const frameCounts = new Map(); // tabId -> Map(frameId -> count)
@@ -10,8 +11,11 @@ const frameCounts = new Map(); // tabId -> Map(frameId -> count)
 /* ---------- install / menus ---------- */
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-  const s = await S.load();
-  await S.save(s); // writes defaults on first install, fills new fields on update
+  await P.installBundled();         // copy shipped packs and site rules into storage (never over newer or edited ones)
+  const { settings } = await P.loadAll();
+  await S.save(settings);           // writes defaults on first install, migrates and fills new fields on update
+  scheduleUpdates();
+  if (settings.autoUpdate) P.updateAll().catch(() => {});
   buildMenus();
   if (details.reason === 'install') {
     chrome.tabs.create({ url: chrome.runtime.getURL('src/options/options.html?welcome=1') });
@@ -19,7 +23,11 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   refreshAllBadges();
 });
 
-chrome.runtime.onStartup.addListener(() => { buildMenus(); refreshAllBadges(); });
+chrome.runtime.onStartup.addListener(() => { buildMenus(); scheduleUpdates(); refreshAllBadges(); });
+
+function scheduleUpdates() {
+  chrome.alarms.create('gss-update', { periodInMinutes: G.UPDATE_INTERVAL_HOURS * 60, delayInMinutes: 1 });
+}
 
 function buildMenus() {
   chrome.contextMenus.removeAll(() => {
@@ -93,6 +101,9 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
     if (!statsTimer) statsTimer = setTimeout(flushStats, 2000);
   } else if (msg.type === 'disable-site' && msg.host) {
     S.update((s) => { if (!s.disabledSites.includes(msg.host)) s.disabledSites.push(msg.host); });
+  } else if (msg.type === 'update-packs') {
+    P.updateAll().then((report) => reply({ ok: true, report })).catch((e) => reply({ ok: false, error: e.message }));
+    return true;
   } else if (msg.type === 'pause') {
     const until = Date.now() + (msg.minutes || 15) * 60 * 1000;
     S.update((s) => { s.pausedUntil = until; }).then(() => {
@@ -154,6 +165,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 chrome.alarms.onAlarm.addListener(async (a) => {
+  if (a.name === 'gss-update') {
+    const s = await S.load();
+    if (s.autoUpdate) await P.updateAll().catch(() => {});
+    return;
+  }
   if (a.name === 'gss-resume') {
     const s = await S.load();
     if (s.pausedUntil && Date.now() >= s.pausedUntil) { s.pausedUntil = 0; await S.save(s); }

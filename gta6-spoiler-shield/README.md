@@ -2,6 +2,8 @@
 
 A Chrome extension (Manifest V3) that hides GTA VI spoilers across the web, and lets you decide exactly what counts as a spoiler: only the story, only the map, everything, or your own custom rules.
 
+**Nothing about GTA VI is hard-coded.** The engine only knows how to read *topic packs* (JSON files with context words, categories and spoiler words) and *site rules* (JSON describing how each website wraps a post). GTA VI ships as the default pack. Packs and site rules can be edited in the settings, installed from a file, or subscribed to from a link that refreshes every 6 hours, so new spoiler words (a mission revealed after launch, a new character) reach everyone without an extension update. The same engine works for any game, show or film: see [docs/packs.md](docs/packs.md).
+
 > Unofficial fan tool. Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.
 
 ## Install (unpacked)
@@ -27,7 +29,7 @@ Works in Chrome, Edge, Brave, Arc, Opera and other Chromium browsers.
 - **Smart page context.** On a page that is itself about GTA VI (r/GTA6, a GTA VI video, a GTA VI article URL), every comment is judged as GTA VI even if it never names the game. So "the ending made me cry" under a GTA VI video gets shielded, while the same sentence on a cooking blog does not.
 - **Reads more than text:** image `alt`, `title` and `aria-label` too, so thumbnails with spoiler alt text are covered.
 
-## Categories
+## Categories (GTA VI pack)
 
 | On by default | Off by default |
 |---|---|
@@ -44,6 +46,9 @@ Each category's word list is editable in the settings (add or remove words, rese
 "About GTA VI" is decided by a context score: strong signals (*GTA 6*, *GTA VI*, *Leonida*, *Jason Duval*, *Port Gellhorn*…) count on their own, while weaker ones (*GTA*, *Rockstar*, *Vice City*, *Lucia*…) need to appear together. That is why "Vice City Stories ending" or "the ending of this movie" stays visible.
 
 ## Making it your own
+
+- **Topic packs:** install from a link (auto-updates) or a file, create one for any game or show from a template, edit any pack as JSON with validation, export, switch packs on or off. With several packs on, every shield says which pack it came from.
+- **Site rules:** subscribe to a site rules link to get layout fixes, or write your own rules for a forum or site that isn't covered. Yours always win.
 
 - **Custom rules:** your own categories with any words, with or without requiring GTA VI context (e.g. Spanish spoilers, a streamer's name).
 - **Always shield / Never shield** word lists, and **Also means GTA VI** for nicknames and translations.
@@ -64,9 +69,12 @@ Everything runs locally. No network requests, no analytics. Settings and stats l
 ## Development
 
 ```
-src/shared/defaults.js     categories, context terms, site selectors, default settings
+packs/gta6.json            the GTA VI topic pack (data)
+rules/sites.json           per-site rules for ~30 networks (data)
+src/shared/defaults.js     engine constants and default settings (no topic data)
 src/shared/matcher.js      term compiler + text judge (pure, no DOM)
-src/shared/settings.js     storage helpers
+src/shared/packs.js        pack/site-rule validation, storage, install, subscribe, auto-update
+src/shared/settings.js     settings storage and migration
 src/content/               page engine + overlay styles
 src/background/            badge, stats, context menus, shortcuts
 src/popup/, src/options/   UI
@@ -76,8 +84,9 @@ src/popup/, src/options/   UI
 npm test            # matcher unit tests (node:test)
 npm run test:e2e    # loads the extension in Chromium via Playwright and checks real pages
 npm run test:social # 20 social-network look-alike pages served under their real hostnames
+npm run test:packs  # install a pack from a link, update it remotely, write packs and site rules in settings
 npm run icons       # re-render icons from icons/icon.svg
 npm run zip         # package for the Chrome Web Store
 ```
 
-Known limits: text inside closed shadow DOM and inside images or video frames themselves (no OCR) cannot be read. Sites change their markup often; the per-site rules live in `src/shared/defaults.js` (`SITE_CONTAINERS`) and the generic fallback still catches most things when a rule goes stale. If a site shows something that slipped through, right-click it and choose **Shield this element**, or add the word to *Always shield*.
+Known limits: text inside closed shadow DOM and inside images or video frames themselves (no OCR) cannot be read. Sites change their markup often; the per-site rules live in `rules/sites.json` (or a subscribed link) and the generic fallback still catches most things when a rule goes stale. If a site shows something that slipped through, right-click it and choose **Shield this element**, or add the word to *Always shield*.

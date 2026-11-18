@@ -1,7 +1,7 @@
 /* Spoiler Shield settings: load, save and merge with defaults. Uses chrome.storage.local. */
 (function (root) {
   'use strict';
-  const G = root.GSS;
+  const G = root.GSS || (typeof require === 'function' ? require('./defaults.js') : {});
   const KEY = 'settings';
   const STATS_KEY = 'stats';
 
@@ -9,19 +9,19 @@
 
   function merge(stored) {
     const base = clone(G.DEFAULT_SETTINGS);
-    const s = Object.assign(base, stored || {});
-    // Categories: keep user state, add any new built-in category with its default.
-    const cats = {};
-    for (const c of G.CATEGORIES) {
-      const st = (stored && stored.categories && stored.categories[c.id]) || {};
-      cats[c.id] = {
-        enabled: typeof st.enabled === 'boolean' ? st.enabled : c.defaultOn,
-        extra: Array.isArray(st.extra) ? st.extra : [],
-        removed: Array.isArray(st.removed) ? st.removed : []
-      };
+    const src = stored && typeof stored === 'object' ? clone(stored) : {};
+
+    // Version 1 kept GTA VI categories at the top level; move them into the GTA VI pack's state.
+    if (src.categories && !src.packs) {
+      src.packs = { gta6: { enabled: true, categories: src.categories, extraContext: Array.isArray(src.extraContext) ? src.extraContext : [] } };
     }
-    s.categories = cats;
-    for (const k of ['customRules', 'keywords', 'exceptions', 'extraContext', 'disabledSites']) {
+    delete src.categories;
+    delete src.extraContext;
+
+    const s = Object.assign(base, src);
+    s.schema = G.DEFAULT_SETTINGS.schema;
+    if (!s.packs || typeof s.packs !== 'object' || Array.isArray(s.packs)) s.packs = {};
+    for (const k of ['customRules', 'keywords', 'exceptions', 'disabledSites', 'customSites']) {
       if (!Array.isArray(s[k])) s[k] = [];
     }
     return s;
@@ -40,7 +40,7 @@
     const s = await load();
     const r = await mutator(s);
     await save(r || s);
-    return r || s;
+    return merge(r || s);
   }
 
   function hostOf(url) {
@@ -69,5 +69,8 @@
     return Object.assign({ total: 0, byCategory: {}, bySite: {}, since: Date.now() }, got[STATS_KEY] || {});
   }
 
-  G.settings = { KEY, STATS_KEY, merge, load, save, update, hostOf, siteDisabled, inactiveReason, loadStats };
-})(globalThis);
+  const api = { KEY, STATS_KEY, merge, load, save, update, hostOf, siteDisabled, inactiveReason, loadStats };
+  root.GSS = root.GSS || {};
+  root.GSS.settings = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);

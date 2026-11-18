@@ -90,20 +90,20 @@ function serve() {
 
     console.log('live settings');
     await check('turning a category off unshields its cards live', async () => {
-      await popup.click('#cats .chip-toggle[data-id="secrets"]');
+      await popup.click('#cats .chip-toggle[data-id="gta6/secrets"]');
       await page.waitForTimeout(400);
       assert.ok(!(await shielded('a5')));
       assert.ok(await shielded('a3'));
-      await popup.click('#cats .chip-toggle[data-id="secrets"]');
+      await popup.click('#cats .chip-toggle[data-id="gta6/secrets"]');
       await page.waitForTimeout(400);
       assert.ok(await shielded('a5'));
     });
     await check('a card in two categories stays shielded while either is on', async () => {
-      await popup.click('#cats .chip-toggle[data-id="map"]');
+      await popup.click('#cats .chip-toggle[data-id="gta6/map"]');
       await page.waitForTimeout(400);
       assert.ok(await shielded('a3'));
       assert.doesNotMatch(await page.$eval('#a3 .gss-ov-reasons', (el) => el.dataset.t), /Map/);
-      await popup.click('#cats .chip-toggle[data-id="map"]');
+      await popup.click('#cats .chip-toggle[data-id="gta6/map"]');
       await page.waitForTimeout(400);
     });
     await check('blackout mode shields plain news', async () => {

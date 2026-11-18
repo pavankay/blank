@@ -2,12 +2,33 @@
   'use strict';
   const G = globalThis.GSS;
   const S = G.settings;
+  const P = G.packs;
+  let packs = [];
+
+  /** Find a category (or custom rule) by its stats key, e.g. "gta6/story" or "custom/keywords". */
+  function describe(key) {
+    const [packId, id] = key.split('/');
+    if (packId === 'custom') {
+      if (id === 'keywords') return { emoji: '🔑', label: 'Your keywords' };
+      if (id === 'manual') return { emoji: '✋', label: 'Shielded by you' };
+      const r = (settings.customRules || []).find((x) => x.id === id);
+      return r ? { emoji: r.emoji || '🧩', label: r.label } : { emoji: '🧩', label: id };
+    }
+    const p = packs.find((x) => x.id === packId);
+    if (id === 'general') return { emoji: '🛡️', label: `Anything ${p ? p.short : packId}` };
+    const c = p && p.categories.find((x) => x.id === id);
+    return c ? { emoji: c.emoji, label: (packs.length > 1 ? p.short + ' · ' : '') + c.label } : { emoji: '🛡️', label: key };
+  }
   const $ = (id) => document.getElementById(id);
 
   const SENS_HINTS = {
-    relaxed: 'Only clear spoilers: endings, deaths, map leaks, walkthroughs. News and trailers stay visible.',
-    balanced: 'Anything about GTA VI that touches a category you picked. The recommended setting.',
-    strict: 'Total blackout. Every mention of GTA VI is shielded, whatever it is about.'
+    relaxed: () => 'Only clear spoilers, like endings, deaths and leaks. News and trailers stay visible.',
+    balanced: (t) => `Anything about ${t} that touches a category you picked. The recommended setting.`,
+    strict: (t) => `Total blackout. Every mention of ${t} is shielded, whatever it is about.`
+  };
+  const topicNames = () => {
+    const on = packs.filter((p) => settings.packs[p.id] && settings.packs[p.id].enabled).map((p) => p.short);
+    return on.length ? on.join(' or ') : 'your topics';
   };
 
   let settings = null;
@@ -58,16 +79,17 @@
       const by = status.byCategory || {};
       const entries = Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 4);
       for (const [id, n] of entries) {
-        const c = G.CATEGORIES.find((x) => x.id === id) || (settings.customRules || []).find((x) => x.id === id);
+        const c = describe(id);
         const s = document.createElement('span');
-        s.textContent = `${(c && c.emoji) || (id === 'keywords' ? '🔑' : id === 'manual' ? '✋' : '🛡️')} ${n}`;
-        s.title = (c && c.label) || id;
+        s.textContent = `${c.emoji} ${n}`;
+        s.title = c.label;
         mini.appendChild(s);
       }
       if (status.pageContext) {
         const s = document.createElement('span');
-        s.textContent = '📍 GTA VI page';
-        s.title = 'This page is about GTA VI, so every post on it is judged as GTA VI';
+        const names = (status.pagePacks || []).map((id) => (packs.find((p) => p.id === id) || {}).short || id).join(' + ');
+        s.textContent = `📍 ${names} page`;
+        s.title = `This page is about ${names}, so every post on it is judged as ${names}`;
         mini.appendChild(s);
       }
     }
@@ -83,7 +105,7 @@
     for (const b of $('sensitivity').querySelectorAll('button')) {
       b.setAttribute('aria-checked', String(b.dataset.v === settings.sensitivity));
     }
-    $('sensHint').textContent = SENS_HINTS[settings.sensitivity];
+    $('sensHint').textContent = SENS_HINTS[settings.sensitivity](topicNames());
 
     renderCats();
   }
@@ -104,10 +126,32 @@
   function renderCats() {
     const box = $('cats');
     box.textContent = '';
-    for (const c of G.CATEGORIES) {
-      const b = chip(c.id, c.emoji, c.short || c.label, settings.categories[c.id].enabled, `${c.label}: ${c.description}`);
-      b.addEventListener('click', () => save((s) => { s.categories[c.id].enabled = !s.categories[c.id].enabled; }));
-      box.appendChild(b);
+    const on = packs.filter((p) => settings.packs[p.id] && settings.packs[p.id].enabled);
+    $('edition').textContent = on.length ? `${on.map((p) => p.short).join(' + ')} edition` : 'No topic packs on';
+    if (!packs.length) {
+      const e = document.createElement('p');
+      e.className = 'hint';
+      e.textContent = 'No topic packs installed yet. Add one in settings.';
+      box.appendChild(e);
+    }
+    for (const p of packs) {
+      const st = settings.packs[p.id];
+      if (packs.length > 1) {
+        const h = document.createElement('button');
+        h.type = 'button';
+        h.className = 'pack-head' + (st.enabled ? ' on' : '');
+        h.setAttribute('aria-pressed', String(st.enabled));
+        h.title = st.enabled ? `Turn the ${p.name} pack off` : `Turn the ${p.name} pack on`;
+        h.textContent = `${st.enabled ? '●' : '○'} ${p.name}`;
+        h.addEventListener('click', () => save((s) => { s.packs[p.id].enabled = !s.packs[p.id].enabled; }));
+        box.appendChild(h);
+      }
+      if (!st.enabled) continue;
+      for (const c of p.categories) {
+        const b = chip(`${p.id}/${c.id}`, c.emoji, c.short || c.label, st.categories[c.id].enabled, `${c.label}${c.description ? ': ' + c.description : ''}`);
+        b.addEventListener('click', () => save((s) => { const cs = s.packs[p.id].categories[c.id]; cs.enabled = !cs.enabled; }));
+        box.appendChild(b);
+      }
     }
     const cbox = $('customCats');
     cbox.textContent = '';
@@ -121,8 +165,15 @@
     }
   }
 
+  async function reload() {
+    const data = await P.loadAll();
+    settings = data.settings;
+    packs = data.packs;
+  }
+
   async function save(mutator) {
-    settings = await S.update(mutator);
+    await S.update(async (s) => { P.withPackState(s, packs); await mutator(s); });
+    await reload();
     render();
   }
 
@@ -138,7 +189,7 @@
 
   async function init() {
     [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    settings = await S.load();
+    await reload();
     render();
     refreshStatus();
     const stats = await S.loadStats();
@@ -154,8 +205,11 @@
     if (b) save((s) => { s.sensitivity = b.dataset.v; });
   });
 
-  $('allOn').addEventListener('click', () => save((s) => { for (const k in s.categories) s.categories[k].enabled = true; }));
-  $('allOff').addEventListener('click', () => save((s) => { for (const k in s.categories) s.categories[k].enabled = false; }));
+  const setAll = (v) => save((s) => {
+    for (const id in s.packs) if (s.packs[id].enabled) for (const k in s.packs[id].categories) s.packs[id].categories[k].enabled = v;
+  });
+  $('allOn').addEventListener('click', () => setAll(true));
+  $('allOff').addEventListener('click', () => setAll(false));
 
   const menu = $('pauseMenu');
   $('pauseBtn').addEventListener('click', () => {
@@ -174,7 +228,7 @@
       minutes = Math.ceil((t - Date.now()) / 60000);
     }
     await chrome.runtime.sendMessage({ type: 'pause', minutes });
-    settings = await S.load();
+    await reload();
     render();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { menu.hidden = true; $('pauseBtn').focus(); } });
@@ -211,7 +265,7 @@
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
-    if (changes[S.KEY]) { settings = S.merge(changes[S.KEY].newValue); render(); setTimeout(refreshStatus, 300); }
+    if (changes[S.KEY] || changes[P.PACKS_KEY]) { reload().then(() => { render(); setTimeout(refreshStatus, 300); }); }
   });
 
   init();

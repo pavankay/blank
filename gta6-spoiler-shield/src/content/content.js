@@ -1,6 +1,6 @@
 /*
  * Spoiler Shield content script.
- * Watches the page from document_start, finds the "card" around any GTA VI spoiler text and covers it
+ * Watches the page from document_start, finds the "card" around any spoiler text and covers it
  * before it paints. Big spoiler pages (articles, watch pages) get a full-page shield instead.
  */
 (() => {
@@ -23,20 +23,23 @@
   const MAX_CONTAINER_TEXT = 5000;  // generic containers bigger than this are "the page", not a card
   const MAX_SITE_TEXT = 25000;
 
-  let siteRule = G.SITE_CONTAINERS.find((r) => r.host && r.host.test(location.hostname)) || null;
-  let SITE_SEL = siteRule ? siteRule.selectors.join(',') : '';
+  const P = G.packs;
+  let siteRule = null;               // from the site rules data (or the user's own rules)
+  let SITE_SEL = '';
+  let sitesData = null;
+  let packList = [];
   const OBSERVE_OPTS = {
     childList: true, subtree: true, characterData: true,
     attributes: true, attributeFilter: ['alt', 'title', 'aria-label']
   };
   const shadowRoots = new Set();   // open shadow roots we watch (web-component sites like new Reddit)
   let shadowSeen = false;
-  const GENERIC_SEL = G.GENERIC_CONTAINERS.filter((s) => !SEMANTIC_SEL.includes(s)).join(',');
+  let GENERIC_SEL = G.GENERIC_CONTAINERS.filter((s) => !SEMANTIC_SEL.includes(s)).join(',');
 
   let settings = null;
   let matcher = null;
   let active = false;
-  let assumeContext = false;
+  let assumePacks = [];              // packs the current page itself is about
   let observer = null;
   let resumeTimer = null;
 
@@ -204,7 +207,7 @@
     if (!p || SKIP_TAGS.has(p.tagName) || isOurs(p)) return;
     const data = textNode.data;
     if (!data || data.length < 2) return;
-    if (!matcher.mightTrigger(data, assumeContext)) return;
+    if (!matcher.mightTrigger(data, assumePacks)) return;
     const c = findContainer(p);
     if (c) candidates.add(c);
   }
@@ -212,7 +215,7 @@
   function considerAttrs(el) {
     if (isOurs(el)) return;
     const v = (el.getAttribute('alt') || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.getAttribute('aria-label') || '');
-    if (v.length < 3 || !matcher.mightTrigger(v, assumeContext)) return;
+    if (v.length < 3 || !matcher.mightTrigger(v, assumePacks)) return;
     const c = findContainer(el);
     if (c) candidates.add(c);
   }
@@ -264,7 +267,7 @@
       revealedSig.delete(el); // recycled element with new content: judge it again
     }
 
-    const result = matcher.evaluate(text, { assumeContext });
+    const result = matcher.evaluate(text, { assume: assumePacks });
     if (result) shieldEl(el, result);
     else if (shielded.has(el)) unshieldEl(el);
   }
@@ -471,36 +474,40 @@
     try { pathWords = decodeURIComponent(location.pathname).replace(/[-_/+.]+/g, ' '); } catch (_) {}
     const topic = topicText();
 
-    const urlCtx = G.urlHasContext(url);
-    const topicCtx = !!topic && matcher.contextScore(G.normalize(topic)).score >= matcher.threshold;
-    const textCtx = topicCtx || matcher.contextScore(G.normalize(headline + ' ' + pathWords)).score >= matcher.threshold;
-    const nextAssume = !!settings.pageContext && (urlCtx || textCtx);
-    if (nextAssume !== assumeContext) {
-      assumeContext = nextAssume;
+    const urlPacks = matcher.urlPacks(url);
+    const topicPacks = topic ? matcher.contextPacks(topic) : [];
+    const textPacks = matcher.contextPacks(headline + ' ' + pathWords);
+    const next = settings.pageContext ? Array.from(new Set([...urlPacks, ...topicPacks, ...textPacks])).sort() : [];
+    if (next.join() !== assumePacks.join()) {
+      assumePacks = next;
       rescan();
     }
 
     if (!IS_TOP) return;
-    if (!settings.pageShield || G.isSearchPage(url) || pageRevealedUrls.has(url)) { hidePageShield(); return; }
-    let result = matcher.evaluate(headline + ' ' + pathWords, { assumeContext: urlCtx });
-    // A live stream or VOD whose category is GTA VI is gameplay footage, whatever the streamer called it.
-    const footageOn = settings.sensitivity === 'strict' || (settings.categories.footage && settings.categories.footage.enabled);
-    if (!result && siteRule && siteRule.live && topicCtx && footageOn) {
-      result = { categories: [{ id: 'footage', label: 'Live GTA VI gameplay', emoji: '📹', term: '' }] };
+    if (!settings.pageShield || G.isSearchPage(url, sitesData && sitesData.searchPages) || pageRevealedUrls.has(url)) { hidePageShield(); return; }
+    let result = matcher.evaluate(headline + ' ' + pathWords, { assume: urlPacks });
+    // A stream whose category belongs to a pack is live footage of it, whatever the streamer called it.
+    if (!result && siteRule && siteRule.live) {
+      const live = topicPacks.map((id) => matcher.liveCategory(id)).filter(Boolean);
+      if (live.length) result = { categories: live };
     }
     if (result) showPageShield(result);
     else hidePageShield();
   }
 
+  function setSiteRule(r) {
+    siteRule = r || null;
+    SITE_SEL = siteRule ? siteRule.selectors.join(',') : '';
+  }
+
+  /** Self-hosted networks (Mastodon...) are recognised by their page, not their hostname. */
   function resolveSiteRule() {
     if (siteRule) return;
-    const r = G.SITE_CONTAINERS.find((x) => {
-      if (!x.detect) return false;
+    const r = P.detectRules(sitesData, settings && settings.customSites).find((x) => {
       try { return !!document.querySelector(x.detect); } catch (_) { return false; }
     });
     if (!r) return;
-    siteRule = r;
-    SITE_SEL = r.selectors.join(',');
+    setSiteRule(r);
     if (active) rescan();
   }
 
@@ -535,7 +542,7 @@
         <div class="glow"></div>
         <div class="card">
           <div class="logo">${SHIELD_SVG}</div>
-          <p class="eyebrow">Spoiler Shield · GTA VI</p>
+          <p class="eyebrow">Spoiler Shield · ${escapeHtml(packNames(reasons))}</p>
           <h1 id="t">This page looks like a spoiler</h1>
           <p class="sub">${settings.showReasons ? 'It seems to be about:' : 'We covered it before it loaded.'}</p>
           ${settings.showReasons ? `<ul class="chips">${reasons.map((c) => `<li>${c.emoji} ${escapeHtml(c.label)}</li>`).join('')}</ul>` : ''}
@@ -579,6 +586,12 @@
     document.documentElement.classList.remove('gss-page-locked');
     if (document.title === SHIELD_TITLE && realTitle) document.title = realTitle;
     scheduleCount();
+  }
+
+  function packNames(cats) {
+    const names = Array.from(new Set(cats.map((c) => c.pack).filter((id) => id && id !== 'custom')))
+      .map((id) => (packList.find((p) => p.id === id) || {}).short || id);
+    return names.length ? names.join(' + ') : 'Your rules';
   }
 
   function escapeHtml(s) {
@@ -646,13 +659,24 @@
     if (observer) observer.disconnect();
     unshieldAll();
     hidePageShield();
-    assumeContext = false;
+    assumePacks = [];
     scheduleCount();
+  }
+
+  function applyData(data) {
+    sitesData = data.sites;
+    packList = data.packs;
+    if (sitesData && Array.isArray(sitesData.generic) && sitesData.generic.length) {
+      GENERIC_SEL = sitesData.generic.filter((s) => !SEMANTIC_SEL.includes(s)).join(',');
+    }
+    const hostRule = P.siteRuleFor(location.hostname, sitesData, data.settings.customSites);
+    if (hostRule || (siteRule && siteRule.hosts && siteRule.hosts.length)) setSiteRule(hostRule);
+    applySettings(data.settings);
   }
 
   function applySettings(next) {
     settings = next;
-    matcher = G.compile(settings);
+    matcher = G.compile(settings, P.enabledPacks(settings, packList));
     clearTimeout(resumeTimer);
     const reason = S.inactiveReason(settings, HOST);
     const was = active;
@@ -704,7 +728,8 @@
         byCategory: cats,
         pageShielded: !!pageShield,
         pageCategories: pageShield ? pageShield.result.categories.map((c) => c.id) : [],
-        pageContext: assumeContext
+        pageContext: assumePacks.length > 0,
+        pagePacks: assumePacks
       });
       return;
     }
@@ -720,14 +745,15 @@
       const el = findContainer(t.nodeType === 1 ? t : t.parentElement);
       if (el) {
         revealedSig.delete(el);
-        shieldEl(el, { categories: [{ id: 'manual', label: 'Shielded by you', emoji: '✋', term: '' }] });
+        shieldEl(el, { categories: [{ id: 'custom/manual', pack: 'custom', label: 'Shielded by you', emoji: '✋', term: '' }] });
         scheduleCount();
       }
     }
   });
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes[S.KEY]) applySettings(S.merge(changes[S.KEY].newValue));
+    if (area !== 'local') return;
+    if (changes[S.KEY] || changes[P.PACKS_KEY] || changes[P.SITES_KEY]) P.loadAll().then(applyData).catch(() => {});
   });
 
   // SPA navigations that do not touch the DOM right away.
@@ -753,7 +779,7 @@
     if (active) { checkPage(); scanRoot(document.body); flush(); }
   });
 
-  S.load().then(applySettings).catch(() => {});
+  P.loadAll().then(applyData).catch(() => {});
 
   /* ---------- page shield assets ---------- */
 

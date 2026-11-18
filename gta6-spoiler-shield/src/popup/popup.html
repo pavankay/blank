@@ -13,7 +13,7 @@
       <img src="../../icons/icon48.png" width="30" height="30" alt="">
       <div>
         <div class="name">Spoiler Shield</div>
-        <div class="edition">GTA VI edition</div>
+        <div class="edition" id="edition">&nbsp;</div>
       </div>
     </div>
     <label class="switch big" title="Turn the shield on or off (Alt+Shift+S)">
@@ -73,7 +73,7 @@
   </section>
 
   <form class="block quick" id="quickForm">
-    <input id="quickInput" type="text" placeholder="Always shield a word… e.g. Brian" autocomplete="off" maxlength="80">
+    <input id="quickInput" type="text" placeholder="Always shield a word or name…" autocomplete="off" maxlength="80">
     <button class="btn accent" type="submit">Add</button>
   </form>
 
@@ -85,6 +85,7 @@
   <script src="../shared/defaults.js"></script>
   <script src="../shared/matcher.js"></script>
   <script src="../shared/settings.js"></script>
+  <script src="../shared/packs.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

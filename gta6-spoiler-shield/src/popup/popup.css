@@ -56,3 +56,9 @@ body {
 .foot { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 0; font-size: 12px; color: var(--faint); }
 
 body.disabled .block, body.disabled .actions .btn:not(#pauseBtn) { opacity: .55; }
+
+.pack-head { grid-column: 1 / -1; appearance: none; border: 0; background: none; text-align: left; padding: 6px 2px 2px; font-weight: 800; font-size: 12px; color: var(--muted); cursor: pointer; letter-spacing: .02em; }
+.pack-head.on { color: var(--text); }
+.pack-head:first-child { padding-top: 0; }
+.pack-head:hover { color: var(--pink); }
+.cats .hint { grid-column: 1 / -1; }
