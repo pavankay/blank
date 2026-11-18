@@ -9,6 +9,7 @@ const assert = require('assert/strict');
 const EXT = path.resolve(__dirname, '..');
 const FIX = path.join(__dirname, 'fixtures');
 const SHOTS = process.env.SHOTS_DIR || null;
+const CATS = require('../packs/gta6.json').categories.length;
 
 function serve() {
   return new Promise((resolve) => {
@@ -85,7 +86,7 @@ function serve() {
     await popup.setViewportSize({ width: 388, height: 720 });
     await popup.goto(`chrome-extension://${extId}/src/popup/popup.html`);
     await popup.waitForTimeout(500);
-    await check('popup renders categories', async () => assert.equal(await popup.locator('#cats .chip-toggle').count(), 12));
+    await check('popup renders categories', async () => assert.equal(await popup.locator('#cats .chip-toggle').count(), CATS));
     if (SHOTS) await popup.screenshot({ path: path.join(SHOTS, 'popup.png'), fullPage: true });
 
     console.log('live settings');
@@ -154,7 +155,7 @@ function serve() {
     await opt.setViewportSize({ width: 1200, height: 900 });
     await opt.goto(`chrome-extension://${extId}/src/options/options.html`);
     await opt.waitForTimeout(500);
-    await check('options lists categories', async () => assert.equal(await opt.locator('#catList .cat').count(), 12));
+    await check('options lists categories', async () => assert.equal(await opt.locator('#catList .cat').count(), CATS));
     await check('test lab judges text', async () => {
       await opt.fill('#labInput', 'GTA 6 ending explained');
       assert.match(await opt.textContent('#labOut'), /Would be shielded/);

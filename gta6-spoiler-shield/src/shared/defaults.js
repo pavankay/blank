@@ -34,6 +34,9 @@
   ];
 
   const UPDATE_INTERVAL_HOURS = 6;
+  const LEARN_INTERVAL_HOURS = 12;
+  const COMMUNITY_INTERVAL_MINUTES = 15;
+  const HASH_DISTANCE = 12;       // fingerprints this close (out of 64 bits) count as the same picture (unrelated pictures sit around 25-35)
 
   const DEFAULT_SETTINGS = {
     schema: 2,
@@ -47,6 +50,11 @@
     customSites: [],              // the user's own site rules (same shape as rules/sites.json entries); they win
     sitesUrl: '',                 // optional URL that keeps site rules up to date
     autoUpdate: true,             // refresh packs and site rules from their URLs
+    learnFromSources: true,       // let packs learn new names from their sources (the game wiki)
+    communityUrl: '',             // community server: shared reports, image fingerprints, learned names
+    shareReports: true,           // send your reports to the community server (anonymous)
+    vision: 'off',                // off | on: read thumbnails with the browser's on-device model
+    hashImages: true,             // fingerprint thumbnails so reported screenshots are caught when reposted
     blockStyle: 'blur',           // blur | redact | collapse
     revealMode: 'click',          // click | hold | locked
     showReasons: true,
@@ -60,7 +68,7 @@
 
   const api = {
     PACK_FORMAT, SITES_FORMAT, BUNDLED_PACKS, BUNDLED_SITES,
-    CONTEXT_WEIGHT, CONTEXT_THRESHOLD, GENERIC_CONTAINERS, UPDATE_INTERVAL_HOURS, DEFAULT_SETTINGS
+    CONTEXT_WEIGHT, CONTEXT_THRESHOLD, GENERIC_CONTAINERS, UPDATE_INTERVAL_HOURS, LEARN_INTERVAL_HOURS, COMMUNITY_INTERVAL_MINUTES, HASH_DISTANCE, DEFAULT_SETTINGS
   };
 
   root.GSS = Object.assign(root.GSS || {}, api);

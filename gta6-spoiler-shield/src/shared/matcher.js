@@ -135,7 +135,7 @@
         const terms = applyEdits(c.terms, cs);
         cats.push({
           key: `${p.id}/${c.id}`, id: c.id, pack: p.id,
-          label: multi ? `${p.short} · ${c.label}` : c.label, emoji: c.emoji, liveStream: !!c.liveStream,
+          label: multi ? `${p.short} · ${c.label}` : c.label, emoji: c.emoji, liveStream: !!c.liveStream, media: c.media || '',
           re: compileList(terms),
           strongRe: compileList(c.strong.concat(cs.extra || [])),
           soloRe: compileList(c.solo)
@@ -297,6 +297,23 @@
         }
 
         return found.length ? { categories: found, context } : null;
+      },
+
+      /**
+       * For a post with a picture or video but no spoiler words: is it about a pack whose
+       * "unlabeled screenshots" category is on? Then its media gets covered, not its text.
+       */
+      unlabeled(raw, opts) {
+        if (sensitivity === 'relaxed') return null;
+        const text = prep(raw);
+        if (exceptionRe && exceptionRe.test(text)) return null;
+        const assume = asSet(opts && opts.assume);
+        for (const P of compiled) {
+          const c = P.cats.find((x) => x.media === 'unlabeled');
+          if (!c) continue;
+          if (assume.has(P.id) || scorePack(P, text).score >= P.threshold) return { id: c.key, pack: P.id, label: c.label, emoji: c.emoji, term: '' };
+        }
+        return null;
       },
 
       /** Cheap test used before doing any DOM work. */

@@ -1,6 +1,68 @@
 {
   "format": "spoiler-shield-sites@1",
-  "version": "2026.11.18",
+  "version": "2026.11.18.2",
+  "itemIds": [
+    {
+      "pattern": "(?:youtube\\.com/(?:watch\\?(?:[^#]*&)?v=|shorts/|live/|embed/)|youtu\\.be/|ytimg\\.com/(?:vi|vi_webp|an_webp)/)([\\w-]{11})",
+      "key": "youtube:$1"
+    },
+    {
+      "pattern": "tiktok\\.com/@[\\w.-]+/(?:video|photo)/(\\d{8,})",
+      "key": "tiktok:$1"
+    },
+    {
+      "pattern": "(?:x|twitter)\\.com/\\w+/status/(\\d{6,})",
+      "key": "x:$1"
+    },
+    {
+      "pattern": "reddit\\.com/r/\\w+/comments/(\\w{4,})",
+      "key": "reddit:$1"
+    },
+    {
+      "pattern": "redd\\.it/(\\w{4,})",
+      "key": "reddit:$1"
+    },
+    {
+      "pattern": "instagram\\.com/(?:[\\w.]+/)?(?:p|reel|reels|tv)/([\\w-]{5,})",
+      "key": "instagram:$1"
+    },
+    {
+      "pattern": "(?:clips\\.twitch\\.tv/|twitch\\.tv/\\w+/clip/)([\\w-]{4,})",
+      "key": "twitchclip:$1"
+    },
+    {
+      "pattern": "twitch\\.tv/videos/(\\d{5,})",
+      "key": "twitchvod:$1"
+    },
+    {
+      "pattern": "kick\\.com/[\\w-]+/(?:videos|clips)/([\\w-]{6,})",
+      "key": "kick:$1"
+    },
+    {
+      "pattern": "facebook\\.com/(?:watch/?\\?v=|reel/|[\\w.]+/videos/)(\\d{6,})",
+      "key": "facebook:$1"
+    },
+    {
+      "pattern": "bsky\\.app/profile/[\\w.:-]+/post/(\\w{6,})",
+      "key": "bsky:$1"
+    },
+    {
+      "pattern": "threads\\.(?:net|com)/@[\\w.]+/post/([\\w-]{6,})",
+      "key": "threads:$1"
+    },
+    {
+      "pattern": "streamable\\.com/(\\w{4,})",
+      "key": "streamable:$1"
+    },
+    {
+      "pattern": "imgur\\.com/(?:gallery/|a/)?(\\w{5,8})(?:[./?#]|$)",
+      "key": "imgur:$1"
+    },
+    {
+      "pattern": "i\\.redd\\.it/(\\w{6,})",
+      "key": "redditimg:$1"
+    }
+  ],
   "sites": [
     {
       "name": "YouTube",
@@ -51,7 +113,15 @@
         "ytd-watch-metadata h1",
         "yt-shorts-video-title-view-model",
         "ytd-reel-video-renderer[is-active] h2"
-      ]
+      ],
+      "author": [
+        "ytd-channel-name",
+        "#channel-name",
+        ".ytd-channel-name",
+        "yt-content-metadata-view-model a",
+        "#author-text"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Reddit",
@@ -75,7 +145,14 @@
       "topic": [
         "shreddit-subreddit-header",
         ".redditname"
-      ]
+      ],
+      "author": [
+        "[slot=\"authorName\"]",
+        "a[href^=\"/user/\"]",
+        ".author",
+        "faceplate-tracker[noun=\"community\"] a"
+      ],
+      "visionFeed": true
     },
     {
       "name": "X",
@@ -94,7 +171,11 @@
       ],
       "topic": [
         "[data-testid=\"primaryColumn\"] h2[role=\"heading\"]"
-      ]
+      ],
+      "author": [
+        "[data-testid=\"User-Name\"]"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Facebook",
@@ -107,7 +188,13 @@
         "div[data-pagelet^=\"FeedUnit\"]",
         "div[data-video-id]",
         "li[role=\"option\"]"
-      ]
+      ],
+      "author": [
+        "h2 a",
+        "h3 a",
+        "strong a"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Instagram",
@@ -124,7 +211,12 @@
       "topic": [
         "header h1",
         "header h2"
-      ]
+      ],
+      "author": [
+        "header a",
+        "a[role=\"link\"] span"
+      ],
+      "visionFeed": true
     },
     {
       "name": "TikTok",
@@ -150,7 +242,13 @@
         "h1[data-e2e=\"challenge-title\"]",
         "h1[data-e2e=\"browse-video-desc\"]",
         "[data-e2e=\"live-game-tag\"]"
-      ]
+      ],
+      "author": [
+        "[data-e2e=\"video-author-uniqueid\"]",
+        "[data-e2e=\"browse-username\"]",
+        "[data-e2e=\"search-card-user-unique-id\"]"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Twitch",
@@ -174,7 +272,12 @@
         "[data-a-target=\"video-info-game-boxart-link\"]",
         "a[data-a-target=\"stream-game-link\"] span"
       ],
-      "live": true
+      "live": true,
+      "author": [
+        "a[data-a-target=\"preview-card-channel-link\"]",
+        ".chat-author__display-name"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Kick",
@@ -193,7 +296,11 @@
         "#channel-content a[href*=\"/category/\"]",
         "a[href*=\"/category/\"][class*=\"category\"]"
       ],
-      "live": true
+      "live": true,
+      "author": [
+        ".chat-entry-username"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Threads",
@@ -204,7 +311,11 @@
       "selectors": [
         "div[data-pressable-container]",
         "div[data-interactive-id]"
-      ]
+      ],
+      "author": [
+        "a[href^=\"/@\"]"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Bluesky",
@@ -216,7 +327,11 @@
         "div[data-testid^=\"postThreadItem\"]",
         "div[data-testid=\"contentHider-post\"]",
         "div[data-testid^=\"feedGenerator\"]"
-      ]
+      ],
+      "author": [
+        "a[href^=\"/profile/\"]"
+      ],
+      "visionFeed": true
     },
     {
       "name": "Mastodon",
@@ -247,6 +362,9 @@
         "section[aria-label*=\"hannel\"] h1",
         "h1[class*=\"title\"]",
         "div[class*=\"titleWrapper\"] h1"
+      ],
+      "author": [
+        "span[class*=\"username\"]"
       ]
     },
     {
@@ -259,7 +377,11 @@
         "div[data-id]",
         "div[data-cell-id]",
         "div[data-testid=\"reply\"]"
-      ]
+      ],
+      "author": [
+        "a[href*=\"tumblr.com/\"]"
+      ],
+      "visionFeed": true
     },
     {
       "name": "LinkedIn",
@@ -287,7 +409,8 @@
         "[data-grid-item=\"true\"]",
         "[data-test-id=\"comment\"]",
         "[data-test-id=\"search-suggestion\"]"
-      ]
+      ],
+      "visionFeed": true
     },
     {
       "name": "Snapchat",
@@ -298,7 +421,8 @@
         "div[class*=\"Spotlight\"]",
         "a[href*=\"/spotlight/\"]",
         "div[class*=\"StoryCard\"]"
-      ]
+      ],
+      "visionFeed": true
     },
     {
       "name": "Telegram",

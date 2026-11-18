@@ -30,7 +30,7 @@
   let packList = [];
   const OBSERVE_OPTS = {
     childList: true, subtree: true, characterData: true,
-    attributes: true, attributeFilter: ['alt', 'title', 'aria-label']
+    attributes: true, attributeFilter: ['alt', 'title', 'aria-label', 'src', 'poster']
   };
   const shadowRoots = new Set();   // open shadow roots we watch (web-component sites like new Reddit)
   let shadowSeen = false;
@@ -56,6 +56,22 @@
   let lastPageCheck = 0;
   let pageCheckTimer = null;
   let lastContextMenuTarget = null;
+
+  // Reports, community feed and image checks
+  let itemIdRes = [];                // compiled item-id patterns from the site rules
+  const knownKeys = new Map();       // item key -> { source: 'you' | 'community', n }
+  let safeKeys = new Set();          // items you marked "not a spoiler"
+  let reportedHashes = [];           // [{ h, source, n }] fingerprints of reported pictures
+  let safeHashes = [];
+  let watchingMedia = false;         // whether pictures alone can trigger a check
+  const mediaHosts = new WeakMap();  // card -> elements covering its pictures
+  const mediaRevealed = new WeakMap(); // card -> signature when its pictures were revealed
+  const imageChecked = new Map();    // picture URL -> fingerprint ('' if none)
+  const pendingHash = new Map();     // picture URL -> Set(cards) waiting for a fingerprint
+  let hashTimer = null;
+  const visionDone = new Map();      // picture URL -> result | 'pending'
+  const visionWaiting = new Map();   // picture URL -> Set(cards)
+  let visionBudget = 60;             // on-device checks per page
 
   let statQueue = {};
   let statTimer = null;
@@ -200,6 +216,98 @@
     return null;
   }
 
+  /* ---------- pictures, item ids, authors ---------- */
+
+  const MEDIA_WRAP = 'a, picture, figure, ytd-thumbnail, yt-thumbnail-view-model, [class*="thumb"], [class*="Thumb"], [class*="media"], [class*="Media"], [data-testid="tweetPhoto"], [data-testid="videoPlayer"]';
+
+  function mediaSrc(m) {
+    const s = m.tagName === 'VIDEO' ? (m.poster || '') : (m.currentSrc || m.getAttribute('src') || m.getAttribute('data-src') || '');
+    if (!s) return '';
+    try { const u = new URL(s, location.href).href; return /^(https?:|data:image\/)/.test(u) ? u : ''; } catch (_) { return ''; }
+  }
+
+  /** Pictures and videos in a card that are worth covering or checking (not avatars, icons or emoji). */
+  function mediaIn(el) {
+    const out = [];
+    const nodes = el.querySelectorAll('img, video');
+    for (let i = 0; i < nodes.length && out.length < 4; i++) {
+      const m = nodes[i];
+      if (isOurs(m) || !mediaSrc(m)) continue;
+      const cls = `${typeof m.className === 'string' ? m.className : ''} ${m.getAttribute('alt') || ''}`;
+      if (/avatar|emoji|icon|logo|profile|badge|spinner/i.test(cls)) continue;
+      if (m.closest('[id*="avatar"], [class*="avatar"], [class*="Avatar"]')) continue;
+      const w = m.width || Number(m.getAttribute('width')) || 0;
+      const h = m.height || Number(m.getAttribute('height')) || 0;
+      if ((w && w < 48) || (h && h < 36)) continue;
+      out.push(m);
+    }
+    return out;
+  }
+
+  function mediaHost(m, card) {
+    let h = m.parentElement;
+    let n = h;
+    while (n && n !== card) {
+      if ((n.textContent || '').trim().length > 40) break;
+      h = n;
+      if (n.matches && n.matches(MEDIA_WRAP)) break;
+      n = n.parentElement;
+    }
+    return h;
+  }
+
+  function hexHash(s) {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(16) + s.length.toString(16);
+  }
+
+  /** Keys for a URL: its item ids, or a page key for ordinary pages. */
+  function pageKeys(url) {
+    if (!url) return [];
+    const keys = P.keysFor(url, itemIdRes);
+    try { const u = new URL(url, location.href); keys.push('page:' + hexHash(u.hostname.replace(/^www\./, '') + u.pathname.replace(/\/+$/, ''))); } catch (_) {}
+    return keys;
+  }
+
+  function itemKeysOf(el) {
+    if (!itemIdRes.length) return [];
+    const keys = new Set();
+    const add = (u) => { if (u) for (const k of P.keysFor(u, itemIdRes)) keys.add(k); };
+    if (el.href) add(el.href);
+    const links = el.querySelectorAll('a[href]');
+    for (let i = 0; i < links.length && i < 25; i++) add(links[i].href);
+    const media = el.querySelectorAll('img, video, iframe');
+    for (let i = 0; i < media.length && i < 8; i++) add(media[i].currentSrc || media[i].src || media[i].poster);
+    return Array.from(keys);
+  }
+
+  function lookupKeys(keys) {
+    let best = null;
+    for (const k of keys) {
+      const hit = knownKeys.get(k);
+      if (hit && (!best || hit.source === 'you' || hit.n > best.n)) best = hit;
+    }
+    return best;
+  }
+
+  function reportedCat(hit) {
+    return {
+      id: 'custom/reported', pack: 'custom', emoji: '🚩', term: '',
+      label: hit.source === 'you' ? 'Reported by you' : `Reported by ${hit.n} ${hit.n === 1 ? 'person' : 'people'}`
+    };
+  }
+
+  function authorOf(el) {
+    if (!el || !siteRule || !siteRule.author) return '';
+    for (const sel of siteRule.author) {
+      let a = null;
+      try { a = el.querySelector(sel); } catch (_) {}
+      if (a && a.textContent.trim()) return a.textContent.trim().slice(0, 80);
+    }
+    return '';
+  }
+
   /* ---------- scanning ---------- */
 
   function considerText(textNode) {
@@ -220,6 +328,19 @@
     if (c) candidates.add(c);
   }
 
+  function considerMedia(m) {
+    if (isOurs(m) || !mediaSrc(m)) return;
+    const c = findContainer(m);
+    if (c) candidates.add(c);
+  }
+
+  function considerLink(a) {
+    const keys = P.keysFor(a.href, itemIdRes);
+    if (!keys.some((k) => knownKeys.has(k) || safeKeys.has(k))) return;
+    const c = findContainer(a);
+    if (c) candidates.add(c);
+  }
+
   function scanRoot(root) {
     if (!active || !root) return;
     if (root.nodeType === 3) { considerText(root); return; }
@@ -230,9 +351,12 @@
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
     let n;
     while ((n = walker.nextNode())) {
-      if (n.nodeType === 3) considerText(n);
-      else if (n.shadowRoot) watchShadowRoot(n.shadowRoot);
+      if (n.nodeType === 3) { considerText(n); continue; }
+      if (n.shadowRoot) watchShadowRoot(n.shadowRoot);
+      if (watchingMedia && (n.tagName === 'IMG' || n.tagName === 'VIDEO')) considerMedia(n);
+      else if (knownKeys.size && n.tagName === 'A') considerLink(n);
     }
+    if (root.nodeType === 1 && watchingMedia && (root.tagName === 'IMG' || root.tagName === 'VIDEO')) considerMedia(root);
 
     if (root.matches && root.matches(ATTR_SEL)) considerAttrs(root);
     const withAttrs = root.querySelectorAll ? root.querySelectorAll(ATTR_SEL) : [];
@@ -248,16 +372,19 @@
   }
 
   function evaluateContainer(el) {
+    if (el.__gssCard && el.__gssCard !== el) el = el.__gssCard; // a covered picture: judge its whole card
     if (!el.isConnected || !active) return;
     // A covered ancestor already hides this one.
-    const coveredAncestor = el.parentElement && el.parentElement.closest('.gss-shielded');
+    const coveredAncestor = el.parentElement && el.parentElement.closest('.gss-shielded:not(.gss-media)');
     if (coveredAncestor) return;
 
+    const media = mediaIn(el);
     const text = containerText(el);
-    const h = hash(text);
+    const h = hash(text + '|' + media.map(mediaSrc).join('|'));
     if (sig.get(el) === h) {
       // Same content, but the site may have thrown our overlay or classes away while re-rendering.
       if (shielded.has(el)) repairShield(el);
+      for (const mh of mediaHosts.get(el) || []) if (shielded.has(mh)) repairShield(mh);
       return;
     }
     sig.set(el, h);
@@ -267,9 +394,144 @@
       revealedSig.delete(el); // recycled element with new content: judge it again
     }
 
-    const result = matcher.evaluate(text, { assume: assumePacks });
-    if (result) shieldEl(el, result);
-    else if (shielded.has(el)) unshieldEl(el);
+    // 1. You said this one is fine.
+    const keys = itemKeysOf(el);
+    if (keys.some((k) => safeKeys.has(k))) {
+      unshieldMedia(el);
+      if (shielded.has(el)) unshieldEl(el);
+      return;
+    }
+
+    // 2. The words give it away, or 3. you or enough people reported this exact video or post.
+    let result = matcher.evaluate(text, { assume: assumePacks });
+    if (!result) {
+      const hit = lookupKeys(keys);
+      if (hit) result = { categories: [reportedCat(hit)] };
+    }
+    if (result) {
+      unshieldMedia(el);
+      shieldEl(el, result);
+      return;
+    }
+    if (shielded.has(el) && !el.classList.contains('gss-media')) unshieldEl(el);
+
+    // 4. About the game, with a picture, but no words saying what it shows: cover only the picture.
+    const un = media.length ? matcher.unlabeled(text, { assume: assumePacks }) : null;
+    if (un) shieldMedia(el, media, un);
+    else unshieldMedia(el);
+
+    // 5. The picture itself: a repost of a reported screenshot, or text written inside the thumbnail.
+    if (media.length) {
+      if (settings.hashImages && reportedHashes.length) queueHashCheck(el, media);
+      if (!un) queueVision(el, media, text);
+    }
+  }
+
+  /* ---------- covering pictures only ---------- */
+
+  function shieldMedia(card, media, cat) {
+    if (mediaRevealed.has(card) && mediaRevealed.get(card) === sig.get(card)) return;
+    const hosts = [];
+    for (const m of media) {
+      const host = mediaHost(m, card);
+      if (host && !hosts.some((x) => x.contains(host) || host.contains(x))) hosts.push(host);
+    }
+    for (const old of mediaHosts.get(card) || []) if (!hosts.includes(old)) unshieldEl(old);
+    for (const host of hosts) {
+      host.__gssCard = card;
+      shieldEl(host, { categories: [cat] });
+      host.classList.add('gss-media');
+    }
+    mediaHosts.set(card, hosts);
+  }
+
+  function unshieldMedia(card) {
+    for (const host of mediaHosts.get(card) || []) if (shielded.has(host)) unshieldEl(host);
+    mediaHosts.delete(card);
+  }
+
+  /* ---------- picture fingerprints ---------- */
+
+  function queueHashCheck(card, media) {
+    for (const m of media.slice(0, 3)) {
+      const u = mediaSrc(m);
+      if (!u) continue;
+      if (imageChecked.has(u)) { applyHash(card, imageChecked.get(u)); continue; }
+      if (!pendingHash.has(u)) pendingHash.set(u, new Set());
+      pendingHash.get(u).add(card);
+    }
+    if (pendingHash.size && !hashTimer) hashTimer = setTimeout(flushHashes, 120);
+  }
+
+  async function flushHashes() {
+    hashTimer = null;
+    const batch = new Map(pendingHash);
+    pendingHash.clear();
+    let res = null;
+    try { res = await chrome.runtime.sendMessage({ type: 'hash-images', urls: Array.from(batch.keys()) }); } catch (_) {}
+    for (const [u, cards] of batch) {
+      const h = (res && res.hashes && res.hashes[u]) || '';
+      imageChecked.set(u, h);
+      for (const c of cards) applyHash(c, h);
+    }
+    scheduleCount();
+  }
+
+  function applyHash(card, h) {
+    if (!h || !active || !card.isConnected || revealedSig.has(card)) return;
+    if (shielded.has(card) && !card.classList.contains('gss-media')) return;
+    if (safeHashes.some((x) => P.hashDistance(h, x) <= G.HASH_DISTANCE)) return;
+    const hit = reportedHashes.find((x) => P.hashDistance(h, x.h) <= G.HASH_DISTANCE);
+    if (!hit) return;
+    unshieldMedia(card);
+    shieldEl(card, { categories: [{
+      id: 'custom/reported-image', pack: 'custom', emoji: '🧩', term: '',
+      label: hit.source === 'you' ? 'Same picture you reported' : `Same picture ${hit.n} people reported`
+    }] });
+  }
+
+  /* ---------- on-device vision ---------- */
+
+  function visionActive() {
+    return !!settings && settings.vision === 'on' && (assumePacks.length > 0 || !!(siteRule && siteRule.visionFeed));
+  }
+
+  function queueVision(card, media, text) {
+    if (!visionActive()) return;
+    const u = mediaSrc(media[0]);
+    if (!u) return;
+    const prev = visionDone.get(u);
+    if (prev && prev !== 'pending') { applyVision(card, text, prev); return; }
+    if (!visionWaiting.has(u)) visionWaiting.set(u, new Set());
+    visionWaiting.get(u).add(card);
+    if (prev === 'pending' || visionBudget <= 0) return;
+    visionBudget--;
+    visionDone.set(u, 'pending');
+    chrome.runtime.sendMessage({ type: 'vision-analyze', url: u }).then((r) => {
+      const v = r && r.ok !== false ? r : { text: '', videoGame: false, game: '' };
+      visionDone.set(u, v);
+      for (const c of visionWaiting.get(u) || []) applyVision(c, containerText(c), v);
+      visionWaiting.delete(u);
+      scheduleCount();
+    }).catch(() => visionDone.set(u, { text: '', videoGame: false, game: '' }));
+  }
+
+  function applyVision(card, text, v) {
+    if (!active || !card.isConnected || revealedSig.has(card)) return;
+    if (shielded.has(card) && !card.classList.contains('gss-media')) return;
+    const seen = `${v.text || ''} ${v.game || ''}`.trim();
+    if (!seen) return;
+    const r = matcher.evaluate(text + ' \n ' + seen, { assume: assumePacks });
+    if (r) {
+      r.categories = r.categories.map((c) => Object.assign({}, c, { label: `${c.label} (in the picture)` }));
+      unshieldMedia(card);
+      shieldEl(card, r);
+      return;
+    }
+    if (v.videoGame) {
+      const un = matcher.unlabeled(text + ' ' + (v.game || ''), { assume: assumePacks });
+      if (un) shieldMedia(card, mediaIn(card), un);
+    }
   }
 
   /* ---------- covering elements ---------- */
@@ -333,7 +595,7 @@
     if (el.__gssOverlay) el.__gssOverlay.remove();
 
     el.classList.add('gss-shielded');
-    el.classList.remove('gss-style-blur', 'gss-style-redact', 'gss-style-collapse');
+    el.classList.remove('gss-style-blur', 'gss-style-redact', 'gss-style-collapse', 'gss-media');
     el.classList.add('gss-style-' + (settings.blockStyle || 'blur'));
     el.classList.toggle('gss-thumbs', !!settings.hideThumbnails);
     el.dataset.gssCats = key;
@@ -366,15 +628,24 @@
 
   function unshieldEl(el) {
     if (el.__gssOverlay) { el.__gssOverlay.remove(); el.__gssOverlay = null; }
-    el.classList.remove('gss-shielded', 'gss-pos', 'gss-inline', 'gss-thumbs', 'gss-style-blur', 'gss-style-redact', 'gss-style-collapse');
+    el.classList.remove('gss-shielded', 'gss-pos', 'gss-inline', 'gss-thumbs', 'gss-style-blur', 'gss-style-redact', 'gss-style-collapse', 'gss-media');
     delete el.dataset.gssCats;
     shielded.delete(el);
     resizeObserver.unobserve(el);
   }
 
   function revealEl(el) {
-    unshieldEl(el);
-    revealedSig.set(el, sig.get(el) || hash(containerText(el)));
+    const card = el.__gssCard;
+    if (card && card !== el) {
+      // Revealing a covered picture: keep its card's text judgement, just show the picture.
+      unshieldEl(el);
+      mediaRevealed.set(card, sig.get(card));
+      mediaHosts.set(card, (mediaHosts.get(card) || []).filter((x) => x !== el));
+    } else {
+      unshieldEl(el);
+      revealedSig.set(el, sig.get(el) || hash(containerText(el)));
+      if (card === el) mediaRevealed.set(el, sig.get(el));
+    }
     scheduleCount();
   }
 
@@ -484,8 +755,14 @@
     }
 
     if (!IS_TOP) return;
+    const keysHere = pageKeys(url);
+    if (keysHere.some((k) => safeKeys.has(k))) { hidePageShield(); return; }
     if (!settings.pageShield || G.isSearchPage(url, sitesData && sitesData.searchPages) || pageRevealedUrls.has(url)) { hidePageShield(); return; }
     let result = matcher.evaluate(headline + ' ' + pathWords, { assume: urlPacks });
+    if (!result) {
+      const hit = lookupKeys(keysHere);
+      if (hit) result = { categories: [reportedCat(hit)] };
+    }
     // A stream whose category belongs to a pack is live footage of it, whatever the streamer called it.
     if (!result && siteRule && siteRule.live) {
       const live = topicPacks.map((id) => matcher.liveCategory(id)).filter(Boolean);
@@ -617,7 +894,11 @@
       } else if (m.type === 'characterData') {
         considerText(target);
       } else if (m.type === 'attributes') {
-        considerAttrs(target);
+        if (m.attributeName === 'src' || m.attributeName === 'poster') {
+          // A lazy-loaded picture arrived: recheck its card if pictures matter here or the card was judged before.
+          const c = findContainer(target);
+          if (c && (watchingMedia || sig.has(c))) candidates.add(c);
+        } else considerAttrs(target);
       }
       // Content changed inside a covered or revealed card: judge it again (YouTube recycles cards).
       const el = target.nodeType === 1 ? target : target.parentElement;
@@ -671,6 +952,18 @@
     }
     const hostRule = P.siteRuleFor(location.hostname, sitesData, data.settings.customSites);
     if (hostRule || (siteRule && siteRule.hosts && siteRule.hosts.length)) setSiteRule(hostRule);
+
+    itemIdRes = P.compileItemIds(sitesData);
+    knownKeys.clear();
+    const feed = data.community || {};
+    for (const [k, n] of Object.entries(feed.items || {})) knownKeys.set(k, { source: 'community', n });
+    for (const k of Object.keys(data.reports.items || {})) knownKeys.set(k, { source: 'you', n: 1 });
+    safeKeys = new Set(Object.keys(data.reports.safe || {}));
+    reportedHashes = (data.reports.hashes || []).map((x) => ({ h: x.h, source: 'you', n: 1 }))
+      .concat((feed.hashes || []).map((x) => ({ h: x.h, source: 'community', n: x.n })));
+    safeHashes = (data.reports.safeHashes || []).map((x) => x.h);
+    watchingMedia = (data.settings.hashImages && reportedHashes.length > 0) || knownKeys.size > 0 || data.settings.vision === 'on';
+    visionBudget = 60;
     applySettings(data.settings);
   }
 
@@ -739,6 +1032,11 @@
       reply && reply({ ok: true });
       return;
     }
+    if (msg.type === 'report-target' || msg.type === 'report-page') {
+      if (msg.type === 'report-page' && !IS_TOP) return;
+      handleReport(msg.kind || 'report', msg, msg.type === 'report-page').then((r) => reply && reply(r));
+      return true;
+    }
     if (msg.type === 'shield-target') {
       const t = lastContextMenuTarget;
       if (!t) return;
@@ -751,9 +1049,74 @@
     }
   });
 
+  /* ---------- reporting ---------- */
+
+  async function handleReport(kind, info, wholePage) {
+    let el = null;
+    const t = wholePage ? null : lastContextMenuTarget;
+    if (t) {
+      const base = t.nodeType === 1 ? t : t.parentElement;
+      const ov = base && base.closest && base.closest('.gss-overlay');
+      if (ov) el = ov.parentElement;
+      else if (base && base !== document.body && base !== document.documentElement && !base.closest('gss-page-shield')) el = findContainer(base);
+      if (el && el.__gssCard) el = el.__gssCard;
+    }
+    const page = !el;
+    let keys;
+    let title;
+    let author = '';
+    let urls = [];
+    if (page) {
+      keys = pageKeys(location.href);
+      title = pageHeadline();
+      const og = document.querySelector('meta[property="og:image"]');
+      if (og && og.content) urls.push(og.content);
+    } else {
+      keys = itemKeysOf(el).concat(P.keysFor(info.linkUrl, itemIdRes), P.keysFor(info.srcUrl, itemIdRes));
+      if (!keys.length) {
+        const a = el.matches('a[href]') ? el : el.querySelector('a[href]');
+        keys = pageKeys(info.linkUrl || (a && a.href) || '').filter((k) => k.startsWith('page:'));
+      }
+      title = containerText(el);
+      author = authorOf(el);
+      urls = mediaIn(el).map(mediaSrc);
+      if (info.srcUrl) urls.unshift(info.srcUrl);
+    }
+    keys = Array.from(new Set(keys));
+    urls = Array.from(new Set(urls)).slice(0, 3);
+    let hashes = [];
+    if (urls.length) {
+      try {
+        const r = await chrome.runtime.sendMessage({ type: 'hash-images', urls });
+        hashes = Object.values((r && r.hashes) || {}).filter(Boolean);
+      } catch (_) {}
+    }
+    const packs = Array.from(new Set(matcher.contextPacks(title + ' ' + (page ? '' : pageHeadline())).concat(assumePacks)));
+
+    if (kind === 'safe') {
+      if (el) {
+        unshieldMedia(el);
+        if (shielded.has(el)) unshieldEl(el);
+        revealedSig.set(el, sig.get(el));
+      } else {
+        pageRevealedUrls.add(location.href);
+        hidePageShield();
+      }
+      scheduleCount();
+      return chrome.runtime.sendMessage({ type: 'not-spoiler', keys, hashes }).catch(() => ({ ok: false }));
+    }
+
+    // Hide it right away; the background stores it and shares it if you follow a community server.
+    const cat = reportedCat({ source: 'you', n: 1 });
+    if (el) { unshieldMedia(el); revealedSig.delete(el); shieldEl(el, { categories: [cat] }); }
+    else if (IS_TOP) { pageRevealedUrls.delete(location.href); showPageShield({ categories: [cat] }); }
+    scheduleCount();
+    return chrome.runtime.sendMessage({ type: 'report', keys, hashes, title, author, packs, page }).catch(() => ({ ok: false }));
+  }
+
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
-    if (changes[S.KEY] || changes[P.PACKS_KEY] || changes[P.SITES_KEY]) P.loadAll().then(applyData).catch(() => {});
+    if ([S.KEY, P.PACKS_KEY, P.SITES_KEY, P.LEARNED_KEY, P.COMMUNITY_KEY, P.REPORTS_KEY].some((k) => changes[k])) P.loadAll().then(applyData).catch(() => {});
   });
 
   // SPA navigations that do not touch the DOM right away.

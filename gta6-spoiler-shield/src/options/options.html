@@ -22,6 +22,8 @@
         <a href="#protection">🛡️ Protection</a>
         <a href="#packs">📦 Topic packs</a>
         <a href="#categories">🗂️ Categories</a>
+        <a href="#smart">🧠 Smart detection</a>
+        <a href="#community">👥 Community</a>
         <a href="#rules">🧩 Custom rules</a>
         <a href="#words">🔑 Words</a>
         <a href="#sites">🌍 Sites & site rules</a>
@@ -155,6 +157,56 @@
         <div class="cat-list" id="catList"></div>
       </section>
 
+      <!-- Smart detection -->
+      <section class="card" id="smart">
+        <header class="card-head">
+          <h2>Smart detection</h2>
+          <p>Most spoilers don't say "spoiler". These catch the ones that hide in pictures, vague captions and names nobody has heard of yet.</p>
+        </header>
+        <div class="toggles flush">
+          <label class="toggle-row">
+            <span><b>Learn from the game's wiki</b><small>Every 12 hours each pack reads its wiki categories (characters, missions, places…) and starts listening for new names as editors add them. Learned words appear in Categories with a 📚 mark and can be removed like any other.</small></span>
+            <span class="switch"><input type="checkbox" data-key="learnFromSources"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <div class="status-line"><span id="learnStatus"></span><button class="link" id="learnNow" type="button">Refresh now</button></div>
+          <label class="toggle-row">
+            <span><b>Recognise reposted spoiler pictures</b><small>When you (or the community) report a post, its picture gets a fingerprint. The same screenshot is then hidden wherever it shows up again, whatever caption it has.</small></span>
+            <span class="switch"><input type="checkbox" data-key="hashImages"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <div class="toggle-row">
+            <span><b>Read thumbnails with on-device AI</b><small>On GTA VI pages and video feeds, the browser's built-in model reads the words written inside thumbnails ("LUCIA DIES??") and notices game footage behind random captions. Runs on your computer; pictures are never uploaded.</small></span>
+            <div class="seg small" id="visionMode" role="radiogroup" aria-label="On-device AI">
+              <button role="radio" data-v="off">Off</button>
+              <button role="radio" data-v="on">On</button>
+            </div>
+          </div>
+          <div class="status-line"><span id="visionStatus">Checking this browser…</span><button class="link" id="visionDownload" type="button" hidden>Download the model</button></div>
+        </div>
+      </section>
+
+      <!-- Community -->
+      <section class="card" id="community">
+        <header class="card-head">
+          <h2>Community</h2>
+          <p>Right-click anything and choose <b>🚩 Report as a spoiler</b>. It's hidden for you at once. If you follow a community server, it's hidden for everyone once enough <em>different</em> people report it, and the server learns new names and channels from what gets reported.</p>
+        </header>
+        <form class="row" id="communityForm">
+          <input type="url" id="communityUrl" class="grow" placeholder="https://… community server (optional)" aria-label="Community server link">
+          <button class="btn accent" type="submit">Save & sync</button>
+        </form>
+        <div class="site-status" id="communityStatus"></div>
+        <div class="toggles flush">
+          <label class="toggle-row">
+            <span><b>Share my reports</b><small>Sends what you report (its link id, picture fingerprint, title and channel) with a random install id. Nothing is sent while you just browse.</small></span>
+            <span class="switch"><input type="checkbox" data-key="shareReports"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+        </div>
+        <h3 class="label spaced">Your reports</h3>
+        <div class="report-list" id="myReports"></div>
+        <h3 class="label spaced">Marked "not a spoiler"</h3>
+        <div class="report-list" id="mySafe"></div>
+      </section>
+
       <!-- Custom rules -->
       <section class="card" id="rules">
         <header class="card-head">
@@ -286,6 +338,7 @@
   <script src="../shared/matcher.js"></script>
   <script src="../shared/settings.js"></script>
   <script src="../shared/packs.js"></script>
+  <script src="../shared/vision.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

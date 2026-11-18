@@ -197,3 +197,18 @@ div.toggle-row { cursor: default; }
 .editor-msg.bad { color: var(--danger); }
 .editor-msg.good { color: var(--ok); }
 @media (max-width: 640px) { .pack { flex-wrap: wrap; } .pack .btns { width: 100%; justify-content: flex-start; } }
+
+/* Smart detection & community */
+.toggles.flush { margin-top: 0; border-top: 0; }
+.status-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 0 14px; margin-top: -6px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+.status-line .bad { color: var(--danger); }
+.seg.small { flex: none; width: 140px; }
+.tag.learned { border-color: color-mix(in srgb, var(--ok) 55%, transparent); }
+.tag.learned::before { content: "📚"; font-size: 11px; }
+.tag.learned.community::before { content: "👥"; }
+.report-list { display: flex; flex-direction: column; gap: 6px; }
+.report-list .empty { color: var(--faint); font-size: 12.5px; }
+.report { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--line); font-size: 12.5px; }
+.report .what { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.report code { font-size: 11px; }
+.report time { color: var(--faint); white-space: nowrap; }

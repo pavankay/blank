@@ -14,6 +14,17 @@ A Chrome extension (Manifest V3) that hides GTA VI spoilers across the web, and 
 
 Works in Chrome, Edge, Brave, Arc, Opera and other Chromium browsers.
 
+## Spoilers that never say "spoiler"
+
+Most people don't label spoilers. Spoiler Shield layers several kinds of detection so it catches those too. The full explanation is in [docs/smart-detection.md](docs/smart-detection.md).
+
+- **Reactions & teasers.** Things like "bro what 💀 #GTA6" or "not them doing that 😭".
+- **Unlabeled screenshots.** A GTA VI post with a picture but no spoiler words gets **just the picture covered**, and the title stays readable.
+- **Learns from the game wiki every 12 hours.** It picks up new characters, missions and places as editors add them. On launch eve it learned 296 words this way.
+- **Report as a spoiler** (right-click). The post is hidden at once, everywhere that video or post appears. Its picture is fingerprinted, so the same screenshot reposted under a different caption is caught too.
+- **Community server** (`server/`, no dependencies). Once enough *different* people report something, it's hidden for everyone. The server also learns names and channels that keep showing up in reports. "Not a spoiler" votes, rate limits and moderation keep it honest.
+- **Optional on-device AI.** It reads the words written inside thumbnails ("LUCIA DIES??"). Pictures never leave your computer.
+
 ## What it does
 
 - **Covers spoilers before they paint.** It runs at `document_start` and watches the page with a `MutationObserver`, so infinite feeds, lazy-loaded comments and recycled cards (YouTube) are caught as they appear.
@@ -64,7 +75,13 @@ Shortcuts: `Alt+Shift+S` toggles the shield, `Alt+Shift+R` reveals everything on
 
 ## Privacy
 
-Everything runs locally. No network requests, no analytics. Settings and stats live in `chrome.storage.local`.
+No analytics, no account. Settings, stats and your reports live in `chrome.storage.local`. The extension only goes online to:
+
+- refresh packs and site rules from links you chose
+- read the game wiki to learn new names (you can turn this off)
+- download the community feed and send *your* reports, only if you set a community server
+
+Pictures are only fingerprinted or read on your computer.
 
 ## Development
 
@@ -75,16 +92,23 @@ src/shared/defaults.js     engine constants and default settings (no topic data)
 src/shared/matcher.js      term compiler + text judge (pure, no DOM)
 src/shared/packs.js        pack/site-rule validation, storage, install, subscribe, auto-update
 src/shared/settings.js     settings storage and migration
+src/shared/imagehash.js    picture fingerprints (difference hash with letterbox trimming)
+src/shared/community.js    community feed sync and report sending
+src/shared/vision.js       optional on-device model / TextDetector wrapper
+src/offscreen/             hidden page for the model when the background can't reach it
+server/server.js           community server (no dependencies)
 src/content/               page engine + overlay styles
 src/background/            badge, stats, context menus, shortcuts
 src/popup/, src/options/   UI
 ```
 
 ```
-npm test            # matcher unit tests (node:test)
+npm test            # unit tests: matcher, smart detection, community server
 npm run test:e2e    # loads the extension in Chromium via Playwright and checks real pages
 npm run test:social # 20 social-network look-alike pages served under their real hostnames
 npm run test:packs  # install a pack from a link, update it remotely, write packs and site rules in settings
+npm run test:smart  # unlabeled posts, wiki learning, reports, reposted screenshots, community threshold, vision
+npm run server      # run a community server locally
 npm run icons       # re-render icons from icons/icon.svg
 npm run zip         # package for the Chrome Web Store
 ```

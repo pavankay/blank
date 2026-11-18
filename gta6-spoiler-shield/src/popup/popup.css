@@ -34,7 +34,7 @@ body {
 .mini { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .mini span { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); color: var(--muted); }
 
-.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+.actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
 .actions .btn { width: 100%; padding: 8px 6px; font-size: 12px; }
 .pause-wrap { position: relative; }
 .menu { position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; min-width: 150px; padding: 4px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: var(--shadow); }

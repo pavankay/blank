@@ -19,6 +19,9 @@
 
   const PACKS_KEY = 'packs';
   const SITES_KEY = 'sites';
+  const LEARNED_KEY = 'learned';      // words learned from a pack's sources (game wiki)
+  const COMMUNITY_KEY = 'community';  // the community feed: reported items, image fingerprints, learned names
+  const REPORTS_KEY = 'reports';      // this browser's own reports and "not a spoiler" choices
   const LIMITS = { terms: 800, termLen: 120, regexLen: 120, categories: 40, sites: 300, selectors: 100, selectorLen: 300, urls: 60 };
 
   /* ---------- small validators ---------- */
@@ -27,8 +30,8 @@
   const slug = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
 
   // Rejects invalid regexes and the classic catastrophic-backtracking shapes like (a+)+ or (.*)*.
-  function safeRegexSource(src) {
-    if (typeof src !== 'string' || !src || src.length > LIMITS.regexLen) return false;
+  function safeRegexSource(src, maxLen) {
+    if (typeof src !== 'string' || !src || src.length > (maxLen || LIMITS.regexLen)) return false;
     if (/\((?:[^()\\]|\\.)*[+*}](?:[^()\\]|\\.)*\)\s*[+*{]/.test(src)) return false;
     if (/\\[1-9]/.test(src)) return false; // backreferences
     try { new RegExp(src, 'iu'); return true; } catch (_) { return false; }
@@ -125,7 +128,8 @@
       const label = str(c.label, 40) || cid;
       const terms = termList(c.terms, warnings, `${cid}.terms`);
       const solo = termList(c.solo, warnings, `${cid}.solo`);
-      if (!terms.length && !solo.length) { warnings.push(`Category "${cid}" has no words, so it never matches.`); }
+      const media = c.media === 'unlabeled' ? 'unlabeled' : '';
+      if (!terms.length && !solo.length && !media) { warnings.push(`Category "${cid}" has no words, so it never matches.`); }
       categories.push({
         id: cid,
         label,
@@ -134,6 +138,7 @@
         description: str(c.description, 200),
         defaultOn: c.defaultOn !== false,
         liveStream: c.liveStream === true,
+        media,
         terms,
         strong: termList(c.strong, warnings, `${cid}.strong`),
         solo
@@ -153,6 +158,22 @@
       }
     }
 
+    // Where the pack can learn more by itself (a game wiki's category pages).
+    const sources = [];
+    for (const src of (Array.isArray(raw.sources) ? raw.sources : []).slice(0, 20)) {
+      if (!src || src.type !== 'mediawiki') { warnings.push('Skipped a source of an unknown type.'); continue; }
+      const api = cleanUrl(src.api);
+      const category = str(src.category, 120);
+      const into = slug(src.into);
+      if (!api || !api.startsWith('https:') || !category) { warnings.push('Skipped a source without an https "api" and a "category".'); continue; }
+      if (!categories.some((c) => c.id === into)) { warnings.push(`Skipped source "${category}": no category "${into}" to learn into.`); continue; }
+      sources.push({
+        type: 'mediawiki', api, category, into,
+        depth: Math.max(0, Math.min(2, Number(src.depth) || 0)),
+        context: ['auto', 'strong', 'names'].includes(src.context) ? src.context : 'none'
+      });
+    }
+
     const examples = (Array.isArray(raw.examples) ? raw.examples : [])
       .filter((s) => typeof s === 'string' && s.trim()).map((s) => s.trim().slice(0, 200)).slice(0, 20);
 
@@ -165,7 +186,7 @@
         version: str(raw.version, 40) || '1',
         description: str(raw.description, 300),
         updateUrl: cleanUrl(raw.updateUrl),
-        context, categories, examples, threshold
+        context, categories, sources, examples, threshold
       }
     };
   }
@@ -226,8 +247,14 @@
       if (safeRegexSource(p)) searchPages.push(p); else warnings.push(`searchPages: skipped ${p}`);
     }
     const generic = raw.generic ? selectorList(raw.generic, warnings, 'generic') : G.GENERIC_CONTAINERS.slice();
+    // How to recognise the same video or post anywhere (links, embeds, thumbnail URLs) so reports can follow it.
+    const itemIds = [];
+    for (const it of (Array.isArray(raw.itemIds) ? raw.itemIds : []).slice(0, 60)) {
+      if (!it || !safeRegexSource(it.pattern, 220) || typeof it.key !== 'string' || !/^[a-z0-9-]+:\$1$/.test(it.key)) { warnings.push('itemIds: skipped an invalid entry'); continue; }
+      itemIds.push({ pattern: it.pattern, key: it.key });
+    }
     if (errors.length) return { errors, warnings };
-    return { errors, warnings, data: { format: G.SITES_FORMAT, version: str(raw.version, 40) || '1', sites, generic, searchPages } };
+    return { errors, warnings, data: { format: G.SITES_FORMAT, version: str(raw.version, 40) || '1', sites, generic, searchPages, itemIds } };
   }
 
   function validateSite(s, warnings) {
@@ -239,7 +266,13 @@
     if (!hosts.length && !detect) { warnings.push(`Site "${name}" has no "hosts" or "detect", skipped.`); return null; }
     const selectors = selectorList(s.selectors, warnings, `${name}.selectors`);
     if (!selectors.length) { warnings.push(`Site "${name}" has no selectors, skipped.`); return null; }
-    return { name, hosts, detect, selectors, topic: selectorList(s.topic, warnings, `${name}.topic`), live: s.live === true };
+    return {
+      name, hosts, detect, selectors,
+      topic: selectorList(s.topic, warnings, `${name}.topic`),
+      author: selectorList(s.author, warnings, `${name}.author`),
+      live: s.live === true,
+      visionFeed: s.visionFeed === true
+    };
   }
 
   function hostMatches(host, pattern) {
@@ -263,6 +296,150 @@
 
   function detectRules(sitesData, customSites) {
     return [].concat(customSites || [], (sitesData && sitesData.sites) || []).filter((r) => r && r.detect && !(r.hosts && r.hosts.length));
+  }
+
+  /* ---------- learned and community words ---------- */
+
+  const uniq = (a) => Array.from(new Set(a.filter(Boolean)));
+
+  /** Clean learned/community data, which comes from the network: plain words only, no regexes. */
+  function plainTerms(list, max) {
+    return uniq((Array.isArray(list) ? list : []).filter((t) => typeof t === 'string')
+      .map((t) => t.trim()).filter((t) => t.length >= 3 && t.length <= 60 && !t.startsWith('/'))).slice(0, max || 400);
+  }
+
+  /**
+   * Packs with the words they learned added in. Learned words are listed separately on each category
+   * (category.learned) so settings can show them, and the user's "removed" list still applies to them.
+   */
+  function augmentPacks(packList, learned, community) {
+    return packList.map((p) => {
+      const L = (learned && learned[p.id]) || {};
+      const C = (community && community.learned && community.learned[p.id]) || {};
+      const cTerms = plainTerms(C.terms, 300);
+      const cAuthors = plainTerms(C.authors, 300);
+      const hasL = L.categories && Object.keys(L.categories).length;
+      if (!hasL && !L.context && !cTerms.length && !cAuthors.length) return p;
+      const q = JSON.parse(JSON.stringify(p));
+      for (const c of q.categories) {
+        const add = plainTerms(L.categories && L.categories[c.id]);
+        if (!add.length) continue;
+        const have = new Set(c.terms.map((t) => t.toLowerCase()));
+        c.learned = add.filter((t) => !have.has(t.toLowerCase()));
+        c.terms = c.terms.concat(c.learned);
+      }
+      const ctx = L.context || {};
+      q.context.strong = uniq(q.context.strong.concat(plainTerms(ctx.strong), cAuthors));
+      q.context.names = uniq(q.context.names.concat(plainTerms(ctx.names)));
+      q.learnedContext = { strong: plainTerms(ctx.strong), names: plainTerms(ctx.names), authors: cAuthors };
+      if (cTerms.length) {
+        q.categories.push({
+          id: 'community', label: 'Community-reported', short: 'Reported', emoji: '👥', defaultOn: true, liveStream: false, media: '',
+          description: 'Names and phrases that keep turning up in posts people reported as spoilers.',
+          terms: cTerms, strong: cTerms, solo: [], learned: cTerms
+        });
+      }
+      return q;
+    });
+  }
+
+  /** Turn a wiki page title into a word worth listening for, or '' to skip it. */
+  function cleanWikiTitle(t) {
+    if (typeof t !== 'string' || /^(Category|File|Template|User|Help|List of)\b/i.test(t)) return '';
+    t = t.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    if (/^unnamed\b/i.test(t) || t.length < 3 || t.length > 40) return '';
+    return t;
+  }
+
+  async function wikiCategory(api, category, depth, seen, budget) {
+    const titles = [];
+    let cont = '';
+    do {
+      if (++budget.n > 40) break;
+      const url = `${api}?action=query&list=categorymembers&cmtitle=${encodeURIComponent('Category:' + category)}` +
+        `&cmlimit=500&cmtype=page|subcat&format=json&origin=*${cont ? '&cmcontinue=' + encodeURIComponent(cont) : ''}`;
+      const d = await fetchJson(url);
+      for (const m of (d.query && d.query.categorymembers) || []) {
+        if (m.ns === 14) {
+          const sub = String(m.title).replace(/^Category:/, '');
+          if (depth > 0 && !seen.has(sub)) { seen.add(sub); titles.push(...await wikiCategory(api, sub, depth - 1, seen, budget)); }
+        } else titles.push(m.title);
+      }
+      cont = d.continue && d.continue.cmcontinue;
+    } while (cont);
+    return titles;
+  }
+
+  /** Read a pack's sources and return what it learned: { categories: {id: [...]}, context: {strong, names}, count }. */
+  async function learnPack(pack) {
+    const known = new Set([].concat(pack.context.strong, pack.context.weak, pack.context.names, ...pack.categories.map((c) => c.terms))
+      .map((t) => String(t).toLowerCase()));
+    const out = { categories: {}, context: { strong: [], names: [] }, count: 0, fetchedAt: Date.now(), error: '' };
+    const errors = [];
+    for (const src of pack.sources || []) {
+      try {
+        const titles = await wikiCategory(src.api, src.category, src.depth, new Set([src.category]), { n: 0 });
+        for (const raw of titles) {
+          const t = cleanWikiTitle(raw);
+          if (!t || known.has(t.toLowerCase())) continue;
+          const words = t.split(/\s+/).length;
+          (out.categories[src.into] = out.categories[src.into] || []).push(t);
+          if (src.context === 'strong' || (src.context === 'auto' && words >= 2)) out.context.strong.push(t);
+          else if (src.context === 'names' || (src.context === 'auto' && words === 1)) out.context.names.push(t);
+          known.add(t.toLowerCase());
+          out.count++;
+        }
+      } catch (e) { errors.push(`${src.category}: ${e.message}`); }
+    }
+    out.error = errors.join('; ');
+    return out;
+  }
+
+  /** Refresh learned words for every pack that has sources. */
+  async function learnAll() {
+    const got = await chrome.storage.local.get([PACKS_KEY, LEARNED_KEY]);
+    const learned = got[LEARNED_KEY] || {};
+    const report = [];
+    for (const p of packListFrom(got[PACKS_KEY])) {
+      if (!p.sources || !p.sources.length) { delete learned[p.id]; continue; }
+      const r = await learnPack(p);
+      // Keep what was learned before if this run failed completely.
+      if (!r.count && r.error && learned[p.id]) learned[p.id] = Object.assign({}, learned[p.id], { error: r.error, fetchedAt: r.fetchedAt });
+      else learned[p.id] = r;
+      report.push(`${p.name}: ${r.count} words${r.error ? ` (${r.error})` : ''}`);
+    }
+    await chrome.storage.local.set({ [LEARNED_KEY]: learned });
+    return report;
+  }
+
+  /* ---------- item identity (for reports) ---------- */
+
+  function compileItemIds(sitesData) {
+    return ((sitesData && sitesData.itemIds) || []).map((it) => {
+      try { return { re: new RegExp(it.pattern, 'i'), key: it.key }; } catch (_) { return null; }
+    }).filter(Boolean);
+  }
+
+  /** Stable keys for a link or image URL, e.g. "youtube:dQw4w9WgXcQ". */
+  function keysFor(url, compiled) {
+    const out = [];
+    if (!url) return out;
+    for (const { re, key } of compiled) {
+      const m = re.exec(url);
+      if (m && m[1]) out.push(key.replace('$1', m[1]));
+    }
+    return out;
+  }
+
+  /** Hamming distance between two 16-hex-digit image fingerprints. */
+  function hashDistance(a, b) {
+    if (!a || !b || a.length !== b.length) return 64;
+    let d = 0;
+    for (let i = 0; i < a.length; i += 4) {
+      let x = parseInt(a.slice(i, i + 4), 16) ^ parseInt(b.slice(i, i + 4), 16);
+      while (x) { d += x & 1; x >>>= 1; }
+    }
+    return d;
   }
 
   /* ---------- pack state inside settings ---------- */
@@ -318,15 +495,22 @@
 
   /** Everything a page, popup or options page needs, in one storage read. */
   async function loadAll() {
-    const got = await chrome.storage.local.get([G.settings.KEY, PACKS_KEY, SITES_KEY]);
-    return fromRaw(got[G.settings.KEY], got[PACKS_KEY], got[SITES_KEY]);
+    const got = await chrome.storage.local.get([G.settings.KEY, PACKS_KEY, SITES_KEY, LEARNED_KEY, COMMUNITY_KEY, REPORTS_KEY]);
+    return fromRaw(got[G.settings.KEY], got[PACKS_KEY], got[SITES_KEY], got[LEARNED_KEY], got[COMMUNITY_KEY], got[REPORTS_KEY]);
   }
 
-  function fromRaw(rawSettings, rawPacks, rawSites) {
+  function emptyReports() { return { items: {}, safe: {}, hashes: [] }; }
+
+  function fromRaw(rawSettings, rawPacks, rawSites, learned, community, reports) {
     const store = rawPacks || {};
-    const packs = packListFrom(store);
+    const rawList = packListFrom(store);
+    const packs = augmentPacks(rawList, learned, community);
     const settings = withPackState(G.settings.merge(rawSettings), packs);
-    return { settings, packs, packStore: store, sites: (rawSites && rawSites.data) || null, sitesEntry: rawSites || null };
+    return {
+      settings, packs, rawPacks: rawList, packStore: store,
+      sites: (rawSites && rawSites.data) || null, sitesEntry: rawSites || null,
+      learned: learned || {}, community: community || null, reports: Object.assign(emptyReports(), reports || {})
+    };
   }
 
   async function fetchJson(url) {
@@ -425,9 +609,10 @@
   }
 
   const api = {
-    PACKS_KEY, SITES_KEY, LIMITS,
+    PACKS_KEY, SITES_KEY, LEARNED_KEY, COMMUNITY_KEY, REPORTS_KEY, LIMITS,
     slug, safeRegexSource, cleanUrl, compareVersions,
     validatePack, packTemplate, validateSites, validateSite, hostMatches, siteRuleFor, detectRules,
+    augmentPacks, plainTerms, cleanWikiTitle, learnPack, learnAll, compileItemIds, keysFor, hashDistance, emptyReports, fetchJson,
     withPackState, enabledPacks, packListFrom, fromRaw,
     loadAll, loadPackStore, loadSitesStore, putPack, removePack, subscribe, installBundled, updateAll, resetSitesToBundled
   };

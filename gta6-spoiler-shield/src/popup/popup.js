@@ -101,6 +101,7 @@
     $('siteBtn').classList.toggle('on', !!siteOff);
     $('siteBtn').disabled = !h || special;
     $('revealBtn').disabled = !count;
+    $('reportBtn').disabled = !status || !!reason;
 
     for (const b of $('sensitivity').querySelectorAll('button')) {
       b.setAttribute('aria-checked', String(b.dataset.v === settings.sensitivity));
@@ -248,6 +249,18 @@
     if (!tab) return;
     try { await chrome.tabs.sendMessage(tab.id, { type: 'reveal-all' }); } catch (_) {}
     setTimeout(refreshStatus, 150);
+  });
+
+  $('reportBtn').addEventListener('click', async () => {
+    if (!tab) return;
+    try {
+      await chrome.tabs.sendMessage(tab.id, { type: 'report-page', kind: 'report' }, { frameId: 0 });
+      $('reportBtn').textContent = '✅ Reported';
+    } catch (_) {
+      $('reportBtn').textContent = 'Can’t report this page';
+    }
+    $('reportBtn').disabled = true;
+    setTimeout(refreshStatus, 300);
   });
 
   $('quickForm').addEventListener('submit', (e) => {

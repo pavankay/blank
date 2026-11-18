@@ -9,6 +9,9 @@
   let packs = [];         // validated packs, sorted by name
   let packStore = {};     // id -> { pack, source, url, fetchedAt, error }
   let sitesEntry = null;  // { data, source, url, fetchedAt, error }
+  let learned = {};       // packId -> { categories, context, count, fetchedAt, error }
+  let community = null;   // the community feed, if following a server
+  let reports = null;     // this browser's reports
   let editingRuleId = null;
   const openCats = new Set();
 
@@ -35,6 +38,9 @@
     packs = data.packs;
     packStore = data.packStore;
     sitesEntry = data.sitesEntry;
+    learned = data.learned;
+    community = data.community;
+    reports = data.reports;
   }
 
   async function save(mutator, msg) {
@@ -262,6 +268,8 @@
     renderRules();
     renderWords();
     renderSites();
+    renderSmart();
+    renderCommunity();
     renderLabExamples();
     runLab();
   }
@@ -314,7 +322,8 @@
       const ctxId = `ctx-${p.id}`;
       const ctx = el('div', { class: 'pack-ctx' },
         el('h4', { text: `📍 Also means ${p.short}` }),
-        el('p', { class: 'hint', text: `Extra words that tell the shield a text is about ${p.name}: nicknames, translations, new names revealed after the pack was made.` }),
+        el('p', { class: 'hint', text: `Extra words that tell the shield a text is about ${p.name}: nicknames, translations, new names revealed after the pack was made.` +
+          (p.learnedContext ? ` Already learned automatically: ${p.learnedContext.strong.length + p.learnedContext.names.length} names from the wiki, ${p.learnedContext.authors.length} channels from community reports.` : '') }),
         el('div', { class: 'tags', id: ctxId }));
       group.append(ctx);
       list.append(group);
@@ -331,6 +340,8 @@
     const tagsId = `tags-${p.id}-${c.id}`;
     const removed = new Set(st.removed);
     const strong = new Set(c.strong);
+    const learnedSet = new Set(c.learned || []);
+    const fromCommunity = c.id === 'community';
     const count = c.terms.filter((t) => !removed.has(t)).length + st.extra.length;
     const isOpen = openCats.has(key);
 
@@ -347,14 +358,16 @@
       el('div', { class: 'cat-head' },
         el('div', { class: 'cat-em', text: c.emoji, 'aria-hidden': 'true' }),
         el('div', { class: 'cat-info' }, el('b', { text: c.label }), el('small', { text: c.description })),
-        el('span', { class: 'cat-meta', text: `${count} words${st.extra.length || st.removed.length ? ' · edited' : ''}` }),
+        el('span', { class: 'cat-meta', text: `${count} words${learnedSet.size ? ` · ${learnedSet.size} learned` : ''}${st.extra.length || st.removed.length ? ' · edited' : ''}` }),
         expandBtn,
         sw(st.enabled, `Shield ${c.label}`, (v) => save((s) => { s.packs[p.id].categories[c.id].enabled = v; }, `${c.label} ${v ? 'on' : 'off'}`))),
       body);
 
     if (isOpen) {
       const tags = el('div', { class: 'tags', id: tagsId });
-      const items = c.terms.filter((t) => !removed.has(t)).map((t) => ({ value: t, cls: strong.has(t) ? 'strong' : '', title: strong.has(t) ? 'Clear spoiler word (used by Relaxed mode)' : t }))
+      const items = c.terms.filter((t) => !removed.has(t)).map((t) => (learnedSet.has(t)
+        ? { value: t, cls: 'learned' + (fromCommunity ? ' community' : ''), title: fromCommunity ? 'Learned from community reports' : 'Learned from the game wiki' }
+        : { value: t, cls: strong.has(t) ? 'strong' : '', title: strong.has(t) ? 'Clear spoiler word (used by Relaxed mode)' : t }))
         .concat(st.extra.map((t) => ({ value: t, cls: 'added', title: 'Added by you' })));
       tagEditor(tags, items, {
         placeholder: 'Add a word and press Enter',
@@ -452,6 +465,94 @@
     if (settings.customSites.length) box.append(el('span', { text: `${settings.customSites.length} of your own` }));
     if (sitesEntry && sitesEntry.error) box.append(el('span', { class: 'err', text: `Update failed: ${sitesEntry.error}` }));
     if (document.activeElement !== $('sitesUrl')) $('sitesUrl').value = settings.sitesUrl || '';
+  }
+
+  /* ---------- smart detection ---------- */
+
+  let visionInfo = null;
+
+  function renderSmart() {
+    const parts = [];
+    let bad = false;
+    for (const p of packs) {
+      const raw = packStore[p.id] && packStore[p.id].pack;
+      if (!raw || !raw.sources || !raw.sources.length) continue;
+      const L = learned[p.id];
+      if (!settings.learnFromSources) parts.push(`${p.name}: off`);
+      else if (!L) parts.push(`${p.name}: not checked yet`);
+      else {
+        const n = Object.values(L.categories || {}).reduce((a, b) => a + b.length, 0);
+        parts.push(`${p.name}: ${n} words learned from ${raw.sources.length} wiki categories, ${ago(L.fetchedAt)}`);
+        if (L.error) { parts.push(`(some failed: ${L.error})`); bad = true; }
+      }
+    }
+    $('learnStatus').textContent = parts.length ? parts.join(' · ') : 'No installed pack has sources to learn from.';
+    $('learnStatus').className = bad ? 'bad' : '';
+    for (const b of $('visionMode').querySelectorAll('[role="radio"]')) b.setAttribute('aria-checked', String(b.dataset.v === settings.vision));
+    renderVision();
+  }
+
+  function renderVision() {
+    const v = visionInfo;
+    const box = $('visionStatus');
+    $('visionDownload').hidden = !(v && v.engine === 'on-device-model' && v.state === 'downloadable');
+    if (!v) { box.textContent = 'Checking this browser…'; return; }
+    const what = {
+      'on-device-model': {
+        available: 'Ready: the built-in model is on this computer.',
+        downloadable: 'This browser can run it after a one-time model download.',
+        downloading: 'The model is downloading…',
+        unavailable: 'This computer can\'t run the built-in model.'
+      }[v.state],
+      'text-detector': 'Ready: this browser can read text in pictures (no game recognition).',
+      none: 'Not available in this browser. Everything else still works.'
+    }[v.engine];
+    box.textContent = what || `Status: ${v.state}`;
+  }
+
+  async function checkVision() {
+    try { visionInfo = await chrome.runtime.sendMessage({ type: 'vision-status' }); } catch (_) { visionInfo = { engine: 'none', state: 'unavailable' }; }
+    renderVision();
+  }
+
+  function renderCommunity() {
+    if (document.activeElement !== $('communityUrl')) $('communityUrl').value = settings.communityUrl || '';
+    const box = $('communityStatus');
+    box.textContent = '';
+    if (!settings.communityUrl) box.append(el('span', { text: 'Not following a server: reports stay on this computer' }));
+    else if (community) {
+      const learnedCount = Object.values(community.learned || {}).reduce((a, l) => a + (l.terms || []).length + (l.authors || []).length, 0);
+      box.append(
+        el('span', { text: `${Object.keys(community.items || {}).length} videos & posts` }),
+        el('span', { text: `${(community.hashes || []).length} pictures` }),
+        el('span', { text: `${learnedCount} learned names & channels` }),
+        el('span', { text: `synced ${ago(community.fetchedAt)}` }));
+      if (community.error) box.append(el('span', { class: 'err', text: `Sync failed: ${community.error}` }));
+    } else box.append(el('span', { text: 'Waiting for the first sync…' }));
+
+    const list = $('myReports');
+    list.textContent = '';
+    const items = Object.entries((reports && reports.items) || {}).sort((a, b) => b[1].at - a[1].at).slice(0, 50);
+    const pics = (reports && reports.hashes) || [];
+    if (!items.length && !pics.length) list.append(el('span', { class: 'empty', text: 'Nothing reported yet. Right-click a spoiler and choose 🚩 Report as a spoiler.' }));
+    for (const [key, r] of items) {
+      list.append(el('div', { class: 'report' },
+        el('span', { class: 'what', title: r.title || key }, r.title || '(no title) ', ' ', el('code', { text: key })),
+        el('time', { text: ago(r.at) }),
+        el('button', { class: 'link', type: 'button', text: 'Undo', onclick: () => chrome.runtime.sendMessage({ type: 'undo-report', key }).then(() => toast('Report removed')) })));
+    }
+    if (pics.length) list.append(el('span', { class: 'empty', text: `${pics.length} reported picture${pics.length === 1 ? '' : 's'} fingerprinted.` }));
+
+    const safe = $('mySafe');
+    safe.textContent = '';
+    const safeItems = Object.entries((reports && reports.safe) || {}).sort((a, b) => b[1] - a[1]).slice(0, 50);
+    if (!safeItems.length) safe.append(el('span', { class: 'empty', text: 'Nothing yet. Right-click a covered post and choose 👍 Not a spoiler if it was wrongly hidden.' }));
+    for (const [key, at] of safeItems) {
+      safe.append(el('div', { class: 'report' },
+        el('span', { class: 'what' }, el('code', { text: key })),
+        el('time', { text: ago(at) }),
+        el('button', { class: 'link', type: 'button', text: 'Undo', onclick: () => chrome.runtime.sendMessage({ type: 'undo-report', safeKey: key }).then(() => toast('Removed')) })));
+    }
   }
 
   /* ---------- lab ---------- */
@@ -678,6 +779,45 @@
     toast('Built-in site rules restored');
   });
 
+  /* ---------- events: smart detection, community ---------- */
+
+  $('visionMode').addEventListener('click', (e) => {
+    const b = e.target.closest('[role="radio"]');
+    if (b) save((s) => { s.vision = b.dataset.v; }, b.dataset.v === 'on' ? 'On-device AI on' : 'On-device AI off');
+  });
+
+  $('visionDownload').addEventListener('click', async () => {
+    $('visionStatus').textContent = 'Downloading the model… (this happens once)';
+    try {
+      await G.vision.download((p) => { $('visionStatus').textContent = `Downloading the model… ${Math.round(p * 100)}%`; });
+      await checkVision();
+    } catch (e) {
+      $('visionStatus').textContent = `Couldn't download: ${e.message}`;
+    }
+  });
+
+  $('learnNow').addEventListener('click', async () => {
+    $('learnStatus').textContent = 'Reading the wiki…';
+    const r = await chrome.runtime.sendMessage({ type: 'learn-now' });
+    await reload();
+    render();
+    if (r && r.ok) toast(r.report.length ? r.report.join(' · ') : 'Nothing to learn from');
+    else toast(`Couldn't refresh: ${(r && r.error) || 'unknown error'}`);
+  });
+
+  $('communityForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = $('communityUrl').value.trim();
+    const url = raw ? P.cleanUrl(raw) : '';
+    if (raw && !url) { toast('Use an https:// link'); return; }
+    await save((s) => { s.communityUrl = url ? url.replace(/\/+$/, '') : ''; });
+    if (!url) { toast('Not following a server'); return; }
+    const r = await chrome.runtime.sendMessage({ type: 'community-sync' });
+    await reload();
+    render();
+    toast(r && r.ok ? `Synced: ${r.items} reported items` : `Couldn't reach the server: ${(r && r.error) || 'unknown error'}`);
+  });
+
   /* ---------- events: lab, stats, backup ---------- */
 
   $('labInput').addEventListener('input', runLab);
@@ -743,10 +883,10 @@
 
   chrome.storage.onChanged.addListener(async (changes, area) => {
     if (area !== 'local') return;
-    if (changes[S.KEY] || changes[P.PACKS_KEY] || changes[P.SITES_KEY]) {
-      const before = JSON.stringify([settings, packStore, sitesEntry]);
+    if ([S.KEY, P.PACKS_KEY, P.SITES_KEY, P.LEARNED_KEY, P.COMMUNITY_KEY, P.REPORTS_KEY].some((k) => changes[k])) {
+      const before = JSON.stringify([settings, packStore, sitesEntry, learned, community, reports]);
       await reload();
-      if (JSON.stringify([settings, packStore, sitesEntry]) !== before && !$('editor').open) {
+      if (JSON.stringify([settings, packStore, sitesEntry, learned, community, reports]) !== before && !$('editor').open) {
         const focused = document.activeElement && document.activeElement.closest('.tags');
         render();
         if (focused && focused.id) refocus(focused.id);
@@ -755,5 +895,5 @@
     if (changes[S.STATS_KEY]) renderStats();
   });
 
-  reload().then(() => { render(); renderStats(); });
+  reload().then(() => { render(); renderStats(); checkVision(); });
 })();
