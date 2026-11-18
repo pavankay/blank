@@ -228,33 +228,156 @@
     }
   ];
 
-  // Container selectors per site: the "card" that gets shielded around a matched piece of text.
+  /*
+   * Per-site knowledge.
+   *   host / detect: which site (hostname regex, or a selector for self-hosted networks like Mastodon)
+   *   selectors:     the "card" that gets shielded around matched text (post, tweet, video, comment, chat line)
+   *   topic:         elements that say what the whole page is about (stream category, channel name, hashtag header)
+   *   live:          if the topic is GTA VI, the page itself is live gameplay footage
+   */
   const SITE_CONTAINERS = [
     {
-      host: /(^|\.)youtube\.com$/,
+      name: 'YouTube', host: /(^|\.)youtube\.com$/,
       selectors: [
         'ytd-rich-item-renderer', 'ytd-video-renderer', 'ytd-compact-video-renderer', 'ytd-grid-video-renderer',
-        'ytd-reel-item-renderer', 'ytd-playlist-renderer', 'ytd-radio-renderer', 'ytd-compact-playlist-renderer',
-        'ytd-comment-thread-renderer', 'ytd-comment-view-model', 'ytd-post-renderer', 'ytd-backstage-post-thread-renderer',
-        'ytd-notification-renderer', 'yt-lockup-view-model', 'ytm-shorts-lockup-view-model', 'ytd-shelf-renderer #title',
-        'ytd-watch-metadata', 'ytd-playlist-panel-video-renderer', 'ytd-channel-renderer', 'ytm-video-with-context-renderer',
-        'ytm-compact-video-renderer', 'ytm-comment-renderer'
+        'ytd-reel-item-renderer', 'ytd-reel-video-renderer', 'ytd-playlist-renderer', 'ytd-radio-renderer',
+        'ytd-compact-playlist-renderer', 'ytd-compact-radio-renderer', 'ytd-comment-thread-renderer', 'ytd-comment-view-model',
+        'ytd-comment-renderer', 'ytd-post-renderer', 'ytd-backstage-post-thread-renderer', 'ytd-notification-renderer',
+        'yt-lockup-view-model', 'ytm-shorts-lockup-view-model', 'ytm-shorts-lockup-view-model-v2', 'ytd-watch-metadata',
+        'ytd-playlist-panel-video-renderer', 'ytd-channel-renderer', 'ytd-universal-watch-card-renderer',
+        'yt-live-chat-text-message-renderer', 'yt-live-chat-paid-message-renderer', 'yt-live-chat-membership-item-renderer',
+        '.ytp-videowall-still', '.ytp-ce-element', '.ytp-autonav-endscreen-upnext-container', '.ytp-tooltip',
+        'ytm-video-with-context-renderer', 'ytm-compact-video-renderer', 'ytm-comment-renderer', 'ytm-reel-item-renderer',
+        'ytm-rich-item-renderer', '.ytSearchboxComponentSuggestion', '.sbsb_c'
+      ],
+      topic: ['ytd-rich-metadata-renderer #title', 'ytd-watch-metadata h1', 'yt-shorts-video-title-view-model', 'ytd-reel-video-renderer[is-active] h2']
+    },
+    {
+      name: 'Reddit', host: /(^|\.)reddit\.com$/,
+      selectors: [
+        'shreddit-post', 'shreddit-comment', 'article', 'div[data-testid="post-container"]', '.thing', '.comment',
+        '[data-testid="search-post"]', 'search-telemetry-tracker', 'reddit-pdp-right-rail-post', 'faceplate-tracker[noun="trending_search"]',
+        'shreddit-gallery-carousel', 'li[role="presentation"]'
+      ],
+      topic: ['shreddit-subreddit-header', '.redditname']
+    },
+    {
+      name: 'X', host: /(^|\.)(x|twitter)\.com$/,
+      selectors: [
+        'article[data-testid="tweet"]', '[data-testid="trend"]', '[data-testid="UserCell"]', '[data-testid="typeaheadResult"]',
+        '[data-testid="notification"]', '[data-testid="card.wrapper"]', '[data-testid="cellInnerDiv"]'
+      ],
+      topic: ['[data-testid="primaryColumn"] h2[role="heading"]']
+    },
+    {
+      name: 'Facebook', host: /(^|\.)facebook\.com$/,
+      selectors: ['div[role="article"]', 'div[aria-posinset]', 'div[data-pagelet^="FeedUnit"]', 'div[data-video-id]', 'li[role="option"]']
+    },
+    {
+      name: 'Instagram', host: /(^|\.)instagram\.com$/,
+      selectors: ['article', 'a[href*="/p/"]', 'a[href*="/reel/"]', 'ul li', 'div[role="dialog"] ul > div'],
+      topic: ['header h1', 'header h2']
+    },
+    {
+      name: 'TikTok', host: /(^|\.)tiktok\.com$/,
+      selectors: [
+        'article', 'div[data-e2e="recommend-list-item-container"]', 'div[data-e2e="search_top-item"]', 'div[data-e2e="search_video-item"]',
+        'div[data-e2e="search-card-desc"]', 'div[data-e2e="user-post-item"]', 'div[data-e2e="challenge-item"]',
+        '[data-e2e="comment-level-1"]', '[data-e2e="comment-level-2"]', 'div[class*="DivCommentItemContainer"]', 'div[class*="DivItemContainer"]',
+        '[data-e2e="chat-message"]', 'li[id^="sug-"]'
+      ],
+      topic: ['h1[data-e2e="challenge-title"]', 'h1[data-e2e="browse-video-desc"]', '[data-e2e="live-game-tag"]'],
+      live: false
+    },
+    {
+      name: 'Twitch', host: /(^|\.)twitch\.tv$/,
+      selectors: [
+        'article', 'div[data-a-target^="card-"]', '.chat-line__message', '[data-a-target="chat-line-message"]', '.vod-message',
+        'div[data-target="directory-first-item"]', '[data-test-selector="search-result-live-channel__name"]', '.tw-tower > div',
+        '[data-a-target="side-nav-card"]', '.side-nav-card'
+      ],
+      topic: ['a[data-a-target="stream-game-link"]', '[data-a-target="video-info-game-boxart-link"]', 'a[data-a-target="stream-game-link"] span'],
+      live: true
+    },
+    {
+      name: 'Kick', host: /(^|\.)kick\.com$/,
+      selectors: ['[data-chat-entry]', '.chat-entry', '#chatroom-messages > div > div', 'div[class*="card"]', 'a[href*="/videos/"]'],
+      topic: ['[data-testid="livestream-category"]', '#channel-content a[href*="/category/"]', 'a[href*="/category/"][class*="category"]'],
+      live: true
+    },
+    {
+      name: 'Threads', host: /(^|\.)threads\.(net|com)$/,
+      selectors: ['div[data-pressable-container]', 'div[data-interactive-id]']
+    },
+    {
+      name: 'Bluesky', host: /(^|\.)bsky\.app$/,
+      selectors: ['div[data-testid^="feedItem"]', 'div[data-testid^="postThreadItem"]', 'div[data-testid="contentHider-post"]', 'div[data-testid^="feedGenerator"]']
+    },
+    {
+      name: 'Mastodon', detect: '#mastodon, body.app-body, meta[property="og:site_name"][content*="Mastodon"]',
+      selectors: ['article', '.status', '.detailed-status', '.notification', '.conversation', '.account-card']
+    },
+    {
+      name: 'Discord', host: /(^|\.)discord\.com$/,
+      selectors: ['li[id^="chat-messages"]', 'div[class*="messageListItem"]', 'div[class*="message_"]', 'div[class*="threadMessage"]', 'div[class*="forumPost"]', 'li[class*="card"]'],
+      topic: ['section[aria-label*="hannel"] h1', 'h1[class*="title"]', 'div[class*="titleWrapper"] h1']
+    },
+    {
+      name: 'Tumblr', host: /(^|\.)tumblr\.com$/,
+      selectors: ['article', 'div[data-id]', 'div[data-cell-id]', 'div[data-testid="reply"]']
+    },
+    {
+      name: 'LinkedIn', host: /(^|\.)linkedin\.com$/,
+      selectors: ['.feed-shared-update-v2', '.comments-comment-item', '.comments-comment-entity', 'article', '.update-components-article', '.news-module__storyline', 'li.feed-follows-module-recommendation']
+    },
+    {
+      name: 'Pinterest', host: /(^|\.)pinterest\.[a-z.]+$/,
+      selectors: ['[data-test-id="pin"]', '[data-test-id="pinWrapper"]', '[data-grid-item="true"]', '[data-test-id="comment"]', '[data-test-id="search-suggestion"]']
+    },
+    {
+      name: 'Snapchat', host: /(^|\.)snapchat\.com$/,
+      selectors: ['div[class*="Spotlight"]', 'a[href*="/spotlight/"]', 'div[class*="StoryCard"]']
+    },
+    {
+      name: 'Telegram', host: /^web\.telegram\.org$/,
+      selectors: ['.message', '.bubble', '.Message', '.chatlist-chat', '.ListItem', '.reply-markup']
+    },
+    {
+      name: 'WhatsApp', host: /^web\.whatsapp\.com$/,
+      selectors: ['div[role="row"]', 'div.message-in', 'div.message-out', 'div[role="listitem"]', 'div[role="gridcell"]']
+    },
+    {
+      name: 'Messenger', host: /(^|\.)messenger\.com$/,
+      selectors: ['div[role="row"]', 'div[role="gridcell"]', 'a[role="link"][href*="/t/"]']
+    },
+    {
+      name: 'Steam', host: /(^|\.)(steamcommunity\.com|steampowered\.com)$/,
+      selectors: ['div.apphub_Card', '.commentthread_comment', '.forum_topic', '.review_box', '.partnereventwebrowembed', '.blotter_block', '.newsPostBlock']
+    },
+    {
+      name: 'VK', host: /(^|\.)vk\.(com|ru)$/,
+      selectors: ['.post', '._post', '.reply', '.im-mess', '.feed_row']
+    },
+    {
+      name: '9GAG', host: /(^|\.)9gag\.com$/, selectors: ['article', '.comment-entry', '[class*="comment-item"]']
+    },
+    {
+      name: 'Imgur', host: /(^|\.)imgur\.com$/, selectors: ['.Post-item', '.GalleryComment', '.Gallery-Content--title', '.post-image-container']
+    },
+    {
+      name: 'Quora', host: /(^|\.)quora\.com$/, selectors: ['.dom_annotate_multifeed_bundle_AnswersBundle', 'div.q-box.qu-borderBottom', 'div.q-click-wrapper']
+    },
+    {
+      name: 'Google', host: /(^|\.)google\.[a-z.]+$/,
+      selectors: [
+        'div.g', 'div.MjjYud', 'g-inner-card', 'div.related-question-pair', 'g-section-with-header', 'div.SoaBEf', 'article',
+        'li[role="presentation"]', 'div[role="option"]', 'div[jscontroller][data-hveid] > div'
       ]
     },
-    { host: /(^|\.)reddit\.com$/, selectors: ['shreddit-post', 'shreddit-comment', 'faceplate-tracker[noun="post"]', 'article', 'div[data-testid="post-container"]', '.thing', 'search-telemetry-tracker', 'reddit-pdp-right-rail-post'] },
-    { host: /(^|\.)(x|twitter)\.com$/, selectors: ['article[data-testid="tweet"]', '[data-testid="trend"]', '[data-testid="UserCell"]', '[data-testid="cellInnerDiv"]'] },
-    { host: /(^|\.)google\.[a-z.]+$/, selectors: ['div.g', 'div.MjjYud', 'g-inner-card', 'div[jscontroller][data-hveid] > div', 'div.related-question-pair', 'g-section-with-header', 'div.yuRUbf', 'div.SoaBEf'] },
-    { host: /(^|\.)bing\.com$/, selectors: ['li.b_algo', 'div.b_ans', '.news-card'] },
-    { host: /(^|\.)duckduckgo\.com$/, selectors: ['article[data-testid="result"]', 'li[data-layout]'] },
-    { host: /(^|\.)facebook\.com$/, selectors: ['div[role="article"]', 'div[data-pagelet^="FeedUnit"]'] },
-    { host: /(^|\.)instagram\.com$/, selectors: ['article', 'div[role="button"] > div > div'] },
-    { host: /(^|\.)tiktok\.com$/, selectors: ['div[data-e2e="recommend-list-item-container"]', 'div[data-e2e="search_top-item"]', 'div[data-e2e="user-post-item"]'] },
-    { host: /(^|\.)twitch\.tv$/, selectors: ['article', 'div[data-a-target^="card-"]', '.chat-line__message', '[data-a-target="chat-line-message"]'] },
-    { host: /(^|\.)threads\.(net|com)$/, selectors: ['div[data-pressable-container]'] },
-    { host: /(^|\.)bsky\.app$/, selectors: ['div[data-testid^="feedItem"]', 'div[data-testid^="postThreadItem"]'] },
-    { host: /(^|\.)discord\.com$/, selectors: ['li[id^="chat-messages"]', 'div[class*="message_"]'] },
-    { host: /(^|\.)news\.ycombinator\.com$/, selectors: ['tr.athing', 'tr.athing + tr', 'td.default'] },
-    { host: /(^|\.)fandom\.com$/, selectors: ['section', '.portable-infobox', 'li', 'p', 'figure'] }
+    { name: 'Bing', host: /(^|\.)bing\.com$/, selectors: ['li.b_algo', 'div.b_ans', '.news-card', 'li.sa_sg'] },
+    { name: 'DuckDuckGo', host: /(^|\.)duckduckgo\.com$/, selectors: ['article[data-testid="result"]', 'li[data-layout]', 'li[role="option"]'] },
+    { name: 'Hacker News', host: /(^|\.)news\.ycombinator\.com$/, selectors: ['tr.athing', 'tr.athing + tr', 'td.default'] },
+    { name: 'Fandom', host: /(^|\.)fandom\.com$/, selectors: ['section', '.portable-infobox', 'li', 'p', 'figure'] }
   ];
 
   const GENERIC_CONTAINERS = [

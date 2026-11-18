@@ -12,16 +12,32 @@
   const BEFORE = '(?<![\\p{L}\\p{N}])';
   const AFTER = '(?![\\p{L}\\p{N}])';
 
+  // Split hashtags and handles the way people write them on socials: #GTA6Spoilers -> "gta 6 spoilers".
+  function splitTag(tag) {
+    return tag
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+      .replace(/([A-Za-z])(\d)/g, '$1 $2')
+      .replace(/(\d)([A-Za-z])/g, '$1 $2')
+      .replace(/_/g, ' ');
+  }
+
   function normalize(text) {
     if (!text) return '';
     return String(text)
-      .normalize('NFKD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/[‘’ʼ]/g, "'")
-      .replace(/[Ⅰ-ↈ]/g, (ch) => ch.normalize('NFKC'))
+      .normalize('NFKD') // also folds fancy fonts: 𝗚𝗧𝗔 𝟲, ＧＴＡ６, Ⅵ
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\u200b-\u200d\u2060\ufeff\ufe0f\u20e3\u00ad]/g, '') // zero-width tricks, emoji keycaps
+      .replace(/[\u2018\u2019\u02bc\u2032]/g, "'")
+      .replace(/([#@])([\p{L}\p{N}_]{3,})/gu, (m, p, t) => p + splitTag(t))
       .toLowerCase()
+      .replace(/#(gta ?vi(?!ce)|gta ?six|grand ?theft ?auto ?(?:vi|6))(?=[a-z])/g, '#$1 ')
+      .replace(/([\p{L}])'s(?![\p{L}\p{N}])/gu, '$1')
       .replace(/\s+/g, ' ');
   }
+
+  // "no spoilers", "spoiler-free" and friends are promises, not spoilers.
+  const NEGATED_SPOILER = /(?<![\p{L}\p{N}])(?:no|zero|without|0|non|not)[\s-]+(?:[\p{L}]+[\s-]+){0,2}spoilers?(?![\p{L}\p{N}])|spoiler[\s-]*(?:free|less|safe)/gu;
 
   function escapeRe(s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -178,7 +194,7 @@
        * @returns {null | {categories: Array<{id,label,emoji,term}>, context: string[], score: number}}
        */
       evaluate(raw, opts) {
-        const text = normalize(raw);
+        const text = normalize(raw).replace(NEGATED_SPOILER, ' ');
         if (!text || text.length < 2) return null;
         if (exceptionRe && exceptionRe.test(text)) return null;
 

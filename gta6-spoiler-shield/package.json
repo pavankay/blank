@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test tests/matcher.test.js",
     "test:e2e": "node tests/e2e.js",
+    "test:social": "node tests/social.e2e.js",
     "icons": "node tools/render-icons.js",
     "zip": "rm -f spoiler-shield.zip && zip -r spoiler-shield.zip manifest.json icons/*.png src -x '*.DS_Store'"
   }

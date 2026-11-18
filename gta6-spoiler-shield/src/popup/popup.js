@@ -45,7 +45,7 @@
       expired: 'Ended on ' + settings.activeUntil,
       na: 'Not available here'
     })[state];
-    $('host').textContent = special ? 'Browser pages cannot be filtered' : (h || 'this page');
+    $('host').textContent = special ? 'Browser pages cannot be filtered' : (h || 'this page') + (status && status.site ? ` · tuned for ${status.site}` : '');
 
     const count = status ? status.count + (status.pageShielded ? 1 : 0) : 0;
     $('count').textContent = fmt(count);

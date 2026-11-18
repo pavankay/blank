@@ -17,14 +17,20 @@
   const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION', 'TEMPLATE', 'HEAD', 'TITLE', 'META', 'LINK']);
   const BLOCK_TAGS = new Set(['P', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'TD', 'TH', 'DD', 'DT', 'BLOCKQUOTE', 'FIGCAPTION', 'FIGURE', 'DIV', 'SECTION', 'ARTICLE', 'ASIDE', 'HEADER', 'FOOTER', 'A', 'SPAN', 'LABEL', 'PRE']);
   const NEVER_CONTAINER = new Set(['HTML', 'BODY', 'MAIN', 'HEAD']);
-  const SEMANTIC_SEL = 'article, [role="article"], li, figure, blockquote';
+  const SEMANTIC_SEL = 'article, [role="article"], li, figure, blockquote, [role="option"]';
   const ATTR_SEL = 'img[alt], [title], [aria-label]';
   const CARD_TEXT_LIMIT = 600;      // fallback climbs to the largest ancestor with at most this much text
   const MAX_CONTAINER_TEXT = 5000;  // generic containers bigger than this are "the page", not a card
   const MAX_SITE_TEXT = 25000;
 
-  const siteRule = G.SITE_CONTAINERS.find((r) => r.host.test(location.hostname));
-  const SITE_SEL = siteRule ? siteRule.selectors.join(',') : '';
+  let siteRule = G.SITE_CONTAINERS.find((r) => r.host && r.host.test(location.hostname)) || null;
+  let SITE_SEL = siteRule ? siteRule.selectors.join(',') : '';
+  const OBSERVE_OPTS = {
+    childList: true, subtree: true, characterData: true,
+    attributes: true, attributeFilter: ['alt', 'title', 'aria-label']
+  };
+  const shadowRoots = new Set();   // open shadow roots we watch (web-component sites like new Reddit)
+  let shadowSeen = false;
   const GENERIC_SEL = G.GENERIC_CONTAINERS.filter((s) => !SEMANTIC_SEL.includes(s)).join(',');
 
   let settings = null;
@@ -92,6 +98,9 @@
   function findContainer(el) {
     if (!el || el.nodeType !== 1) return null;
     if (isOurs(el) || el.isContentEditable) return null;
+    // Text inside a shadow root: cover the light-DOM host, where our overlay and styles can live.
+    const rootNode = el.getRootNode && el.getRootNode();
+    if (rootNode && rootNode !== document && rootNode.host) return findContainer(rootNode.host);
 
     let c = null;
     if (SITE_SEL) {
@@ -114,6 +123,7 @@
         const len = textLen(n);
         if (len > CARD_TEXT_LIMIT) break;
         if (BLOCK_TAGS.has(n.tagName) || n.tagName.includes('-')) best = n;
+        if (isRepeatedItem(n)) break; // n is one post in a feed of look-alike siblings: stop here
         n = n.parentElement;
       }
       c = best || el;
@@ -124,6 +134,17 @@
       c = c.parentElement;
     }
     return c;
+  }
+
+  function isRepeatedItem(el) {
+    const p = el.parentElement;
+    if (!p || p.children.length < 2) return false;
+    let same = 0;
+    for (const sib of p.children) {
+      if (sib.tagName === el.tagName && sib.className === el.className && (sib.textContent || '').trim().length > 10) same++;
+      if (same >= 2) return true;
+    }
+    return false;
   }
 
   function containerText(el) {
@@ -141,7 +162,39 @@
       if (ti) t += ' ' + ti;
       if (ar) t += ' ' + ar;
     }
+    if (shadowSeen) t += ' ' + shadowText(el, 0);
     return t.length > 30000 ? t.slice(0, 30000) : t;
+  }
+
+  function shadowText(el, depth) {
+    if (depth > 3) return '';
+    let t = '';
+    if (el.shadowRoot) t += ' ' + el.shadowRoot.textContent + shadowText(el.shadowRoot, depth + 1);
+    const all = el.querySelectorAll('*');
+    for (let i = 0; i < all.length && i < 2000; i++) {
+      const sr = all[i].shadowRoot;
+      if (sr) t += ' ' + sr.textContent + shadowText(sr, depth + 1);
+    }
+    return t;
+  }
+
+  function watchShadowRoot(sr) {
+    if (!sr || shadowRoots.has(sr)) return;
+    shadowRoots.add(sr);
+    shadowSeen = true;
+    if (observer && active) observer.observe(sr, OBSERVE_OPTS);
+    scanRoot(sr);
+  }
+
+  function closestComposed(el, sel) {
+    let n = el;
+    while (n) {
+      const c = n.closest ? n.closest(sel) : null;
+      if (c) return c;
+      const r = n.getRootNode ? n.getRootNode() : null;
+      n = r && r.host ? r.host : null;
+    }
+    return null;
   }
 
   /* ---------- scanning ---------- */
@@ -167,12 +220,16 @@
   function scanRoot(root) {
     if (!active || !root) return;
     if (root.nodeType === 3) { considerText(root); return; }
-    if (root.nodeType !== 1) return;
-    if (SKIP_TAGS.has(root.tagName) || isOurs(root)) return;
+    if (root.nodeType !== 1 && root.nodeType !== 11) return;
+    if (root.nodeType === 1 && (SKIP_TAGS.has(root.tagName) || isOurs(root))) return;
+    if (root.shadowRoot) watchShadowRoot(root.shadowRoot);
 
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
     let n;
-    while ((n = walker.nextNode())) considerText(n);
+    while ((n = walker.nextNode())) {
+      if (n.nodeType === 3) considerText(n);
+      else if (n.shadowRoot) watchShadowRoot(n.shadowRoot);
+    }
 
     if (root.matches && root.matches(ATTR_SEL)) considerAttrs(root);
     const withAttrs = root.querySelectorAll ? root.querySelectorAll(ATTR_SEL) : [];
@@ -393,15 +450,30 @@
     return [getRealTitle(), h1 ? h1.textContent : '', og ? og.content : ''].join(' \n ');
   }
 
+  /** Text of the elements that say what the page is about: stream category, channel name, hashtag header. */
+  function topicText() {
+    if (!siteRule || !siteRule.topic) return '';
+    let t = '';
+    for (const sel of siteRule.topic) {
+      let el = null;
+      try { el = document.querySelector(sel); } catch (_) {}
+      if (el) t += ' ' + el.textContent;
+    }
+    return t.slice(0, 600);
+  }
+
   function checkPage() {
     if (!active || !settings) return;
     lastPageCheck = Date.now();
     const url = location.href;
     const headline = pageHeadline();
-    const pathWords = decodeURIComponent(location.pathname).replace(/[-_/+.]+/g, ' ');
+    let pathWords = '';
+    try { pathWords = decodeURIComponent(location.pathname).replace(/[-_/+.]+/g, ' '); } catch (_) {}
+    const topic = topicText();
 
     const urlCtx = G.urlHasContext(url);
-    const textCtx = matcher.contextScore(G.normalize(headline + ' ' + pathWords)).score >= matcher.threshold;
+    const topicCtx = !!topic && matcher.contextScore(G.normalize(topic)).score >= matcher.threshold;
+    const textCtx = topicCtx || matcher.contextScore(G.normalize(headline + ' ' + pathWords)).score >= matcher.threshold;
     const nextAssume = !!settings.pageContext && (urlCtx || textCtx);
     if (nextAssume !== assumeContext) {
       assumeContext = nextAssume;
@@ -410,12 +482,30 @@
 
     if (!IS_TOP) return;
     if (!settings.pageShield || G.isSearchPage(url) || pageRevealedUrls.has(url)) { hidePageShield(); return; }
-    const result = matcher.evaluate(headline + ' ' + pathWords, { assumeContext: urlCtx });
+    let result = matcher.evaluate(headline + ' ' + pathWords, { assumeContext: urlCtx });
+    // A live stream or VOD whose category is GTA VI is gameplay footage, whatever the streamer called it.
+    const footageOn = settings.sensitivity === 'strict' || (settings.categories.footage && settings.categories.footage.enabled);
+    if (!result && siteRule && siteRule.live && topicCtx && footageOn) {
+      result = { categories: [{ id: 'footage', label: 'Live GTA VI gameplay', emoji: '📹', term: '' }] };
+    }
     if (result) showPageShield(result);
     else hidePageShield();
   }
 
+  function resolveSiteRule() {
+    if (siteRule) return;
+    const r = G.SITE_CONTAINERS.find((x) => {
+      if (!x.detect) return false;
+      try { return !!document.querySelector(x.detect); } catch (_) { return false; }
+    });
+    if (!r) return;
+    siteRule = r;
+    SITE_SEL = r.selectors.join(',');
+    if (active) rescan();
+  }
+
   function schedulePageCheck() {
+    if (!siteRule) resolveSiteRule();
     const since = Date.now() - lastPageCheck;
     if (since > 250) { checkPage(); return; }
     if (pageCheckTimer) return;
@@ -518,7 +608,7 @@
       }
       // Content changed inside a covered or revealed card: judge it again (YouTube recycles cards).
       const el = target.nodeType === 1 ? target : target.parentElement;
-      const covered = el && el.closest && el.closest('.gss-shielded');
+      const covered = el && closestComposed(el, '.gss-shielded');
       if (covered) candidates.add(covered);
     }
     flush();
@@ -543,10 +633,11 @@
   function start() {
     if (!observer) observer = new MutationObserver(onMutations);
     observer.disconnect();
-    observer.observe(document.documentElement, {
-      childList: true, subtree: true, characterData: true,
-      attributes: true, attributeFilter: ['alt', 'title', 'aria-label']
-    });
+    observer.observe(document.documentElement, OBSERVE_OPTS);
+    for (const sr of shadowRoots) {
+      if (sr.host && sr.host.isConnected) observer.observe(sr, OBSERVE_OPTS);
+      else shadowRoots.delete(sr);
+    }
     checkPage();
     rescan();
   }
@@ -606,6 +697,7 @@
       for (const el of shielded) for (const id of (el.dataset.gssCats || '').split(',')) if (id) cats[id] = (cats[id] || 0) + 1;
       reply({
         host: HOST,
+        site: siteRule ? siteRule.name : null,
         active,
         reason: settings ? S.inactiveReason(settings, HOST) : 'loading',
         count: shielded.size,
@@ -641,15 +733,25 @@
   // SPA navigations that do not touch the DOM right away.
   window.addEventListener('popstate', () => setTimeout(() => { if (location.href !== lastUrl) onNavigate(); }, 50));
   document.addEventListener('yt-navigate-finish', () => onNavigate());
+  // Shadow roots created by the page (reported by main-world.js).
+  document.addEventListener('gss-shadow-attached', (e) => {
+    const host = e.composedPath()[0];
+    if (host && host.shadowRoot && active) { watchShadowRoot(host.shadowRoot); flush(); }
+  }, true);
+
   setInterval(() => {
     if (!active) return;
     if (location.href !== lastUrl) onNavigate();
+    if (siteRule && siteRule.topic) schedulePageCheck();
     for (const el of shielded) {
       if (!el.isConnected) { shielded.delete(el); continue; }
       repairShield(el);
     }
   }, 1000);
-  document.addEventListener('DOMContentLoaded', () => { if (active) { checkPage(); scanRoot(document.body); flush(); } });
+  document.addEventListener('DOMContentLoaded', () => {
+    resolveSiteRule();
+    if (active) { checkPage(); scanRoot(document.body); flush(); }
+  });
 
   S.load().then(applySettings).catch(() => {});
 

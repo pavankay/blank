@@ -129,3 +129,22 @@ test('url context and search pages', () => {
   assert.ok(M.isSearchPage('https://www.youtube.com/results?search_query=gta+6'));
   assert.ok(!M.isSearchPage('https://www.youtube.com/watch?v=x'));
 });
+
+test('social-media writing styles', () => {
+  const m = M.compile(base());
+  assert.deepEqual(ids(m.evaluate('#GTA6Spoilers the final heist')), ['missions', 'story']);
+  assert.deepEqual(ids(m.evaluate('#GTAVIEasterEggs')), ['secrets']);
+  assert.deepEqual(ids(m.evaluate('@RockstarGames new GTA ending')), ['story']);
+  assert.deepEqual(ids(m.evaluate('𝗚𝗧𝗔 𝟲 ending was insane')), ['story']);    // styled unicode fonts
+  assert.deepEqual(ids(m.evaluate('G​TA 6 map leak')), ['leaks', 'map']); // zero-width evasion
+  assert.deepEqual(ids(m.evaluate("Lucia's death hit hard")), ['story']);       // possessive
+  assert.equal(m.evaluate('#gtavicecity nostalgia ending'), null);             // the 2002 game, not VI
+});
+
+test('"no spoilers" is a promise, not a spoiler', () => {
+  const m = M.compile(base());
+  assert.equal(m.evaluate('GTA 6 first impressions (no spoilers)'), null);
+  assert.equal(m.evaluate('GTA 6 review, no story spoilers'), null);
+  assert.equal(m.evaluate('GTA VI spoiler-free review'), null);
+  assert.deepEqual(ids(m.evaluate('no spoilers but Lucia dies lol')), ['story']);
+});
