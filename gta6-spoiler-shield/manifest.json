@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "Spoiler Shield for GTA VI",
+  "short_name": "Spoiler Shield",
+  "version": "1.0.0",
+  "description": "Block GTA VI spoilers across the web. Choose exactly what to hide: story, map, missions, characters, leaks, footage and more.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Spoiler Shield",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "options_page": "src/options/options.html",
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "permissions": ["storage", "contextMenus", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/shared/defaults.js",
+        "src/shared/matcher.js",
+        "src/shared/settings.js",
+        "src/content/content.js"
+      ],
+      "css": ["src/content/content.css"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "commands": {
+    "toggle-shield": {
+      "suggested_key": { "default": "Alt+Shift+S" },
+      "description": "Turn Spoiler Shield on or off"
+    },
+    "reveal-page": {
+      "suggested_key": { "default": "Alt+Shift+R" },
+      "description": "Reveal everything shielded on this page"
+    }
+  }
+}

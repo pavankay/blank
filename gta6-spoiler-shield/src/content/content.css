@@ -1,0 +1,139 @@
+/* Spoiler Shield: styles injected into every page. Everything is prefixed gss- and forced with !important. */
+
+.gss-shielded.gss-pos { position: relative !important; }
+.gss-shielded.gss-inline { display: inline-block !important; }
+
+/* Content under the cover: unclickable, unselectable, and never a hover-preview trigger. */
+.gss-shielded > :not(.gss-overlay) {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+/* Blur style: soft blur on the children, plus a backdrop blur on the overlay that also catches bare text. */
+.gss-shielded.gss-style-blur > :not(.gss-overlay) {
+  filter: blur(var(--gss-blur, 16px)) saturate(0.5) !important;
+}
+.gss-shielded.gss-style-blur.gss-thumbs img,
+.gss-shielded.gss-style-blur.gss-thumbs video,
+.gss-shielded.gss-style-blur.gss-thumbs picture,
+.gss-shielded.gss-style-blur.gss-thumbs [style*="background-image"] {
+  filter: blur(28px) brightness(0.7) !important;
+}
+.gss-shielded.gss-style-blur.gss-thumbs video { visibility: hidden !important; }
+
+/* Collapse style: the card shrinks to a slim bar. */
+.gss-shielded.gss-style-collapse { font-size: 0 !important; line-height: 0 !important; min-height: 0 !important; }
+.gss-shielded.gss-style-collapse > :not(.gss-overlay) { display: none !important; }
+
+/* ---------- overlay ---------- */
+
+.gss-overlay {
+  all: initial !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  padding: 10px !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  border-radius: inherit !important;
+  min-height: 100% !important;
+  font: 600 13px/1.3 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  color: #f6f1ff !important;
+  text-align: center !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  background:
+    linear-gradient(135deg, rgba(255, 95, 162, 0.28), rgba(255, 138, 61, 0.18) 45%, rgba(61, 214, 245, 0.2)) !important;
+  backdrop-filter: blur(18px) saturate(0.6) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(0.6) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
+  transition: background 0.15s ease !important;
+}
+.gss-overlay:hover { background: linear-gradient(135deg, rgba(255, 95, 162, 0.38), rgba(255, 138, 61, 0.26) 45%, rgba(61, 214, 245, 0.28)) !important; }
+.gss-overlay:focus-visible { outline: 3px solid #3dd6f5 !important; outline-offset: -3px !important; }
+
+.gss-ov-inner {
+  all: initial !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+  max-width: 100% !important;
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+  background: rgba(20, 14, 42, 0.82) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  font: inherit !important;
+  color: inherit !important;
+  pointer-events: none !important;
+}
+.gss-ov-inner > span { all: initial !important; font: inherit !important; color: inherit !important; display: block !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; max-width: 100% !important; }
+.gss-ov-inner > span::before { content: attr(data-t) !important; }
+.gss-ov-inner > .gss-ov-badge { font-size: 20px !important; line-height: 1 !important; }
+.gss-ov-inner > .gss-ov-title { font-size: 13px !important; font-weight: 800 !important; letter-spacing: 0.02em !important; }
+.gss-ov-inner > .gss-ov-reasons { font-size: 11.5px !important; font-weight: 600 !important; color: #ffc2dc !important; }
+.gss-ov-inner > .gss-ov-action {
+  margin-top: 4px !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #1a1033 !important;
+  background: linear-gradient(135deg, #ff5fa2, #ff8a3d) !important;
+}
+
+/* Hold-to-reveal progress bar */
+.gss-ov-progress {
+  all: initial !important;
+  position: absolute !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  height: 4px !important;
+  width: 0 !important;
+  background: linear-gradient(90deg, #ff5fa2, #ffd166) !important;
+  pointer-events: none !important;
+}
+.gss-overlay.gss-holding .gss-ov-progress { width: 100% !important; transition: width 0.9s linear !important; }
+
+/* Small cards: one line */
+.gss-overlay.gss-compact { padding: 4px !important; }
+.gss-overlay.gss-compact .gss-ov-inner { flex-direction: row !important; gap: 8px !important; padding: 4px 10px !important; border-radius: 999px !important; }
+.gss-overlay.gss-compact .gss-ov-badge { font-size: 14px !important; }
+.gss-overlay.gss-compact .gss-ov-reasons { display: none !important; }
+.gss-overlay.gss-compact .gss-ov-action { margin-top: 0 !important; padding: 2px 8px !important; }
+.gss-overlay.gss-tiny .gss-ov-title { display: none !important; }
+.gss-overlay.gss-tiny .gss-ov-inner { padding: 1px 8px !important; }
+
+/* Redact style: solid cover, nothing shows through */
+.gss-shielded.gss-style-redact > .gss-overlay {
+  background: repeating-linear-gradient(-45deg, #1a1033 0 14px, #221645 14px 28px) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Collapse style overlay sits in the flow as a slim bar */
+.gss-shielded.gss-style-collapse > .gss-overlay {
+  position: relative !important;
+  inset: auto !important;
+  min-height: 0 !important;
+  padding: 6px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(255, 95, 162, 0.22), rgba(61, 214, 245, 0.18)) !important;
+  backdrop-filter: none !important;
+}
+.gss-shielded.gss-style-collapse > .gss-overlay .gss-ov-inner { flex-direction: row !important; gap: 10px !important; padding: 5px 12px !important; border-radius: 999px !important; }
+.gss-shielded.gss-style-collapse > .gss-overlay .gss-ov-badge { font-size: 14px !important; }
+.gss-shielded.gss-style-collapse > .gss-overlay .gss-ov-action { margin-top: 0 !important; }
+
+/* Full-page shield */
+html.gss-page-locked { overflow: hidden !important; }
+html.gss-page-locked body { visibility: hidden !important; }
+gss-page-shield { visibility: visible !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gss-overlay, .gss-overlay.gss-holding .gss-ov-progress { transition: none !important; }
+}

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spoiler Shield</title>
+  <link rel="stylesheet" href="../ui/theme.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="../../icons/icon48.png" width="30" height="30" alt="">
+      <div>
+        <div class="name">Spoiler Shield</div>
+        <div class="edition">GTA VI edition</div>
+      </div>
+    </div>
+    <label class="switch big" title="Turn the shield on or off (Alt+Shift+S)">
+      <input type="checkbox" id="enabled" aria-label="Shield on">
+      <span class="track"><span class="thumb"></span></span>
+    </label>
+  </header>
+
+  <section class="hero" id="hero" data-state="on">
+    <div class="ring">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="52" class="ring-bg"/>
+        <circle cx="60" cy="60" r="52" class="ring-fg" id="ringFg"/>
+      </svg>
+      <div class="ring-num"><span id="count">0</span><small>here</small></div>
+    </div>
+    <div class="hero-text">
+      <div class="status" id="status">Protecting this page</div>
+      <div class="host" id="host">…</div>
+      <div class="mini" id="mini"></div>
+    </div>
+  </section>
+
+  <section class="actions">
+    <div class="pause-wrap">
+      <button class="btn" id="pauseBtn" aria-haspopup="menu" aria-expanded="false">⏸ Pause</button>
+      <div class="menu" id="pauseMenu" role="menu" hidden>
+        <button role="menuitem" data-min="15">15 minutes</button>
+        <button role="menuitem" data-min="60">1 hour</button>
+        <button role="menuitem" data-min="240">4 hours</button>
+        <button role="menuitem" data-min="tomorrow">Until tomorrow</button>
+      </div>
+    </div>
+    <button class="btn" id="siteBtn">🚫 Off on this site</button>
+    <button class="btn" id="revealBtn" title="Alt+Shift+R">👁 Reveal page</button>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2>Sensitivity</h2>
+    </div>
+    <div class="seg" id="sensitivity" role="radiogroup" aria-label="Sensitivity">
+      <button role="radio" data-v="relaxed">Relaxed</button>
+      <button role="radio" data-v="balanced">Balanced</button>
+      <button role="radio" data-v="strict">Blackout</button>
+    </div>
+    <p class="hint" id="sensHint"></p>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2>What to shield</h2>
+      <div class="links"><button class="link" id="allOn">All</button><button class="link" id="allOff">None</button></div>
+    </div>
+    <div class="cats" id="cats"></div>
+    <div class="cats custom" id="customCats"></div>
+  </section>
+
+  <form class="block quick" id="quickForm">
+    <input id="quickInput" type="text" placeholder="Always shield a word… e.g. Brian" autocomplete="off" maxlength="80">
+    <button class="btn accent" type="submit">Add</button>
+  </form>
+
+  <footer class="foot">
+    <span id="lifetime">0 spoilers shielded so far</span>
+    <button class="link" id="openOptions">All settings ⚙</button>
+  </footer>
+
+  <script src="../shared/defaults.js"></script>
+  <script src="../shared/matcher.js"></script>
+  <script src="../shared/settings.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

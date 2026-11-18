@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Gaming news feed</title>
+<style>
+ body{font-family:system-ui;background:#f4f2f8;margin:0;padding:24px;color:#1a1033}
+ .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1000px}
+ article{background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 8px #0001}
+ .thumb{height:110px;border-radius:8px;background:linear-gradient(135deg,#ff8a3d,#ff5fa2);margin-bottom:10px}
+ h2{font-size:16px;margin:0 0 6px} p{margin:0;font-size:13px;color:#555}
+</style></head>
+<body>
+<h1>Today in games</h1>
+<div class="grid" id="grid">
+  <article id="a1"><div class="thumb"></div><h2>GTA 6 ending explained: who really dies</h2><p>Spoilers for the final mission ahead.</p></article>
+  <article id="a2"><div class="thumb"></div><h2>Rockstar confirms GTA 6 launch time</h2><p>Unlock times for every region.</p></article>
+  <article id="a3"><div class="thumb"></div><h2>Full GTA VI map leaked</h2><p>Every location, compared with Los Santos.</p></article>
+  <article id="a4"><div class="thumb"></div><h2>Best cozy games this winter</h2><p>A calm list for a cold month.</p></article>
+  <article id="a5"><div class="thumb"></div><h2>Grand Theft Auto VI: 25 easter eggs you missed</h2><p>Hidden references everywhere.</p></article>
+  <article id="a6"><div class="thumb"></div><h2>New Zelda patch notes</h2><p>The ending of the patch notes is long.</p></article>
+</div>
+<p id="plain">A paragraph that says nothing about any game.</p>
+<script>
+  // Simulate an infinite feed adding cards later.
+  setTimeout(() => {
+    const a = document.createElement('article');
+    a.id = 'late';
+    a.innerHTML = '<div class="thumb"></div><h2>Lucia Caminos first 30 minutes playthrough</h2><p>No commentary, 4K.</p>';
+    document.getElementById('grid').appendChild(a);
+  }, 400);
+  setTimeout(() => {
+    // Recycled card: a safe card becomes a spoiler.
+    document.querySelector('#a4 h2').textContent = 'GTA 6 secret ending guide';
+  }, 700);
+</script>
+</body></html>

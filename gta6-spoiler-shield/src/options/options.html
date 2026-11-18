@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spoiler Shield Settings</title>
+  <link rel="icon" href="../../icons/icon32.png">
+  <link rel="stylesheet" href="../ui/theme.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <div class="brand">
+        <img src="../../icons/icon128.png" width="40" height="40" alt="">
+        <div>
+          <div class="name">Spoiler Shield</div>
+          <div class="edition">GTA VI edition</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Sections">
+        <a href="#protection">🛡️ Protection</a>
+        <a href="#categories">🗂️ Categories</a>
+        <a href="#rules">🧩 Custom rules</a>
+        <a href="#words">🔑 Words</a>
+        <a href="#sites">🌍 Sites</a>
+        <a href="#lab">🧪 Test lab</a>
+        <a href="#stats">📊 Stats</a>
+        <a href="#backup">💾 Backup</a>
+      </nav>
+      <div class="side-status" id="sideStatus">
+        <label class="switch big"><input type="checkbox" id="enabled" aria-label="Shield on"><span class="track"><span class="thumb"></span></span></label>
+        <span id="sideStatusText">Shield on</span>
+      </div>
+      <p class="disclaimer">Unofficial fan tool. Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
+    </aside>
+
+    <main class="main">
+      <section class="welcome" id="welcome" hidden>
+        <div>
+          <h1>You're shielded. Go enjoy Leonida blind.</h1>
+          <p>Spoiler Shield is already running on every site. Pick what counts as a spoiler for you below, or keep the defaults: story, characters, missions, map, footage, leaks and secrets are hidden; trailers, reviews and gameplay news stay visible.</p>
+        </div>
+        <button class="btn" id="dismissWelcome">Got it</button>
+      </section>
+
+      <!-- Protection -->
+      <section class="card" id="protection">
+        <header class="card-head">
+          <h2>Protection</h2>
+          <p>How hard to look, and what a shielded spoiler looks like.</p>
+        </header>
+
+        <h3 class="label">Sensitivity</h3>
+        <div class="radio-cards" id="sensitivity" role="radiogroup" aria-label="Sensitivity">
+          <button role="radio" data-v="relaxed">
+            <span class="rc-title">🌤️ Relaxed</span>
+            <span class="rc-desc">Only clear spoilers: endings, deaths, twists, map leaks, walkthroughs, playthroughs.</span>
+          </button>
+          <button role="radio" data-v="balanced">
+            <span class="rc-title">⚖️ Balanced <em>recommended</em></span>
+            <span class="rc-desc">Anything about GTA VI that touches one of your chosen categories.</span>
+          </button>
+          <button role="radio" data-v="strict">
+            <span class="rc-title">🌑 Blackout</span>
+            <span class="rc-desc">Every mention of GTA VI, even plain news. For the truly spoiler-proof.</span>
+          </button>
+        </div>
+
+        <h3 class="label">Shield style</h3>
+        <div class="radio-cards styles" id="blockStyle" role="radiogroup" aria-label="Shield style">
+          <button role="radio" data-v="blur">
+            <span class="preview p-blur"><span class="ln"></span><span class="ln s"></span><span class="pill">🛡️ Spoiler shielded</span></span>
+            <span class="rc-title">Blur</span>
+            <span class="rc-desc">Frosted glass. Layout stays exactly the same.</span>
+          </button>
+          <button role="radio" data-v="redact">
+            <span class="preview p-redact"><span class="pill">🛡️ Spoiler shielded</span></span>
+            <span class="rc-title">Redact</span>
+            <span class="rc-desc">Solid cover. Nothing shows through at all.</span>
+          </button>
+          <button role="radio" data-v="collapse">
+            <span class="preview p-collapse"><span class="ln"></span><span class="pill thin">🛡️ Spoiler · Click to reveal</span><span class="ln s"></span></span>
+            <span class="rc-title">Collapse</span>
+            <span class="rc-desc">Shrinks posts to a slim bar so feeds stay short.</span>
+          </button>
+        </div>
+
+        <h3 class="label">Revealing</h3>
+        <div class="seg wide" id="revealMode" role="radiogroup" aria-label="Reveal mode">
+          <button role="radio" data-v="click">Click to reveal</button>
+          <button role="radio" data-v="hold">Hold to reveal</button>
+          <button role="radio" data-v="locked">Locked</button>
+        </div>
+        <p class="hint" id="revealHint"></p>
+
+        <div class="toggles">
+          <label class="toggle-row">
+            <span><b>Full-page shield</b><small>Cover whole articles, wiki pages and videos whose title is a spoiler, before they load.</small></span>
+            <span class="switch"><input type="checkbox" data-key="pageShield"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <label class="toggle-row">
+            <span><b>Smart page context</b><small>On pages that are about GTA VI (like r/GTA6 or a GTA VI video), judge every post as GTA VI even if it never names the game.</small></span>
+            <span class="switch"><input type="checkbox" data-key="pageContext"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <label class="toggle-row">
+            <span><b>Extra-strong thumbnail blur</b><small>Images and video previews get a heavier blur than text.</small></span>
+            <span class="switch"><input type="checkbox" data-key="hideThumbnails"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <label class="toggle-row">
+            <span><b>Pause videos on shielded pages</b><small>Stops autoplay from spoiling things behind a full-page shield.</small></span>
+            <span class="switch"><input type="checkbox" data-key="pauseVideos"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <label class="toggle-row">
+            <span><b>Say why something was shielded</b><small>Show the category, like "🗺️ Map & locations". It never shows the word that matched.</small></span>
+            <span class="switch"><input type="checkbox" data-key="showReasons"><span class="track"><span class="thumb"></span></span></span>
+          </label>
+          <div class="toggle-row">
+            <span><b>Switch off automatically after</b><small>Finished the story? Pick a date and the shield turns itself off after it. Leave empty to keep it on.</small></span>
+            <span class="date-wrap"><input type="date" id="activeUntil"><button class="link" id="clearDate">Clear</button></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories -->
+      <section class="card" id="categories">
+        <header class="card-head">
+          <h2>Categories</h2>
+          <p>Turn whole topics on or off, then fine-tune the exact words each one listens for. Words marked ★ are "clear spoiler" words used by Relaxed mode.</p>
+        </header>
+        <div class="cat-list" id="catList"></div>
+      </section>
+
+      <!-- Custom rules -->
+      <section class="card" id="rules">
+        <header class="card-head">
+          <h2>Custom rules</h2>
+          <p>Make your own category. Handy for a friend's streams, a subreddit's in-jokes, or another language.</p>
+        </header>
+        <form class="rule-form" id="ruleForm">
+          <div class="rule-grid">
+            <label><span>Emoji</span><input type="text" id="ruleEmoji" maxlength="4" value="🧩"></label>
+            <label class="grow"><span>Name</span><input type="text" id="ruleLabel" maxlength="40" placeholder="e.g. Spanish spoilers" required></label>
+          </div>
+          <label><span>Words or phrases, one per line or comma-separated</span>
+            <textarea id="ruleTerms" rows="3" placeholder="final, muere, traición*, /capitulo \d+/" required></textarea>
+          </label>
+          <label class="check"><input type="checkbox" id="ruleContext" checked> Only when the text is about GTA VI</label>
+          <div class="row-end">
+            <button type="button" class="btn" id="ruleCancel" hidden>Cancel</button>
+            <button class="btn accent" type="submit" id="ruleSubmit">Add rule</button>
+          </div>
+        </form>
+        <div class="rule-list" id="ruleList"></div>
+      </section>
+
+      <!-- Words -->
+      <section class="card" id="words">
+        <header class="card-head">
+          <h2>Words</h2>
+          <p>Use <code>word*</code> to match endings (betray, betrayed, betrayal) and <code>/regex/</code> for anything fancier.</p>
+        </header>
+        <div class="word-block">
+          <h3>🔑 Always shield</h3>
+          <p class="hint">Shielded anywhere, even when the page never mentions GTA VI.</p>
+          <div class="tags" id="keywords"></div>
+        </div>
+        <div class="word-block">
+          <h3>🕊️ Never shield</h3>
+          <p class="hint">Text containing any of these is always left alone. Use it to fix false alarms.</p>
+          <div class="tags" id="exceptions"></div>
+        </div>
+        <div class="word-block">
+          <h3>📍 Also means GTA VI</h3>
+          <p class="hint">Extra words that tell the shield a text is about the game, like a nickname or a translation.</p>
+          <div class="tags" id="extraContext"></div>
+        </div>
+      </section>
+
+      <!-- Sites -->
+      <section class="card" id="sites">
+        <header class="card-head">
+          <h2>Sites</h2>
+          <p>The shield runs everywhere except the sites listed here. Subdomains are included.</p>
+        </header>
+        <div class="tags" id="disabledSites"></div>
+      </section>
+
+      <!-- Lab -->
+      <section class="card" id="lab">
+        <header class="card-head">
+          <h2>Test lab</h2>
+          <p>Paste any headline, tweet or comment to see what the shield would do with your current settings.</p>
+        </header>
+        <textarea id="labInput" rows="3" placeholder="GTA 6 ending explained: what happens to Lucia"></textarea>
+        <label class="check"><input type="checkbox" id="labContext"> Pretend this is on a GTA VI page</label>
+        <div class="lab-out" id="labOut" aria-live="polite"></div>
+        <div class="examples" id="labExamples"></div>
+      </section>
+
+      <!-- Stats -->
+      <section class="card" id="stats">
+        <header class="card-head">
+          <h2>Stats</h2>
+          <p id="statsSince">Spoilers dodged since install.</p>
+        </header>
+        <div class="stat-hero"><span id="statTotal">0</span><small>spoilers shielded</small></div>
+        <div class="stat-cols">
+          <div><h3>By category</h3><div class="bars" id="statCats"></div></div>
+          <div><h3>Top sites</h3><div class="bars" id="statSites"></div></div>
+        </div>
+        <div class="row-end"><button class="btn danger" id="resetStats">Reset stats</button></div>
+      </section>
+
+      <!-- Backup -->
+      <section class="card" id="backup">
+        <header class="card-head">
+          <h2>Backup</h2>
+          <p>Move your setup to another browser or share a ruleset with friends.</p>
+        </header>
+        <div class="row">
+          <button class="btn" id="exportBtn">⬇ Export settings</button>
+          <label class="btn" for="importFile">⬆ Import settings</label>
+          <input type="file" id="importFile" accept="application/json,.json" class="sr-only">
+          <span class="grow"></span>
+          <button class="btn danger" id="resetAll">Reset everything</button>
+        </div>
+        <p class="hint" id="backupMsg"></p>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../shared/defaults.js"></script>
+  <script src="../shared/matcher.js"></script>
+  <script src="../shared/settings.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

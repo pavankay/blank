@@ -1,0 +1,58 @@
+body {
+  width: 360px;
+  padding: 14px;
+  background:
+    radial-gradient(420px 220px at 110% -10%, color-mix(in srgb, var(--pink) 22%, transparent), transparent 70%),
+    radial-gradient(380px 220px at -20% 0%, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 70%),
+    var(--bg);
+}
+
+.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { border-radius: 8px; }
+.name { font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+.edition { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.hero {
+  display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: var(--radius);
+  background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); margin-bottom: 10px;
+}
+.ring { position: relative; width: 84px; height: 84px; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--line); stroke-width: 10; }
+.ring-fg { fill: none; stroke: var(--pink); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset .6s ease, stroke .2s; }
+.ring-num { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring-num span { font-size: 26px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring-num small { font-size: 10.5px; color: var(--faint); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+.hero-text { min-width: 0; flex: 1; }
+.status { font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 10px var(--ok); flex: none; }
+.hero[data-state="paused"] .status::before { background: var(--warn); box-shadow: 0 0 10px var(--warn); }
+.hero[data-state="off"] .status::before, .hero[data-state="site"] .status::before, .hero[data-state="expired"] .status::before, .hero[data-state="na"] .status::before { background: var(--faint); box-shadow: none; }
+.hero[data-state="off"] .ring-fg, .hero[data-state="paused"] .ring-fg, .hero[data-state="site"] .ring-fg { stroke: var(--faint); }
+.host { color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.mini span { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); color: var(--muted); }
+
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+.actions .btn { width: 100%; padding: 8px 6px; font-size: 12px; }
+.pause-wrap { position: relative; }
+.menu { position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; min-width: 150px; padding: 4px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
+.menu button { display: block; width: 100%; text-align: left; appearance: none; border: 0; background: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.menu button:hover, .menu button:focus-visible { background: var(--bg-2); outline: none; }
+
+.block { padding: 12px; border-radius: var(--radius); background: var(--panel); border: 1px solid var(--line); margin-bottom: 10px; }
+.block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.block-head h2 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.links { display: flex; gap: 4px; }
+.hint { margin: 8px 2px 0; font-size: 12px; color: var(--muted); min-height: 2.9em; }
+
+.cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.cats.custom:not(:empty) { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line-2); }
+
+.quick { display: flex; gap: 6px; padding: 8px; }
+.quick input { flex: 1; }
+
+.foot { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 0; font-size: 12px; color: var(--faint); }
+
+body.disabled .block, body.disabled .actions .btn:not(#pauseBtn) { opacity: .55; }
