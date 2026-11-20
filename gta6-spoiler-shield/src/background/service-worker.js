@@ -12,7 +12,7 @@ const S = G.settings;
 const P = G.packs;
 const C = G.community;
 
-const BADGE_BG = '#ff5fa2';
+const BADGE_BG = '#b8402b';
 const frameCounts = new Map(); // tabId -> Map(frameId -> count)
 
 /* ---------- install / startup ---------- */
@@ -50,15 +50,15 @@ function scheduleAlarms() {
 
 function buildMenus() {
   chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({ id: 'gss-report', title: '🚩 Report as a spoiler', contexts: ['all'] });
-    chrome.contextMenus.create({ id: 'gss-not-spoiler', title: '👍 Not a spoiler (show it)', contexts: ['all'] });
+    chrome.contextMenus.create({ id: 'gss-report', title: 'Report as spoiler', contexts: ['all'] });
+    chrome.contextMenus.create({ id: 'gss-not-spoiler', title: 'Not a spoiler', contexts: ['all'] });
     chrome.contextMenus.create({ id: 'gss-sep0', type: 'separator', contexts: ['all'] });
-    chrome.contextMenus.create({ id: 'gss-add-keyword', title: 'Always shield “%s”', contexts: ['selection'] });
-    chrome.contextMenus.create({ id: 'gss-add-exception', title: 'Never shield text with “%s”', contexts: ['selection'] });
-    chrome.contextMenus.create({ id: 'gss-shield-this', title: 'Shield this element (only here, only now)', contexts: ['page', 'link', 'image', 'video'] });
+    chrome.contextMenus.create({ id: 'gss-add-keyword', title: 'Always hide “%s”', contexts: ['selection'] });
+    chrome.contextMenus.create({ id: 'gss-add-exception', title: 'Never hide text with “%s”', contexts: ['selection'] });
+    chrome.contextMenus.create({ id: 'gss-shield-this', title: 'Hide this (just here)', contexts: ['page', 'link', 'image', 'video'] });
     chrome.contextMenus.create({ id: 'gss-sep', type: 'separator', contexts: ['all'] });
-    chrome.contextMenus.create({ id: 'gss-toggle-site', title: 'Turn shield off/on for this site', contexts: ['all'] });
-    chrome.contextMenus.create({ id: 'gss-pause-15', title: 'Pause shield for 15 minutes', contexts: ['all'] });
+    chrome.contextMenus.create({ id: 'gss-toggle-site', title: 'Turn off/on for this site', contexts: ['all'] });
+    chrome.contextMenus.create({ id: 'gss-pause-15', title: 'Pause for 15 minutes', contexts: ['all'] });
   });
 }
 
@@ -372,16 +372,16 @@ async function updateBadge(tabId) {
   try { tab = await chrome.tabs.get(tabId); } catch (_) { return; }
   const reason = S.inactiveReason(s, S.hostOf(tab.url || ''));
   if (reason) {
-    chrome.action.setBadgeText({ tabId, text: reason === 'paused' ? '⏸' : 'OFF' });
-    chrome.action.setBadgeBackgroundColor({ tabId, color: '#6b6390' });
-    chrome.action.setTitle({ tabId, title: `Spoiler Shield: ${({ off: 'off', paused: 'paused', site: 'off on this site', expired: 'switched itself off after your end date' })[reason]}` });
+    chrome.action.setBadgeText({ tabId, text: reason === 'paused' ? 'II' : 'off' });
+    chrome.action.setBadgeBackgroundColor({ tabId, color: '#8a857d' });
+    chrome.action.setTitle({ tabId, title: `Spoiler Shield: ${({ off: 'off', paused: 'paused', site: 'off on this site', expired: 'off (end date passed)' })[reason]}` });
     return;
   }
   const m = frameCounts.get(tabId);
   const total = m ? Array.from(m.values()).reduce((a, b) => a + b, 0) : 0;
   chrome.action.setBadgeText({ tabId, text: total ? (total > 999 ? '999+' : String(total)) : '' });
   chrome.action.setBadgeBackgroundColor({ tabId, color: BADGE_BG });
-  chrome.action.setTitle({ tabId, title: total ? `Spoiler Shield: ${total} spoiler${total === 1 ? '' : 's'} shielded here` : 'Spoiler Shield: protecting this page' });
+  chrome.action.setTitle({ tabId, title: total ? `Spoiler Shield: ${total} hidden on this page` : 'Spoiler Shield' });
 }
 
 async function refreshAllBadges() {

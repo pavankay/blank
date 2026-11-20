@@ -12,7 +12,7 @@
   const S = G.settings;
   const IS_TOP = window === window.top;
   const HOST = location.hostname.replace(/^www\./, '');
-  const SHIELD_TITLE = '🛡️ Spoiler shielded';
+  const SHIELD_TITLE = 'Hidden page';
 
   const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION', 'TEMPLATE', 'HEAD', 'TITLE', 'META', 'LINK']);
   const BLOCK_TAGS = new Set(['P', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'TD', 'TH', 'DD', 'DT', 'BLOCKQUOTE', 'FIGCAPTION', 'FIGURE', 'DIV', 'SECTION', 'ARTICLE', 'ASIDE', 'HEADER', 'FOOTER', 'A', 'SPAN', 'LABEL', 'PRE']);
@@ -537,9 +537,9 @@
   /* ---------- covering elements ---------- */
 
   function actionText() {
-    if (settings.revealMode === 'locked') return 'Locked · pause from the toolbar to view';
-    if (settings.revealMode === 'hold') return 'Hold to reveal';
-    return 'Click to reveal';
+    if (settings.revealMode === 'locked') return 'Locked';
+    if (settings.revealMode === 'hold') return 'Hold to show';
+    return 'Show';
   }
 
   function reasonsText(result) {
@@ -549,9 +549,9 @@
     for (const c of result.categories) {
       if (seen.has(c.id)) continue;
       seen.add(c.id);
-      parts.push(`${c.emoji} ${c.label}`);
+      parts.push(c.label);
     }
-    return parts.slice(0, 3).join('  ·  ');
+    return parts.slice(0, 2).join(', ');
   }
 
   function buildOverlay(result) {
@@ -560,11 +560,10 @@
     ov.setAttribute('role', 'button');
     ov.tabIndex = 0;
     const reasons = reasonsText(result);
-    ov.setAttribute('aria-label', `Spoiler shielded${reasons ? ': ' + result.categories.map((c) => c.label).join(', ') : ''}. ${actionText()}.`);
+    ov.setAttribute('aria-label', `Possible spoiler${reasons ? ': ' + reasons : ''}. ${actionText()}.`);
     // All visible text comes from CSS (attr()), so the overlay adds nothing to the page's textContent.
     const parts = [
-      ['gss-ov-badge', '🛡️'],
-      ['gss-ov-title', 'Spoiler shielded'],
+      ['gss-ov-title', 'Possible spoiler'],
       ['gss-ov-reasons', reasons],
       ['gss-ov-action', actionText()]
     ];
@@ -816,19 +815,17 @@
     root.innerHTML = `
       <style>${PAGE_SHIELD_CSS}</style>
       <div class="wrap" role="dialog" aria-modal="true" aria-labelledby="t">
-        <div class="glow"></div>
         <div class="card">
-          <div class="logo">${SHIELD_SVG}</div>
-          <p class="eyebrow">Spoiler Shield · ${escapeHtml(packNames(reasons))}</p>
-          <h1 id="t">This page looks like a spoiler</h1>
-          <p class="sub">${settings.showReasons ? 'It seems to be about:' : 'We covered it before it loaded.'}</p>
-          ${settings.showReasons ? `<ul class="chips">${reasons.map((c) => `<li>${c.emoji} ${escapeHtml(c.label)}</li>`).join('')}</ul>` : ''}
+          <p class="eyebrow">Spoiler Shield</p>
+          <h1 id="t">This page might spoil ${escapeHtml(packNames(reasons))}</h1>
+          ${settings.showReasons ? `<p class="sub">${escapeHtml(reasons.map((c) => c.label).join(', '))}</p>` : ''}
           <div class="actions">
-            <button class="primary" data-a="back">Take me back</button>
-            ${locked ? '' : '<button data-a="show">Show page</button>'}
-            ${locked ? '' : '<button class="ghost" data-a="trust">Turn off on this site</button>'}
+            <button class="primary" data-a="back">Go back</button>
+            ${locked ? '' : '<button data-a="show">Show the page</button>'}
           </div>
-          <p class="fine">${locked ? 'Reveal is locked. Pause the shield from the toolbar to view this page.' : 'Showing the page keeps posts, comments and thumbnails on it shielded.'}</p>
+          <p class="fine">${locked
+            ? 'Showing hidden pages is turned off. Pause Spoiler Shield from the toolbar if you need this page.'
+            : 'If you show it, posts and pictures on the page stay hidden. <button class="link" data-a="trust">Turn off on this site</button>'}</p>
         </div>
       </div>`;
     root.addEventListener('click', (e) => {
@@ -1146,34 +1143,32 @@
 
   /* ---------- page shield assets ---------- */
 
-  const SHIELD_SVG = `<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5fa2"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs><path d="M32 4 8 13v17c0 15.5 10.2 26.6 24 30 13.8-3.4 24-14.5 24-30V13L32 4z" fill="url(#g)"/><path d="M20 33c3.6-5.3 7.6-8 12-8s8.4 2.7 12 8c-3.6 5.3-7.6 8-12 8s-8.4-2.7-12-8z" fill="#1a1033"/><circle cx="32" cy="33" r="4" fill="#ffd166"/><path d="M18 46 46 18" stroke="#1a1033" stroke-width="4.5" stroke-linecap="round"/></svg>`;
-
   const PAGE_SHIELD_CSS = `
     :host { all: initial; }
-    .wrap { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 16px;
-      background: radial-gradient(1200px 700px at 20% 110%, #ff5fa233, transparent 60%),
-                  radial-gradient(900px 600px at 90% -10%, #3dd6f533, transparent 60%), #0e0a1f;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #f6f1ff; overflow: auto; }
-    .glow { position: absolute; width: 520px; height: 520px; border-radius: 50%; filter: blur(80px);
-      background: conic-gradient(from 180deg, #ff5fa2, #ff8a3d, #ffd166, #3dd6f5, #ff5fa2); opacity: .18; animation: spin 18s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media (prefers-reduced-motion: reduce) { .glow { animation: none; } }
-    .card { position: relative; max-width: 460px; width: 100%; text-align: center; padding: 36px 28px 26px;
-      background: #1a1433e6; border: 1px solid #ffffff1f; border-radius: 22px; box-shadow: 0 30px 80px #0008; }
-    .logo { display: grid; place-items: center; margin-bottom: 10px; }
-    .eyebrow { margin: 0 0 6px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #ff9fca; font-weight: 700; }
-    h1 { margin: 0 0 8px; font-size: 26px; line-height: 1.2; font-weight: 800; }
-    .sub { margin: 0 0 12px; color: #c9bfe6; font-size: 14px; }
-    .chips { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-    .chips li { padding: 6px 12px; border-radius: 999px; background: #ffffff12; border: 1px solid #ffffff22; font-size: 13px; font-weight: 600; }
-    .actions { display: flex; flex-direction: column; gap: 10px; }
-    button { all: unset; box-sizing: border-box; cursor: pointer; padding: 12px 16px; border-radius: 12px; font-size: 15px; font-weight: 700;
-      background: #ffffff14; color: #f6f1ff; border: 1px solid #ffffff26; text-align: center; transition: transform .12s, background .12s; }
-    button:hover { background: #ffffff22; }
-    button:active { transform: scale(.98); }
-    button:focus-visible { outline: 3px solid #3dd6f5; outline-offset: 2px; }
-    button.primary { background: linear-gradient(135deg, #ff5fa2, #ff8a3d); border-color: transparent; color: #1a1033; }
-    button.ghost { background: transparent; border-color: transparent; color: #c9bfe6; font-weight: 600; font-size: 13px; }
-    .fine { margin: 16px 0 0; font-size: 12px; color: #9c92bd; }
+    .wrap { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 16px; overflow: auto;
+      background: #f5f4f0; color: #1d1c1a; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .card { max-width: 440px; width: 100%; }
+    .eyebrow { margin: 0 0 10px; font-size: 12px; color: #8a857d; }
+    h1 { margin: 0 0 6px; font-size: 22px; line-height: 1.25; font-weight: 600; }
+    .sub { margin: 0 0 20px; color: #6c6862; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    button { all: unset; box-sizing: border-box; cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 14px; font-weight: 500;
+      border: 1px solid #cfcbc2; background: #fff; color: inherit; }
+    button:hover { background: #efede8; }
+    button:focus-visible { outline: 2px solid #2d63c8; outline-offset: 2px; }
+    button.primary { background: #1d1c1a; border-color: #1d1c1a; color: #f5f4f0; }
+    button.primary:hover { background: #3a3835; }
+    button.link { padding: 0; border: 0; background: none; text-decoration: underline; text-underline-offset: 2px; font-size: inherit; color: inherit; }
+    .fine { margin: 18px 0 0; font-size: 12px; color: #8a857d; }
+    @media (prefers-color-scheme: dark) {
+      .wrap { background: #17171a; color: #e9e8e4; }
+      .eyebrow, .fine { color: #8d8a84; }
+      .sub { color: #a19e98; }
+      button { background: #1f1f23; border-color: #3d3d44; }
+      button:hover { background: #2a2a2f; }
+      button.primary { background: #e9e8e4; border-color: #e9e8e4; color: #17171a; }
+      button.primary:hover { background: #fff; }
+      button.link { background: none; }
+    }
   `;
 })();

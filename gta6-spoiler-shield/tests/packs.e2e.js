@@ -173,8 +173,8 @@ function serve() {
       await pop.goto(`chrome-extension://${extId}/src/popup/popup.html`);
       await pop.waitForTimeout(500);
       const heads = await pop.$$eval('.pack-head', (els) => els.map((e) => e.textContent));
-      assert.deepEqual(heads.map((h) => h.replace(/^[●○] /, '')), ['GTA VI', 'Moonfall Chronicles', 'Starfall Saga']);
-      assert.equal(await pop.textContent('#edition'), 'Moonfall + Starfall edition');
+      assert.deepEqual(heads.map((h) => h.replace(/ \(off\)$/, '')), ['GTA VI (off)', 'Moonfall Chronicles', 'Starfall Saga'].map((h) => h.replace(/ \(off\)$/, '')));
+      assert.equal(await pop.textContent('#edition'), 'Moonfall, Starfall');
       await pop.close();
     });
   } finally {

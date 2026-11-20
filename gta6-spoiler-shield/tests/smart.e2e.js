@@ -150,12 +150,12 @@ function serveSites() {
     await check('a GTA VI video with no spoiler words: only its thumbnail is covered, title stays readable', async () => {
       const s = await state('u1');
       assert.ok(s.pic && !s.title && !s.card, JSON.stringify(s));
-      assert.match(s.reasons, /Unlabeled/);
+      assert.match(s.reasons, /Screenshots/);
     });
     await check('a vague reaction ("bro what 💀 #GTA6") is covered', async () => {
       const s = await state('r1');
       assert.ok(s.card, JSON.stringify(s));
-      assert.match(s.reasons, /Reactions/);
+      assert.match(s.reasons, /Vague reactions/);
     });
     await check('an unrelated video is untouched', async () => {
       const s = await state('j1');

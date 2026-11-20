@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spoiler Shield Settings</title>
+  <title>Spoiler Shield settings</title>
   <link rel="icon" href="../../icons/icon32.png">
   <link rel="stylesheet" href="../ui/theme.css">
   <link rel="stylesheet" href="options.css">
@@ -12,303 +12,268 @@
   <div class="layout">
     <aside class="side">
       <div class="brand">
-        <img src="../../icons/icon128.png" width="40" height="40" alt="">
+        <img src="../../icons/icon48.png" width="24" height="24" alt="">
         <div>
           <div class="name">Spoiler Shield</div>
           <div class="edition" id="edition">&nbsp;</div>
         </div>
       </div>
+      <label class="side-status" id="sideStatus">
+        <span class="switch big"><input type="checkbox" id="enabled" aria-label="Spoiler Shield on"><span class="track"><span class="thumb"></span></span></span>
+        <span id="sideStatusText">On</span>
+      </label>
       <nav class="nav" aria-label="Sections">
-        <a href="#protection">🛡️ Protection</a>
-        <a href="#packs">📦 Topic packs</a>
-        <a href="#categories">🗂️ Categories</a>
-        <a href="#smart">🧠 Smart detection</a>
-        <a href="#community">👥 Community</a>
-        <a href="#rules">🧩 Custom rules</a>
-        <a href="#words">🔑 Words</a>
-        <a href="#sites">🌍 Sites & site rules</a>
-        <a href="#lab">🧪 Test lab</a>
-        <a href="#stats">📊 Stats</a>
-        <a href="#backup">💾 Backup</a>
+        <a href="#protection">General</a>
+        <a href="#packs">Packs</a>
+        <a href="#categories">Categories</a>
+        <a href="#smart">Detection</a>
+        <a href="#community">Reports</a>
+        <a href="#rules">Custom rules</a>
+        <a href="#words">Words</a>
+        <a href="#sites">Sites</a>
+        <a href="#lab">Try it</a>
+        <a href="#stats">Stats</a>
+        <a href="#backup">Backup</a>
       </nav>
-      <div class="side-status" id="sideStatus">
-        <label class="switch big"><input type="checkbox" id="enabled" aria-label="Shield on"><span class="track"><span class="thumb"></span></span></label>
-        <span id="sideStatusText">Shield on</span>
-      </div>
-      <p class="disclaimer">Unofficial fan tool. The bundled GTA VI pack is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
+      <p class="disclaimer">Fan-made. Not affiliated with Rockstar Games or Take-Two.</p>
     </aside>
 
     <main class="main">
       <section class="welcome" id="welcome" hidden>
-        <div>
-          <h1>You're shielded.</h1>
-          <p>Spoiler Shield is already running on every site with the <b id="welcomePacks">installed</b> topic pack. Keep the defaults, pick what counts as a spoiler under Categories, or add packs for other games and shows under Topic packs.</p>
-        </div>
-        <button class="btn" id="dismissWelcome">Got it</button>
+        <p><b>Spoiler Shield is on.</b> It's already running everywhere with the <span id="welcomePacks">installed</span> pack. The defaults are fine for most people; change what gets hidden under Categories.</p>
+        <button class="btn" id="dismissWelcome">OK</button>
       </section>
 
-      <!-- Protection -->
       <section class="card" id="protection">
-        <header class="card-head">
-          <h2>Protection</h2>
-          <p>How hard to look, and what a shielded spoiler looks like.</p>
-        </header>
+        <h2>General</h2>
 
-        <h3 class="label">Sensitivity</h3>
-        <div class="radio-cards" id="sensitivity" role="radiogroup" aria-label="Sensitivity">
-          <button role="radio" data-v="relaxed">
-            <span class="rc-title">🌤️ Relaxed</span>
-            <span class="rc-desc">Only clear spoilers: endings, deaths, twists, map leaks, walkthroughs, playthroughs.</span>
-          </button>
-          <button role="radio" data-v="balanced">
-            <span class="rc-title">⚖️ Balanced <em>recommended</em></span>
-            <span class="rc-desc">Anything about one of your topics that touches a category you chose.</span>
-          </button>
-          <button role="radio" data-v="strict">
-            <span class="rc-title">🌑 Blackout</span>
-            <span class="rc-desc">Every mention of your topics, even plain news. For the truly spoiler-proof.</span>
-          </button>
+        <div class="field">
+          <h3>Sensitivity</h3>
+          <div class="radio-cards" id="sensitivity" role="radiogroup" aria-label="Sensitivity">
+            <button role="radio" data-v="relaxed">
+              <span class="rc-title">Relaxed</span>
+              <span class="rc-desc">Only obvious spoilers: endings, deaths, twists, map leaks, walkthroughs.</span>
+            </button>
+            <button role="radio" data-v="balanced">
+              <span class="rc-title">Balanced <em>(default)</em></span>
+              <span class="rc-desc">Anything about the game in the categories you've ticked.</span>
+            </button>
+            <button role="radio" data-v="strict">
+              <span class="rc-title">Blackout</span>
+              <span class="rc-desc">Every mention of the game, news included.</span>
+            </button>
+          </div>
         </div>
 
-        <h3 class="label">Shield style</h3>
-        <div class="radio-cards styles" id="blockStyle" role="radiogroup" aria-label="Shield style">
-          <button role="radio" data-v="blur">
-            <span class="preview p-blur"><span class="ln"></span><span class="ln s"></span><span class="pill">🛡️ Spoiler shielded</span></span>
-            <span class="rc-title">Blur</span>
-            <span class="rc-desc">Frosted glass. Layout stays exactly the same.</span>
-          </button>
-          <button role="radio" data-v="redact">
-            <span class="preview p-redact"><span class="pill">🛡️ Spoiler shielded</span></span>
-            <span class="rc-title">Redact</span>
-            <span class="rc-desc">Solid cover. Nothing shows through at all.</span>
-          </button>
-          <button role="radio" data-v="collapse">
-            <span class="preview p-collapse"><span class="ln"></span><span class="pill thin">🛡️ Spoiler · Click to reveal</span><span class="ln s"></span></span>
-            <span class="rc-title">Collapse</span>
-            <span class="rc-desc">Shrinks posts to a slim bar so feeds stay short.</span>
-          </button>
+        <div class="field">
+          <h3>How hidden things look</h3>
+          <div class="radio-cards styles" id="blockStyle" role="radiogroup" aria-label="How hidden things look">
+            <button role="radio" data-v="blur">
+              <span class="preview p-blur"><span class="ln"></span><span class="ln s"></span><span class="pill">Hidden</span></span>
+              <span class="rc-title">Blur</span>
+              <span class="rc-desc">Page layout doesn't change.</span>
+            </button>
+            <button role="radio" data-v="redact">
+              <span class="preview p-redact"><span class="pill">Hidden</span></span>
+              <span class="rc-title">Black box</span>
+              <span class="rc-desc">Nothing shows through.</span>
+            </button>
+            <button role="radio" data-v="collapse">
+              <span class="preview p-collapse"><span class="ln"></span><span class="pill thin">Hidden · Show</span><span class="ln s"></span></span>
+              <span class="rc-title">Collapse</span>
+              <span class="rc-desc">Posts shrink to one line.</span>
+            </button>
+          </div>
         </div>
 
-        <h3 class="label">Revealing</h3>
-        <div class="seg wide" id="revealMode" role="radiogroup" aria-label="Reveal mode">
-          <button role="radio" data-v="click">Click to reveal</button>
-          <button role="radio" data-v="hold">Hold to reveal</button>
-          <button role="radio" data-v="locked">Locked</button>
+        <div class="field">
+          <h3>Showing a hidden post</h3>
+          <div class="seg" id="revealMode" role="radiogroup" aria-label="Showing a hidden post">
+            <button role="radio" data-v="click">Click</button>
+            <button role="radio" data-v="hold">Press and hold</button>
+            <button role="radio" data-v="locked">Not allowed</button>
+          </div>
+          <p class="hint" id="revealHint"></p>
         </div>
-        <p class="hint" id="revealHint"></p>
 
         <div class="toggles">
           <label class="toggle-row">
-            <span><b>Full-page shield</b><small>Cover whole articles, wiki pages and videos whose title is a spoiler, before they load.</small></span>
+            <span><b>Hide whole pages</b><small>Articles, wiki pages and videos whose title gives something away get covered before they load.</small></span>
             <span class="switch"><input type="checkbox" data-key="pageShield"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <label class="toggle-row">
-            <span><b>Smart page context</b><small>On a page that is about one of your topics (a subreddit, a video, a stream, a fan wiki), judge every comment as being about it, even if it never names it.</small></span>
+            <span><b>Treat game pages as all-spoiler</b><small>On a page about the game (r/GTA6, a GTA VI video, a stream), comments get checked even if they never name it.</small></span>
             <span class="switch"><input type="checkbox" data-key="pageContext"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <label class="toggle-row">
-            <span><b>Extra-strong thumbnail blur</b><small>Images and video previews get a heavier blur than text.</small></span>
+            <span><b>Blur pictures more than text</b></span>
             <span class="switch"><input type="checkbox" data-key="hideThumbnails"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <label class="toggle-row">
-            <span><b>Pause videos on shielded pages</b><small>Stops autoplay from spoiling things behind a full-page shield.</small></span>
+            <span><b>Pause videos on hidden pages</b></span>
             <span class="switch"><input type="checkbox" data-key="pauseVideos"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <label class="toggle-row">
-            <span><b>Say why something was shielded</b><small>Show the category, like "🗺️ Map & locations". It never shows the word that matched.</small></span>
+            <span><b>Show why something was hidden</b><small>Shows the category (like "Map & locations"), never the word that matched.</small></span>
             <span class="switch"><input type="checkbox" data-key="showReasons"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <div class="toggle-row">
-            <span><b>Switch off automatically after</b><small>Finished the story? Pick a date and the shield turns itself off after it. Leave empty to keep it on.</small></span>
-            <span class="date-wrap"><input type="date" id="activeUntil"><button class="link" id="clearDate">Clear</button></span>
+            <span><b>Turn off after</b><small>For when you've finished the game. Leave empty to keep it on.</small></span>
+            <span class="date-wrap"><input type="date" id="activeUntil"><button class="link" id="clearDate">clear</button></span>
           </div>
         </div>
       </section>
 
-      <!-- Topic packs -->
       <section class="card" id="packs">
-        <header class="card-head">
-          <h2>Topic packs</h2>
-          <p>Everything the shield knows about a game or show (names, places, spoiler words, categories) lives in a pack, not in the extension's code. Packs with an update link refresh themselves every few hours, so new spoiler words arrive without an extension update.</p>
-        </header>
+        <h2>Packs</h2>
+        <p class="intro">A pack is a JSON file with the names, places and spoiler words for one game or show. GTA VI comes built in. Packs installed from a link update themselves every 6 hours.</p>
         <div class="pack-list" id="packList"></div>
-        <div class="pack-add">
-          <form class="row" id="subscribeForm">
-            <input type="url" id="subscribeUrl" class="grow" placeholder="https://… link to a pack .json" aria-label="Pack link" required>
-            <button class="btn accent" type="submit">Install from link</button>
-          </form>
-          <div class="row">
-            <label class="btn" for="packFile">⬆ Install from file</label>
-            <input type="file" id="packFile" accept="application/json,.json" class="sr-only">
-            <button class="btn" id="newPackBtn" type="button">✨ Create a pack</button>
-            <span class="grow"></span>
-            <button class="btn" id="updateAllBtn" type="button">↻ Check for updates</button>
-          </div>
-          <p class="hint" id="packMsg" aria-live="polite"></p>
+        <form class="row" id="subscribeForm">
+          <input type="url" id="subscribeUrl" class="grow" placeholder="Link to a pack (.json)" aria-label="Pack link" required>
+          <button class="btn" type="submit">Install</button>
+        </form>
+        <div class="row">
+          <label class="btn" for="packFile">Install from file…</label>
+          <input type="file" id="packFile" accept="application/json,.json" class="sr-only">
+          <button class="btn" id="newPackBtn" type="button">New pack…</button>
+          <span class="grow"></span>
+          <button class="btn" id="updateAllBtn" type="button">Check for updates</button>
         </div>
+        <p class="hint" id="packMsg" aria-live="polite"></p>
       </section>
 
-      <!-- Categories -->
       <section class="card" id="categories">
-        <header class="card-head">
-          <h2>Categories</h2>
-          <p>Each pack's categories, with the exact words they listen for. Your edits are kept separately, so they survive pack updates. Words marked ★ are "clear spoiler" words used by Relaxed mode.</p>
-        </header>
+        <h2>Categories</h2>
+        <p class="intro">Tick what you want hidden. "Edit words" shows exactly what each category looks for. Your changes are saved separately and survive pack updates. <b>Bold</b> words are the ones Relaxed mode uses.</p>
         <div class="cat-list" id="catList"></div>
       </section>
 
-      <!-- Smart detection -->
       <section class="card" id="smart">
-        <header class="card-head">
-          <h2>Smart detection</h2>
-          <p>Most spoilers don't say "spoiler". These catch the ones that hide in pictures, vague captions and names nobody has heard of yet.</p>
-        </header>
+        <h2>Detection</h2>
+        <p class="intro">Extra checks for spoilers that don't use any obvious words.</p>
         <div class="toggles flush">
           <label class="toggle-row">
-            <span><b>Learn from the game's wiki</b><small>Every 12 hours each pack reads its wiki categories (characters, missions, places…) and starts listening for new names as editors add them. Learned words appear in Categories with a 📚 mark and can be removed like any other.</small></span>
+            <span><b>Learn new names from the wiki</b><small>Every 12 hours, picks up characters, missions and places as they're added to the game's wiki. Learned words are marked with a dotted underline under Categories.</small></span>
             <span class="switch"><input type="checkbox" data-key="learnFromSources"><span class="track"><span class="thumb"></span></span></span>
           </label>
-          <div class="status-line"><span id="learnStatus"></span><button class="link" id="learnNow" type="button">Refresh now</button></div>
+          <div class="status-line"><span id="learnStatus"></span><button class="link" id="learnNow" type="button">update now</button></div>
           <label class="toggle-row">
-            <span><b>Recognise reposted spoiler pictures</b><small>When you (or the community) report a post, its picture gets a fingerprint. The same screenshot is then hidden wherever it shows up again, whatever caption it has.</small></span>
+            <span><b>Recognise reposted pictures</b><small>When a post is reported, its picture is fingerprinted. The same picture gets hidden wherever it turns up again, whatever the caption says.</small></span>
             <span class="switch"><input type="checkbox" data-key="hashImages"><span class="track"><span class="thumb"></span></span></span>
           </label>
           <div class="toggle-row">
-            <span><b>Read thumbnails with on-device AI</b><small>On GTA VI pages and video feeds, the browser's built-in model reads the words written inside thumbnails ("LUCIA DIES??") and notices game footage behind random captions. Runs on your computer; pictures are never uploaded.</small></span>
-            <div class="seg small" id="visionMode" role="radiogroup" aria-label="On-device AI">
+            <span><b>Read text inside thumbnails</b><small>Uses the browser's built-in AI model, on GTA VI pages and video feeds only. Pictures stay on your computer.</small></span>
+            <div class="seg" id="visionMode" role="radiogroup" aria-label="Read text inside thumbnails">
               <button role="radio" data-v="off">Off</button>
               <button role="radio" data-v="on">On</button>
             </div>
           </div>
-          <div class="status-line"><span id="visionStatus">Checking this browser…</span><button class="link" id="visionDownload" type="button" hidden>Download the model</button></div>
+          <div class="status-line"><span id="visionStatus">Checking…</span><button class="link" id="visionDownload" type="button" hidden>download model</button></div>
         </div>
       </section>
 
-      <!-- Community -->
       <section class="card" id="community">
-        <header class="card-head">
-          <h2>Community</h2>
-          <p>Right-click anything and choose <b>🚩 Report as a spoiler</b>. It's hidden for you at once. If you follow a community server, it's hidden for everyone once enough <em>different</em> people report it, and the server learns new names and channels from what gets reported.</p>
-        </header>
+        <h2>Reports</h2>
+        <p class="intro">Right-click a post and choose <b>Report as spoiler</b> to hide it, and any copies of it. If you add a server below, your reports are shared, and things enough other people report get hidden for you too.</p>
         <form class="row" id="communityForm">
-          <input type="url" id="communityUrl" class="grow" placeholder="https://… community server (optional)" aria-label="Community server link">
-          <button class="btn accent" type="submit">Save & sync</button>
+          <input type="url" id="communityUrl" class="grow" placeholder="Server address (optional)" aria-label="Report server address">
+          <button class="btn" type="submit">Save</button>
         </form>
         <div class="site-status" id="communityStatus"></div>
         <div class="toggles flush">
           <label class="toggle-row">
-            <span><b>Share my reports</b><small>Sends what you report (its link id, picture fingerprint, title and channel) with a random install id. Nothing is sent while you just browse.</small></span>
+            <span><b>Share my reports with the server</b><small>Sends the post's id, picture fingerprint, title and channel with a random install id. Nothing is sent while you're just browsing.</small></span>
             <span class="switch"><input type="checkbox" data-key="shareReports"><span class="track"><span class="thumb"></span></span></span>
           </label>
         </div>
-        <h3 class="label spaced">Your reports</h3>
+        <h3 class="sub">Reported by you</h3>
         <div class="report-list" id="myReports"></div>
-        <h3 class="label spaced">Marked "not a spoiler"</h3>
+        <h3 class="sub">Marked as not a spoiler</h3>
         <div class="report-list" id="mySafe"></div>
       </section>
 
-      <!-- Custom rules -->
       <section class="card" id="rules">
-        <header class="card-head">
-          <h2>Custom rules</h2>
-          <p>Make your own category. Handy for a friend's streams, a subreddit's in-jokes, or another language.</p>
-        </header>
+        <h2>Custom rules</h2>
+        <p class="intro">Your own list of words, e.g. for another language or a streamer's name.</p>
         <form class="rule-form" id="ruleForm">
-          <div class="rule-grid">
-            <label><span>Emoji</span><input type="text" id="ruleEmoji" maxlength="4" value="🧩"></label>
-            <label class="grow"><span>Name</span><input type="text" id="ruleLabel" maxlength="40" placeholder="e.g. Spanish spoilers" required></label>
-          </div>
-          <label><span>Words or phrases, one per line or comma-separated</span>
-            <textarea id="ruleTerms" rows="3" placeholder="final, muere, traición*, /capitulo \d+/" required></textarea>
+          <input type="hidden" id="ruleEmoji" value="">
+          <label><span>Name</span><input type="text" id="ruleLabel" maxlength="40" placeholder="Spanish" required></label>
+          <label><span>Words, one per line or separated by commas</span>
+            <textarea id="ruleTerms" rows="3" placeholder="final, muere, traición*" required></textarea>
           </label>
-          <label class="check"><input type="checkbox" id="ruleContext" checked> Only when the text is about one of your topics</label>
+          <label class="check"><input type="checkbox" id="ruleContext" checked> Only when the text is about the game</label>
           <div class="row-end">
             <button type="button" class="btn" id="ruleCancel" hidden>Cancel</button>
-            <button class="btn accent" type="submit" id="ruleSubmit">Add rule</button>
+            <button class="btn" type="submit" id="ruleSubmit">Add rule</button>
           </div>
         </form>
         <div class="rule-list" id="ruleList"></div>
       </section>
 
-      <!-- Words -->
       <section class="card" id="words">
-        <header class="card-head">
-          <h2>Words</h2>
-          <p>Use <code>word*</code> to match endings (betray, betrayed, betrayal) and <code>/regex/</code> for anything fancier.</p>
-        </header>
+        <h2>Words</h2>
+        <p class="intro"><code>word*</code> also matches word endings (betray, betrayed, betrayal). <code>/regex/</code> works too.</p>
         <div class="word-block">
-          <h3>🔑 Always shield</h3>
-          <p class="hint">Shielded anywhere, even when the text is not about any of your topics.</p>
+          <h3 class="sub">Always hide</h3>
+          <p class="hint">Hidden anywhere, even when the text isn't about the game.</p>
           <div class="tags" id="keywords"></div>
         </div>
         <div class="word-block">
-          <h3>🕊️ Never shield</h3>
-          <p class="hint">Text containing any of these is always left alone. Use it to fix false alarms.</p>
+          <h3 class="sub">Never hide</h3>
+          <p class="hint">Text containing these is left alone. Useful for fixing false alarms.</p>
           <div class="tags" id="exceptions"></div>
         </div>
       </section>
 
-      <!-- Sites -->
       <section class="card" id="sites">
-        <header class="card-head">
-          <h2>Sites</h2>
-          <p>The shield runs everywhere except the sites listed here. Subdomains are included.</p>
-        </header>
+        <h2>Sites</h2>
+        <p class="intro">Spoiler Shield runs everywhere except these sites (and their subdomains).</p>
         <div class="tags" id="disabledSites"></div>
 
-        <h3 class="label spaced">Site rules</h3>
-        <p class="hint">How each network structures a post, video, comment or chat line, so the whole card gets covered. These are data too: subscribe to a link to get fixes when a site changes its layout, or add your own.</p>
+        <h3 class="sub">Site rules</h3>
+        <p class="hint">Tell the extension what a single post looks like on each site, so the whole post gets hidden. You can follow a link to get fixes when a site changes, or write your own.</p>
         <div class="site-status" id="siteStatus"></div>
         <form class="row" id="sitesForm">
-          <input type="url" id="sitesUrl" class="grow" placeholder="https://… link to a site rules .json (optional)" aria-label="Site rules link">
-          <button class="btn" type="submit">Save link & update</button>
+          <input type="url" id="sitesUrl" class="grow" placeholder="Link to site rules (.json, optional)" aria-label="Site rules link">
+          <button class="btn" type="submit">Save</button>
         </form>
         <div class="row">
-          <button class="btn" id="editMySites" type="button">✏️ My site rules</button>
-          <button class="btn" id="viewSites" type="button">👁 View shared rules</button>
+          <button class="btn" id="editMySites" type="button">Edit my rules…</button>
+          <button class="btn" id="viewSites" type="button">View built-in rules</button>
           <span class="grow"></span>
-          <button class="btn danger" id="resetSites" type="button">Reset to built-in</button>
+          <button class="btn danger" id="resetSites" type="button">Reset</button>
         </div>
       </section>
 
-      <!-- Lab -->
       <section class="card" id="lab">
-        <header class="card-head">
-          <h2>Test lab</h2>
-          <p>Paste any headline, tweet or comment to see what the shield would do with your current settings.</p>
-        </header>
-        <textarea id="labInput" rows="3" placeholder="Paste a headline, tweet or comment"></textarea>
-        <label class="check"><input type="checkbox" id="labContext"> Pretend this is on a page about one of my topics</label>
+        <h2>Try it</h2>
+        <p class="intro">Paste a headline, tweet or comment to see whether it would be hidden.</p>
+        <textarea id="labInput" rows="3" placeholder="GTA 6 ending explained"></textarea>
+        <label class="check"><input type="checkbox" id="labContext"> As if it were on a GTA VI page</label>
         <div class="lab-out" id="labOut" aria-live="polite"></div>
         <div class="examples" id="labExamples"></div>
       </section>
 
-      <!-- Stats -->
       <section class="card" id="stats">
-        <header class="card-head">
-          <h2>Stats</h2>
-          <p id="statsSince">Spoilers dodged since install.</p>
-        </header>
-        <div class="stat-hero"><span id="statTotal">0</span><small>spoilers shielded</small></div>
+        <h2>Stats</h2>
+        <p class="intro" id="statsSince"></p>
+        <p class="stat-hero"><span id="statTotal">0</span> hidden</p>
         <div class="stat-cols">
-          <div><h3>By category</h3><div class="bars" id="statCats"></div></div>
-          <div><h3>Top sites</h3><div class="bars" id="statSites"></div></div>
+          <div><h3 class="sub">By category</h3><div class="bars" id="statCats"></div></div>
+          <div><h3 class="sub">By site</h3><div class="bars" id="statSites"></div></div>
         </div>
-        <div class="row-end"><button class="btn danger" id="resetStats">Reset stats</button></div>
+        <div class="row-end"><button class="btn danger" id="resetStats">Reset</button></div>
       </section>
 
-      <!-- Backup -->
       <section class="card" id="backup">
-        <header class="card-head">
-          <h2>Backup</h2>
-          <p>Move your setup to another browser or share a ruleset with friends.</p>
-        </header>
+        <h2>Backup</h2>
+        <p class="intro">Save your settings to a file, or load them in another browser.</p>
         <div class="row">
-          <button class="btn" id="exportBtn">⬇ Export settings</button>
-          <label class="btn" for="importFile">⬆ Import settings</label>
+          <button class="btn" id="exportBtn">Export…</button>
+          <label class="btn" for="importFile">Import…</label>
           <input type="file" id="importFile" accept="application/json,.json" class="sr-only">
           <span class="grow"></span>
-          <button class="btn danger" id="resetAll">Reset everything</button>
+          <button class="btn danger" id="resetAll">Reset all settings</button>
         </div>
         <p class="hint" id="backupMsg"></p>
       </section>
@@ -319,7 +284,7 @@
     <form method="dialog" class="editor-inner" id="editorForm">
       <header class="editor-head">
         <h2 id="editorTitle">Edit</h2>
-        <button class="link" value="cancel" aria-label="Close">✕</button>
+        <button class="link" value="cancel" aria-label="Close">close</button>
       </header>
       <p class="hint" id="editorHint"></p>
       <textarea id="editorText" spellcheck="false" aria-label="JSON"></textarea>

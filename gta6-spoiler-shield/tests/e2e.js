@@ -139,7 +139,7 @@ function serve() {
       assert.equal(await art.locator('gss-page-shield').count(), 1);
       assert.ok(await art.evaluate(() => document.documentElement.classList.contains('gss-page-locked')));
     });
-    await check('tab title is hidden', async () => assert.match(await art.title(), /Spoiler shielded/));
+    await check('tab title is hidden', async () => assert.equal(await art.title(), 'Hidden page'));
     if (SHOTS) await art.screenshot({ path: path.join(SHOTS, 'page-shield.png') });
 
     const safe = await ctx.newPage();
@@ -158,9 +158,9 @@ function serve() {
     await check('options lists categories', async () => assert.equal(await opt.locator('#catList .cat').count(), CATS));
     await check('test lab judges text', async () => {
       await opt.fill('#labInput', 'GTA 6 ending explained');
-      assert.match(await opt.textContent('#labOut'), /Would be shielded/);
+      assert.match(await opt.textContent('#labOut'), /^Hidden/);
       await opt.fill('#labInput', 'Banana bread ending');
-      assert.match(await opt.textContent('#labOut'), /Would stay visible/);
+      assert.match(await opt.textContent('#labOut'), /^Not hidden/);
     });
     await check('custom rule can be added', async () => {
       await opt.fill('#ruleLabel', 'Spanish spoilers');

@@ -5,26 +5,27 @@
   const P = G.packs;
   let packs = [];
 
-  /** Find a category (or custom rule) by its stats key, e.g. "gta6/story" or "custom/keywords". */
+  /** Short name for a stats key, e.g. "gta6/story" -> "Story". */
   function describe(key) {
     const [packId, id] = key.split('/');
     if (packId === 'custom') {
-      if (id === 'keywords') return { emoji: '🔑', label: 'Your keywords' };
-      if (id === 'manual') return { emoji: '✋', label: 'Shielded by you' };
+      if (id === 'keywords') return 'Your words';
+      if (id === 'manual') return 'Hidden by you';
+      if (id === 'reported' || id === 'reported-image') return 'Reported';
       const r = (settings.customRules || []).find((x) => x.id === id);
-      return r ? { emoji: r.emoji || '🧩', label: r.label } : { emoji: '🧩', label: id };
+      return r ? r.label : id;
     }
     const p = packs.find((x) => x.id === packId);
-    if (id === 'general') return { emoji: '🛡️', label: `Anything ${p ? p.short : packId}` };
+    if (id === 'general') return p ? p.short : packId;
     const c = p && p.categories.find((x) => x.id === id);
-    return c ? { emoji: c.emoji, label: (packs.length > 1 ? p.short + ' · ' : '') + c.label } : { emoji: '🛡️', label: key };
+    return c ? (c.short || c.label) : key;
   }
   const $ = (id) => document.getElementById(id);
 
   const SENS_HINTS = {
-    relaxed: () => 'Only clear spoilers, like endings, deaths and leaks. News and trailers stay visible.',
-    balanced: (t) => `Anything about ${t} that touches a category you picked. The recommended setting.`,
-    strict: (t) => `Total blackout. Every mention of ${t} is shielded, whatever it is about.`
+    relaxed: () => 'Only obvious spoilers: endings, deaths, leaks. News and trailers stay up.',
+    balanced: (t) => `Anything about ${t} in the categories you've ticked.`,
+    strict: (t) => `Every mention of ${t}, even news.`
   };
   const topicNames = () => {
     const on = packs.filter((p) => settings.packs[p.id] && settings.packs[p.id].enabled).map((p) => p.short);
@@ -58,46 +59,34 @@
     const hero = $('hero');
     const state = special ? 'na' : (reason || 'on');
     hero.dataset.state = state;
+    const count = status ? status.count + (status.pageShielded ? 1 : 0) : 0;
     $('status').textContent = ({
-      on: status && status.pageShielded ? 'Page shielded' : 'Protecting this page',
-      off: 'Shield is off',
+      on: status && status.pageShielded ? 'page hidden' : 'hidden on this page',
+      off: 'Off',
       paused: `Paused ${minutesLeft(settings.pausedUntil)}`,
       site: 'Off on this site',
-      expired: 'Ended on ' + settings.activeUntil,
-      na: 'Not available here'
+      expired: `Stopped on ${settings.activeUntil}`,
+      na: 'Can’t run here'
     })[state];
-    $('host').textContent = special ? 'Browser pages cannot be filtered' : (h || 'this page') + (status && status.site ? ` · tuned for ${status.site}` : '');
-
-    const count = status ? status.count + (status.pageShielded ? 1 : 0) : 0;
-    $('count').textContent = fmt(count);
-    const pct = Math.min(1, count / 25);
-    $('ringFg').style.strokeDashoffset = String(327 - 327 * (count ? Math.max(0.06, pct) : 0));
+    $('host').textContent = special ? 'Chrome doesn’t let extensions into this page' : (h || 'this page');
+    $('count').textContent = state === 'on' ? fmt(count) : '–';
 
     const mini = $('mini');
     mini.textContent = '';
     if (status && !reason) {
-      const by = status.byCategory || {};
-      const entries = Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 4);
-      for (const [id, n] of entries) {
-        const c = describe(id);
-        const s = document.createElement('span');
-        s.textContent = `${c.emoji} ${n}`;
-        s.title = c.label;
-        mini.appendChild(s);
-      }
+      const parts = Object.entries(status.byCategory || {}).sort((a, b) => b[1] - a[1]).slice(0, 4)
+        .map(([id, n]) => `${describe(id)} ${n}`);
       if (status.pageContext) {
-        const s = document.createElement('span');
-        const names = (status.pagePacks || []).map((id) => (packs.find((p) => p.id === id) || {}).short || id).join(' + ');
-        s.textContent = `📍 ${names} page`;
-        s.title = `This page is about ${names}, so every post on it is judged as ${names}`;
-        mini.appendChild(s);
+        const names = (status.pagePacks || []).map((id) => (packs.find((p) => p.id === id) || {}).short || id).join(', ');
+        parts.push(`whole page treated as ${names}`);
       }
+      mini.textContent = parts.join(' · ');
     }
 
-    $('pauseBtn').textContent = reason === 'paused' ? '▶ Resume' : '⏸ Pause';
+    $('pauseBtn').textContent = reason === 'paused' ? 'Resume' : 'Pause';
     $('pauseBtn').classList.toggle('on', reason === 'paused');
     const siteOff = h && S.siteDisabled(settings, h);
-    $('siteBtn').textContent = siteOff ? '✅ On for this site' : '🚫 Off on this site';
+    $('siteBtn').textContent = siteOff ? 'Turn on here' : 'Turn off here';
     $('siteBtn').classList.toggle('on', !!siteOff);
     $('siteBtn').disabled = !h || special;
     $('revealBtn').disabled = !count;
@@ -111,16 +100,17 @@
     renderCats();
   }
 
-  function chip(id, emoji, label, on, title) {
+  function chip(id, label, on, title) {
     const b = document.createElement('button');
     b.className = 'chip-toggle';
     b.type = 'button';
     b.dataset.id = id;
     b.title = title || label;
     b.setAttribute('aria-pressed', String(!!on));
-    b.innerHTML = '<span class="em"></span><span class="lbl"></span><span class="dot"></span>';
-    b.querySelector('.em').textContent = emoji;
-    b.querySelector('.lbl').textContent = label;
+    const l = document.createElement('span');
+    l.className = 'lbl';
+    l.textContent = label;
+    b.appendChild(l);
     return b;
   }
 
@@ -128,11 +118,11 @@
     const box = $('cats');
     box.textContent = '';
     const on = packs.filter((p) => settings.packs[p.id] && settings.packs[p.id].enabled);
-    $('edition').textContent = on.length ? `${on.map((p) => p.short).join(' + ')} edition` : 'No topic packs on';
+    $('edition').textContent = on.length ? on.map((p) => p.short).join(', ') : 'no packs on';
     if (!packs.length) {
       const e = document.createElement('p');
       e.className = 'hint';
-      e.textContent = 'No topic packs installed yet. Add one in settings.';
+      e.textContent = 'No packs installed. Add one in Settings.';
       box.appendChild(e);
     }
     for (const p of packs) {
@@ -143,13 +133,13 @@
         h.className = 'pack-head' + (st.enabled ? ' on' : '');
         h.setAttribute('aria-pressed', String(st.enabled));
         h.title = st.enabled ? `Turn the ${p.name} pack off` : `Turn the ${p.name} pack on`;
-        h.textContent = `${st.enabled ? '●' : '○'} ${p.name}`;
+        h.textContent = st.enabled ? p.name : `${p.name} (off)`;
         h.addEventListener('click', () => save((s) => { s.packs[p.id].enabled = !s.packs[p.id].enabled; }));
         box.appendChild(h);
       }
       if (!st.enabled) continue;
       for (const c of p.categories) {
-        const b = chip(`${p.id}/${c.id}`, c.emoji, c.short || c.label, st.categories[c.id].enabled, `${c.label}${c.description ? ': ' + c.description : ''}`);
+        const b = chip(`${p.id}/${c.id}`, c.short || c.label, st.categories[c.id].enabled, `${c.label}${c.description ? ': ' + c.description : ''}`);
         b.addEventListener('click', () => save((s) => { const cs = s.packs[p.id].categories[c.id]; cs.enabled = !cs.enabled; }));
         box.appendChild(b);
       }
@@ -157,7 +147,7 @@
     const cbox = $('customCats');
     cbox.textContent = '';
     for (const r of settings.customRules || []) {
-      const b = chip(r.id, r.emoji || '🧩', r.label || 'Custom rule', r.enabled, (r.terms || []).join(', '));
+      const b = chip(r.id, r.label || 'Custom rule', r.enabled, (r.terms || []).join(', '));
       b.addEventListener('click', () => save((s) => {
         const x = s.customRules.find((y) => y.id === r.id);
         if (x) x.enabled = !x.enabled;
@@ -194,7 +184,7 @@
     render();
     refreshStatus();
     const stats = await S.loadStats();
-    $('lifetime').textContent = `${fmt(stats.total)} spoiler${stats.total === 1 ? '' : 's'} shielded so far`;
+    $('lifetime').textContent = `${fmt(stats.total)} hidden so far`;
   }
 
   /* ---------- events ---------- */
@@ -255,9 +245,9 @@
     if (!tab) return;
     try {
       await chrome.tabs.sendMessage(tab.id, { type: 'report-page', kind: 'report' }, { frameId: 0 });
-      $('reportBtn').textContent = '✅ Reported';
+      $('reportBtn').textContent = 'Reported';
     } catch (_) {
-      $('reportBtn').textContent = 'Can’t report this page';
+      $('reportBtn').textContent = 'Can’t report here';
     }
     $('reportBtn').disabled = true;
     setTimeout(refreshStatus, 300);
@@ -269,7 +259,7 @@
     if (!v) return;
     save((s) => { if (!s.keywords.includes(v)) s.keywords.push(v); }).then(() => {
       $('quickInput').value = '';
-      $('quickInput').placeholder = `Added “${v}”. Add another…`;
+      $('quickInput').placeholder = `Added “${v}”`;
       setTimeout(refreshStatus, 300);
     });
   });

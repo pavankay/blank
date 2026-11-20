@@ -3,7 +3,7 @@
   "id": "gta6",
   "name": "GTA VI",
   "short": "GTA VI",
-  "version": "2026.11.18.2",
+  "version": "2026.11.20",
   "description": "Grand Theft Auto VI: story, characters, missions, the map of Leonida, leaks and more.",
   "updateUrl": "",
   "context": {
@@ -483,9 +483,9 @@
     {
       "id": "reactions",
       "short": "Reactions",
-      "label": "Reactions & teasers",
+      "label": "Vague reactions",
       "emoji": "😭",
-      "description": "Posts that hint instead of saying it: \"bro what 💀\", \"not them doing that\", \"I'm not okay\".",
+      "description": "Posts that hint instead of saying it, like \"bro what\", \"not them doing that\" or \"I'm not okay\".",
       "defaultOn": true,
       "terms": [
         "bro what",
@@ -560,10 +560,10 @@
     },
     {
       "id": "unlabeled",
-      "short": "Thumbnails",
-      "label": "Unlabeled screenshots & clips",
+      "short": "Screenshots",
+      "label": "Screenshots & clips",
       "emoji": "🖼️",
-      "description": "Images and video thumbnails about GTA VI that don't say what they show. Only the picture is covered, the title stays readable.",
+      "description": "Pictures and video thumbnails about GTA VI that don't say what they show. Only the picture is covered; the title stays readable.",
       "defaultOn": true,
       "media": "unlabeled",
       "terms": [],

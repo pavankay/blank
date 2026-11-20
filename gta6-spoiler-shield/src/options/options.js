@@ -16,11 +16,11 @@
   const openCats = new Set();
 
   const REVEAL_HINTS = {
-    click: 'One click on the cover shows what is underneath.',
-    hold: 'Press and hold for about a second, so a stray click on a feed never spoils anything.',
-    locked: 'Covers cannot be opened from the page. Pause the shield from the toolbar when you really want to look.'
+    click: 'Click the cover to see what’s under it.',
+    hold: 'Press and hold for a second. Stops accidental clicks while scrolling.',
+    locked: 'Covers can’t be opened. Pause from the toolbar button if you need to.'
   };
-  const SOURCE_LABEL = { bundled: 'Built in', url: 'From link', file: 'From file', custom: 'Edited by you' };
+  const SOURCE_LABEL = { bundled: 'built in', url: 'from link', file: 'from file', custom: 'edited' };
 
   /* ---------- helpers ---------- */
 
@@ -183,7 +183,7 @@
       return null;
     }
     msg.className = 'editor-msg good';
-    msg.textContent = r.warnings && r.warnings.length ? `Looks good, with notes:\n${r.warnings.join('\n')}` : 'Looks good.';
+    msg.textContent = r.warnings && r.warnings.length ? `OK, but some entries were skipped:\n${r.warnings.join('\n')}` : 'OK.';
     return r;
   }
 
@@ -229,10 +229,10 @@
   function editPack(entry) {
     const fromUrl = entry && (entry.url || entry.pack.updateUrl) && entry.source !== 'custom';
     openEditor({
-      title: entry ? `Edit pack: ${entry.pack.name}` : 'Create a pack',
+      title: entry ? `Edit ${entry.pack.name}` : 'New pack',
       hint: fromUrl
-        ? 'Saving your edits stops this pack from updating from its link (so updates never overwrite your changes). For small tweaks, editing words under Categories is better: those survive updates.'
-        : 'A pack is plain JSON: context words tell the shield when text is about your topic, categories hold the spoiler words. Use "word*" for endings and "/regex/" for patterns.',
+        ? 'Saving here stops this pack updating from its link, so your edits aren’t overwritten. To add or remove a few words, use Categories instead.'
+        : '"context" words say what the pack is about; each category lists the words to hide. See docs/packs.md for the format.',
       value: entry ? readablePack(entry.pack) : P.packTemplate('My show'),
       check: checkPack,
       onSave: async ({ value }) => {
@@ -251,10 +251,10 @@
   function render() {
     $('enabled').checked = settings.enabled;
     const reason = S.inactiveReason(settings, '');
-    $('sideStatusText').textContent = ({ '': 'Shield on', off: 'Shield off', paused: 'Paused', expired: 'Ended (date passed)' })[reason] || 'Shield on';
+    $('sideStatusText').textContent = ({ '': 'On', off: 'Off', paused: 'Paused', expired: 'Off (end date passed)' })[reason] || 'On';
     $('welcomePacks').textContent = packs.length ? packs.map((p) => p.name).join(', ') : 'no';
     const on = packs.filter((p) => settings.packs[p.id].enabled);
-    $('edition').textContent = on.length ? `${on.map((p) => p.short).join(' + ')} edition` : 'No packs on';
+    $('edition').textContent = on.length ? on.map((p) => p.short).join(', ') : 'no packs on';
 
     for (const group of ['sensitivity', 'blockStyle', 'revealMode']) {
       for (const b of $(group).querySelectorAll('[role="radio"]')) b.setAttribute('aria-checked', String(b.dataset.v === settings[group]));
@@ -277,7 +277,7 @@
   function renderPacks() {
     const list = $('packList');
     list.textContent = '';
-    if (!packs.length) list.append(el('p', { class: 'hint', text: 'No packs installed. Install one from a link or file, or create your own.' }));
+    if (!packs.length) list.append(el('p', { class: 'hint', text: 'No packs installed.' }));
     for (const p of packs) {
       const entry = packStore[p.id];
       const st = settings.packs[p.id];
@@ -286,10 +286,9 @@
         el('span', { text: `v${p.version}` }),
         el('span', { text: SOURCE_LABEL[entry.source] || entry.source }),
         el('span', { text: `${p.categories.length} ${p.categories.length === 1 ? 'category' : 'categories'}` }),
-        link && entry.source !== 'custom' ? el('span', { text: `auto-updates · checked ${ago(entry.fetchedAt)}`, title: link }) : null,
+        link && entry.source !== 'custom' ? el('span', { text: `checked ${ago(entry.fetchedAt)}`, title: link }) : null,
         entry.error ? el('span', { class: 'err', text: `Update failed: ${entry.error}` }) : null);
       list.append(el('div', { class: 'pack' + (st.enabled ? ' on' : '') },
-        el('div', { class: 'cat-em', text: '📦', 'aria-hidden': 'true' }),
         el('div', { class: 'cat-info' }, el('b', { text: p.name }), el('small', { text: p.description }), meta),
         el('div', { class: 'btns' },
           el('button', { class: 'btn', type: 'button', text: 'Edit', onclick: () => editPack(entry) }),
@@ -310,25 +309,25 @@
     const list = $('catList');
     list.textContent = '';
     const on = packs.filter((p) => settings.packs[p.id].enabled);
-    if (!on.length) { list.append(el('p', { class: 'hint', text: 'Turn a topic pack on to see its categories.' })); return; }
+    if (!on.length) { list.append(el('p', { class: 'hint', text: 'Turn a pack on to see its categories.' })); return; }
     for (const p of on) {
       const st = settings.packs[p.id];
       const group = el('div', { class: 'pack-group' });
-      if (packs.length > 1) group.append(el('h3', { text: `📦 ${p.name}` }));
+      if (packs.length > 1) group.append(el('h3', { text: p.name }));
       const cats = el('div', { class: 'cat-list' });
       for (const c of p.categories) cats.append(categoryCard(p, c, st.categories[c.id]));
       group.append(cats);
 
       const ctxId = `ctx-${p.id}`;
       const ctx = el('div', { class: 'pack-ctx' },
-        el('h4', { text: `📍 Also means ${p.short}` }),
-        el('p', { class: 'hint', text: `Extra words that tell the shield a text is about ${p.name}: nicknames, translations, new names revealed after the pack was made.` +
-          (p.learnedContext ? ` Already learned automatically: ${p.learnedContext.strong.length + p.learnedContext.names.length} names from the wiki, ${p.learnedContext.authors.length} channels from community reports.` : '') }),
+        el('h4', { text: `Other names for ${p.short}` }),
+        el('p', { class: 'hint', text: `Nicknames or translations that mean ${p.name}.` +
+          (p.learnedContext ? ` ${p.learnedContext.strong.length + p.learnedContext.names.length} names from the wiki and ${p.learnedContext.authors.length} reported channels are added automatically.` : '') }),
         el('div', { class: 'tags', id: ctxId }));
       group.append(ctx);
       list.append(group);
       tagEditor(ctx.querySelector('.tags'), st.extraContext.map((v) => ({ value: v })), {
-        placeholder: 'Add a word and press Enter', emptyText: 'Nothing yet.',
+        placeholder: 'Type and press Enter', emptyText: 'None',
         onAdd: (vals) => save((s) => { for (const v of vals) if (!s.packs[p.id].extraContext.includes(v)) s.packs[p.id].extraContext.push(v); }).then(() => refocus(ctxId)),
         onRemove: (v) => save((s) => { s.packs[p.id].extraContext = s.packs[p.id].extraContext.filter((x) => x !== v); }).then(() => refocus(ctxId))
       });
@@ -358,8 +357,8 @@
       el('div', { class: 'cat-head' },
         el('div', { class: 'cat-em', text: c.emoji, 'aria-hidden': 'true' }),
         el('div', { class: 'cat-info' }, el('b', { text: c.label }), el('small', { text: c.description })),
-        el('span', { class: 'cat-meta', text: `${count} words${learnedSet.size ? ` · ${learnedSet.size} learned` : ''}${st.extra.length || st.removed.length ? ' · edited' : ''}` }),
-        expandBtn,
+        el('span', { class: 'cat-meta', text: c.media ? 'pictures only' : `${count} words${learnedSet.size ? ` · ${learnedSet.size} learned` : ''}${st.extra.length || st.removed.length ? ' · edited' : ''}` }),
+        c.media ? null : expandBtn,
         sw(st.enabled, `Shield ${c.label}`, (v) => save((s) => { s.packs[p.id].categories[c.id].enabled = v; }, `${c.label} ${v ? 'on' : 'off'}`))),
       body);
 
@@ -370,7 +369,7 @@
         : { value: t, cls: strong.has(t) ? 'strong' : '', title: strong.has(t) ? 'Clear spoiler word (used by Relaxed mode)' : t }))
         .concat(st.extra.map((t) => ({ value: t, cls: 'added', title: 'Added by you' })));
       tagEditor(tags, items, {
-        placeholder: 'Add a word and press Enter',
+        placeholder: 'Type and press Enter',
         onAdd: (vals) => save((s) => {
           const cs = s.packs[p.id].categories[c.id];
           for (const v of vals) {
@@ -385,10 +384,10 @@
         }).then(() => refocus(tagsId))
       });
       body.append(tags);
-      if (c.solo.length) body.append(el('p', { class: 'hint', text: `Also shielded anywhere, even without naming the topic: ${c.solo.join(', ')}` }));
+      if (c.solo.length) body.append(el('p', { class: 'hint', text: `Hidden even when the game isn’t named: ${c.solo.join(', ')}` }));
       body.append(el('div', { class: 'cat-actions' },
         el('button', {
-          class: 'link', type: 'button', text: 'Reset to the pack’s words',
+          class: 'link', type: 'button', text: 'Undo my changes',
           onclick: () => save((s) => { s.packs[p.id].categories[c.id].extra = []; s.packs[p.id].categories[c.id].removed = []; }, `${c.label} reset`)
         })));
     }
@@ -400,10 +399,9 @@
     list.textContent = '';
     for (const r of settings.customRules) {
       list.append(el('div', { class: 'rule' },
-        el('div', { class: 'cat-em', text: r.emoji || '🧩' }),
         el('div', { class: 'cat-info' },
           el('b', { text: r.label }),
-          el('small', { text: `${r.requireContext ? 'Only with topic context · ' : 'Anywhere · '}${r.terms.join(', ')}` })),
+          el('small', { text: `${r.requireContext ? 'Only about the game: ' : 'Anywhere: '}${r.terms.join(', ')}` })),
         el('div', { class: 'btns' },
           el('button', { class: 'btn', type: 'button', text: 'Edit', onclick: () => editRule(r) }),
           el('button', {
@@ -416,7 +414,7 @@
 
   function editRule(r) {
     editingRuleId = r.id;
-    $('ruleEmoji').value = r.emoji || '🧩';
+    $('ruleEmoji').value = r.emoji || '';
     $('ruleLabel').value = r.label;
     $('ruleTerms').value = r.terms.join('\n');
     $('ruleContext').checked = r.requireContext !== false;
@@ -428,7 +426,7 @@
   function resetRuleForm() {
     editingRuleId = null;
     $('ruleForm').reset();
-    $('ruleEmoji').value = '🧩';
+    $('ruleEmoji').value = '';
     $('ruleSubmit').textContent = 'Add rule';
     $('ruleCancel').hidden = true;
   }
@@ -461,8 +459,8 @@
       box.append(el('span', { text: `${d.sites.length} sites` }), el('span', { text: `v${d.version}` }),
         el('span', { text: SOURCE_LABEL[sitesEntry.source] || sitesEntry.source }));
       if (sitesEntry.fetchedAt) box.append(el('span', { text: `updated ${ago(sitesEntry.fetchedAt)}` }));
-    } else box.append(el('span', { text: 'No shared site rules loaded' }));
-    if (settings.customSites.length) box.append(el('span', { text: `${settings.customSites.length} of your own` }));
+    } else box.append(el('span', { text: 'No site rules loaded' }));
+    if (settings.customSites.length) box.append(el('span', { text: `${settings.customSites.length} of yours` }));
     if (sitesEntry && sitesEntry.error) box.append(el('span', { class: 'err', text: `Update failed: ${sitesEntry.error}` }));
     if (document.activeElement !== $('sitesUrl')) $('sitesUrl').value = settings.sitesUrl || '';
   }
@@ -482,11 +480,11 @@
       else if (!L) parts.push(`${p.name}: not checked yet`);
       else {
         const n = Object.values(L.categories || {}).reduce((a, b) => a + b.length, 0);
-        parts.push(`${p.name}: ${n} words learned from ${raw.sources.length} wiki categories, ${ago(L.fetchedAt)}`);
-        if (L.error) { parts.push(`(some failed: ${L.error})`); bad = true; }
+        parts.push(`${p.name}: ${n} words from the wiki, updated ${ago(L.fetchedAt)}`);
+        if (L.error) { parts.push(`some pages failed: ${L.error}`); bad = true; }
       }
     }
-    $('learnStatus').textContent = parts.length ? parts.join(' · ') : 'No installed pack has sources to learn from.';
+    $('learnStatus').textContent = parts.length ? parts.join(' · ') : 'None of your packs has a wiki to learn from.';
     $('learnStatus').className = bad ? 'bad' : '';
     for (const b of $('visionMode').querySelectorAll('[role="radio"]')) b.setAttribute('aria-checked', String(b.dataset.v === settings.vision));
     renderVision();
@@ -496,16 +494,16 @@
     const v = visionInfo;
     const box = $('visionStatus');
     $('visionDownload').hidden = !(v && v.engine === 'on-device-model' && v.state === 'downloadable');
-    if (!v) { box.textContent = 'Checking this browser…'; return; }
+    if (!v) { box.textContent = 'Checking…'; return; }
     const what = {
       'on-device-model': {
-        available: 'Ready: the built-in model is on this computer.',
-        downloadable: 'This browser can run it after a one-time model download.',
-        downloading: 'The model is downloading…',
-        unavailable: 'This computer can\'t run the built-in model.'
+        available: 'Model ready.',
+        downloadable: 'Needs a one-time model download first.',
+        downloading: 'Downloading the model…',
+        unavailable: 'This computer can’t run Chrome’s built-in model.'
       }[v.state],
-      'text-detector': 'Ready: this browser can read text in pictures (no game recognition).',
-      none: 'Not available in this browser. Everything else still works.'
+      'text-detector': 'Ready (reads text only).',
+      none: 'Not supported in this browser.'
     }[v.engine];
     box.textContent = what || `Status: ${v.state}`;
   }
@@ -519,34 +517,34 @@
     if (document.activeElement !== $('communityUrl')) $('communityUrl').value = settings.communityUrl || '';
     const box = $('communityStatus');
     box.textContent = '';
-    if (!settings.communityUrl) box.append(el('span', { text: 'Not following a server: reports stay on this computer' }));
+    if (!settings.communityUrl) box.append(el('span', { text: 'No server. Reports stay on this computer.' }));
     else if (community) {
       const learnedCount = Object.values(community.learned || {}).reduce((a, l) => a + (l.terms || []).length + (l.authors || []).length, 0);
       box.append(
-        el('span', { text: `${Object.keys(community.items || {}).length} videos & posts` }),
+        el('span', { text: `${Object.keys(community.items || {}).length} posts` }),
         el('span', { text: `${(community.hashes || []).length} pictures` }),
-        el('span', { text: `${learnedCount} learned names & channels` }),
+        el('span', { text: `${learnedCount} names and channels` }),
         el('span', { text: `synced ${ago(community.fetchedAt)}` }));
-      if (community.error) box.append(el('span', { class: 'err', text: `Sync failed: ${community.error}` }));
-    } else box.append(el('span', { text: 'Waiting for the first sync…' }));
+      if (community.error) box.append(el('span', { class: 'err', text: `couldn’t sync: ${community.error}` }));
+    } else box.append(el('span', { text: 'Not synced yet' }));
 
     const list = $('myReports');
     list.textContent = '';
     const items = Object.entries((reports && reports.items) || {}).sort((a, b) => b[1].at - a[1].at).slice(0, 50);
     const pics = (reports && reports.hashes) || [];
-    if (!items.length && !pics.length) list.append(el('span', { class: 'empty', text: 'Nothing reported yet. Right-click a spoiler and choose 🚩 Report as a spoiler.' }));
+    if (!items.length && !pics.length) list.append(el('span', { class: 'empty', text: 'None yet.' }));
     for (const [key, r] of items) {
       list.append(el('div', { class: 'report' },
         el('span', { class: 'what', title: r.title || key }, r.title || '(no title) ', ' ', el('code', { text: key })),
         el('time', { text: ago(r.at) }),
         el('button', { class: 'link', type: 'button', text: 'Undo', onclick: () => chrome.runtime.sendMessage({ type: 'undo-report', key }).then(() => toast('Report removed')) })));
     }
-    if (pics.length) list.append(el('span', { class: 'empty', text: `${pics.length} reported picture${pics.length === 1 ? '' : 's'} fingerprinted.` }));
+    if (pics.length) list.append(el('span', { class: 'empty', text: `${pics.length} picture${pics.length === 1 ? '' : 's'} fingerprinted` }));
 
     const safe = $('mySafe');
     safe.textContent = '';
     const safeItems = Object.entries((reports && reports.safe) || {}).sort((a, b) => b[1] - a[1]).slice(0, 50);
-    if (!safeItems.length) safe.append(el('span', { class: 'empty', text: 'Nothing yet. Right-click a covered post and choose 👍 Not a spoiler if it was wrongly hidden.' }));
+    if (!safeItems.length) safe.append(el('span', { class: 'empty', text: 'None yet.' }));
     for (const [key, at] of safeItems) {
       safe.append(el('div', { class: 'report' },
         el('span', { class: 'what' }, el('code', { text: key })),
@@ -570,17 +568,17 @@
     const text = $('labInput').value.trim();
     out.className = 'lab-out';
     out.textContent = '';
-    if (!text) { out.append(el('span', { class: 'hint', text: 'Type or pick an example below.' })); return; }
+    if (!text) { out.append(el('span', { class: 'hint', text: 'Type something, or click an example.' })); return; }
     const on = P.enabledPacks(settings, packs);
     const m = G.compile(settings, on);
     const r = m.evaluate(text, { assume: $('labContext').checked ? on.map((p) => p.id) : [] });
     if (r) {
       out.classList.add('hit');
-      out.append(el('div', { class: 'verdict', text: '🛡️ Would be shielded' }));
-      for (const c of r.categories) out.append(el('span', { class: 'pill' }, `${c.emoji} ${c.label} `, el('i', { text: `“${c.term}”` })));
+      out.append(el('div', { class: 'verdict', text: 'Hidden' }));
+      for (const c of r.categories) out.append(el('span', { class: 'pill' }, `${c.label} `, el('i', { text: `(“${c.term}”)` })));
     } else {
       out.classList.add('miss');
-      out.append(el('div', { class: 'verdict', text: '👀 Would stay visible' }));
+      out.append(el('div', { class: 'verdict', text: 'Not hidden' }));
     }
     for (const rep of m.contextReport(text)) {
       out.append(el('div', { class: 'ctx', text: rep.hits.length
@@ -593,23 +591,24 @@
 
   function describe(key) {
     const [packId, id] = String(key).split('/');
-    if (!id) return `🛡️ ${key}`;
+    if (!id) return key;
     if (packId === 'custom') {
-      if (id === 'keywords') return '🔑 Your keywords';
-      if (id === 'manual') return '✋ Shielded by you';
+      if (id === 'keywords') return 'Your words';
+      if (id === 'manual') return 'Hidden by you';
+      if (id === 'reported' || id === 'reported-image') return 'Reported';
       const r = settings.customRules.find((x) => x.id === id);
-      return r ? `${r.emoji || '🧩'} ${r.label}` : `🧩 ${id}`;
+      return r ? r.label : id;
     }
     const p = packs.find((x) => x.id === packId);
-    if (id === 'general') return `🛡️ Anything ${p ? p.short : packId}`;
+    if (id === 'general') return `Anything ${p ? p.short : packId}`;
     const c = p && p.categories.find((x) => x.id === id);
-    return c ? `${c.emoji} ${packs.length > 1 ? p.short + ' · ' : ''}${c.label}` : key;
+    return c ? `${packs.length > 1 ? p.short + ': ' : ''}${c.label}` : key;
   }
 
   async function renderStats() {
     const st = await S.loadStats();
     $('statTotal').textContent = new Intl.NumberFormat().format(st.total);
-    $('statsSince').textContent = `Spoilers dodged since ${new Date(st.since).toLocaleDateString()}.`;
+    $('statsSince').textContent = `Since ${new Date(st.since).toLocaleDateString()}.`;
     const merged = {};
     for (const [k, n] of Object.entries(st.byCategory)) {
       // Stats from version 1 used bare category ids; they belong to the GTA VI pack.
@@ -622,7 +621,7 @@
 
   function bars(box, rows) {
     box.textContent = '';
-    if (!rows.length) { box.append(el('span', { class: 'empty', text: 'Nothing shielded yet. Lucky you.' })); return; }
+    if (!rows.length) { box.append(el('span', { class: 'empty', text: 'Nothing yet.' })); return; }
     const max = Math.max(...rows.map((r) => r[1]));
     for (const [k, n] of rows) {
       box.append(el('div', { class: 'bar' },
@@ -669,9 +668,9 @@
       $('subscribeUrl').value = '';
       await reload();
       await save(() => {}, `Installed ${pack.name}`);
-      $('packMsg').textContent = `Installed ${pack.name} v${pack.version}. It will keep itself up to date from that link.` + (warnings.length ? ` (${warnings.length} entries skipped)` : '');
+      $('packMsg').textContent = `Installed ${pack.name} ${pack.version}.` + (warnings.length ? ` ${warnings.length} entries skipped.` : '');
     } catch (err) {
-      $('packMsg').textContent = `Couldn't install from that link: ${err.message}`;
+      $('packMsg').textContent = `Couldn’t install: ${err.message}`;
     }
   });
 
@@ -688,14 +687,14 @@
       await save(() => {}, `Installed ${pack.name}`);
       $('packMsg').textContent = `Installed ${pack.name} v${pack.version} from ${f.name}.` + (pack.updateUrl ? ' It will keep itself up to date from its update link.' : '') + (warnings.length ? ` (${warnings.length} entries skipped)` : '');
     } catch (err) {
-      $('packMsg').textContent = `That file couldn't be installed: ${err.message}`;
+      $('packMsg').textContent = `Couldn’t install that file: ${err.message}`;
     }
   });
 
   $('newPackBtn').addEventListener('click', () => editPack(null));
 
   $('updateAllBtn').addEventListener('click', async () => {
-    $('packMsg').textContent = 'Checking for updates…';
+    $('packMsg').textContent = 'Checking…';
     const res = await chrome.runtime.sendMessage({ type: 'update-packs' });
     await reload();
     render();
@@ -705,7 +704,7 @@
     if (r.updated.length) parts.push(`Updated: ${r.updated.join(', ')}.`);
     if (r.unchanged.length) parts.push(`Already up to date: ${r.unchanged.join(', ')}.`);
     if (r.failed.length) parts.push(`Failed: ${r.failed.join('; ')}.`);
-    $('packMsg').textContent = parts.join(' ') || 'Nothing has an update link yet.';
+    $('packMsg').textContent = parts.join(' ') || 'None of your packs has an update link.';
   });
 
   /* ---------- events: rules, words, sites ---------- */
@@ -718,7 +717,7 @@
     if (bad.length) { toast(`Can't use “${bad[0]}”. Check the regex.`); return; }
     const rule = {
       id: editingRuleId || 'rule-' + Date.now().toString(36),
-      emoji: $('ruleEmoji').value.trim() || '🧩',
+      emoji: $('ruleEmoji').value.trim(),
       label: $('ruleLabel').value.trim() || 'Custom rule',
       terms,
       requireContext: $('ruleContext').checked,
@@ -739,7 +738,7 @@
     if (raw && !url) { toast('Use an https:// link'); return; }
     await save((s) => { s.sitesUrl = url; });
     if (!url) { toast('Site rules link removed'); return; }
-    toast('Updating site rules…');
+    toast('Updating…');
     const res = await chrome.runtime.sendMessage({ type: 'update-packs' });
     await reload();
     render();
@@ -750,7 +749,7 @@
   $('editMySites').addEventListener('click', () => {
     openEditor({
       title: 'My site rules',
-      hint: 'A list of rules. Yours win over the shared ones. Each needs "hosts" (or "detect" for self-hosted sites) and "selectors" for the element that wraps one post.',
+      hint: 'A JSON list. Each rule needs "hosts" and "selectors" (the element around one post). Yours override the built-in ones.',
       value: settings.customSites.length ? settings.customSites : [{ name: 'Example forum', hosts: ['forum.example.com'], selectors: ['.post', '.reply'], topic: ['h1.thread-title'] }],
       check: (raw) => {
         if (!Array.isArray(raw)) return { errors: ['Expected a list: [ { … }, { … } ]'] };
@@ -764,8 +763,8 @@
 
   $('viewSites').addEventListener('click', () => {
     openEditor({
-      title: 'Shared site rules',
-      hint: 'Read-only. To change these, copy what you need into "My site rules", or subscribe to a link with your own file.',
+      title: 'Built-in site rules',
+      hint: 'Read-only. Copy anything you want to change into your own rules.',
       value: (sitesEntry && sitesEntry.data) || {}, readOnly: true
     });
   });
@@ -776,7 +775,7 @@
     await P.resetSitesToBundled();
     await reload();
     render();
-    toast('Built-in site rules restored');
+    toast('Reset to the built-in rules');
   });
 
   /* ---------- events: smart detection, community ---------- */
@@ -787,22 +786,22 @@
   });
 
   $('visionDownload').addEventListener('click', async () => {
-    $('visionStatus').textContent = 'Downloading the model… (this happens once)';
+    $('visionStatus').textContent = 'Downloading…';
     try {
-      await G.vision.download((p) => { $('visionStatus').textContent = `Downloading the model… ${Math.round(p * 100)}%`; });
+      await G.vision.download((p) => { $('visionStatus').textContent = `Downloading… ${Math.round(p * 100)}%`; });
       await checkVision();
     } catch (e) {
-      $('visionStatus').textContent = `Couldn't download: ${e.message}`;
+      $('visionStatus').textContent = `Download failed: ${e.message}`;
     }
   });
 
   $('learnNow').addEventListener('click', async () => {
-    $('learnStatus').textContent = 'Reading the wiki…';
+    $('learnStatus').textContent = 'Updating…';
     const r = await chrome.runtime.sendMessage({ type: 'learn-now' });
     await reload();
     render();
-    if (r && r.ok) toast(r.report.length ? r.report.join(' · ') : 'Nothing to learn from');
-    else toast(`Couldn't refresh: ${(r && r.error) || 'unknown error'}`);
+    if (r && r.ok) toast(r.report.length ? r.report.join(' · ') : 'Nothing to update');
+    else toast(`Update failed: ${(r && r.error) || 'unknown error'}`);
   });
 
   $('communityForm').addEventListener('submit', async (e) => {
@@ -811,11 +810,11 @@
     const url = raw ? P.cleanUrl(raw) : '';
     if (raw && !url) { toast('Use an https:// link'); return; }
     await save((s) => { s.communityUrl = url ? url.replace(/\/+$/, '') : ''; });
-    if (!url) { toast('Not following a server'); return; }
+    if (!url) { toast('Server removed'); return; }
     const r = await chrome.runtime.sendMessage({ type: 'community-sync' });
     await reload();
     render();
-    toast(r && r.ok ? `Synced: ${r.items} reported items` : `Couldn't reach the server: ${(r && r.error) || 'unknown error'}`);
+    toast(r && r.ok ? `Synced (${r.items} posts)` : `Couldn’t reach the server: ${(r && r.error) || 'unknown error'}`);
   });
 
   /* ---------- events: lab, stats, backup ---------- */

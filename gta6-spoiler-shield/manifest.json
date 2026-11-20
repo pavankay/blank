@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Spoiler Shield for GTA VI",
   "short_name": "Spoiler Shield",
-  "version": "1.3.0",
-  "description": "Block game and show spoilers across the web with editable, auto-updating topic packs. Ships with a GTA VI pack: story, map, missions, characters, leaks, footage and more.",
+  "version": "1.3.1",
+  "description": "Hides GTA VI spoilers on YouTube, Reddit, X, TikTok, Twitch and other sites. You pick what counts: story, map, missions, leaks and more.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

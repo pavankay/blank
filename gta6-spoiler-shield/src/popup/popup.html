@@ -9,29 +9,21 @@
 </head>
 <body>
   <header class="top">
+    <img src="../../icons/icon32.png" width="20" height="20" alt="">
     <div class="brand">
-      <img src="../../icons/icon48.png" width="30" height="30" alt="">
-      <div>
-        <div class="name">Spoiler Shield</div>
-        <div class="edition" id="edition">&nbsp;</div>
-      </div>
+      <span class="name">Spoiler Shield</span>
+      <span class="edition" id="edition">&nbsp;</span>
     </div>
-    <label class="switch big" title="Turn the shield on or off (Alt+Shift+S)">
-      <input type="checkbox" id="enabled" aria-label="Shield on">
+    <label class="switch big" title="On or off (Alt+Shift+S)">
+      <input type="checkbox" id="enabled" aria-label="Spoiler Shield on">
       <span class="track"><span class="thumb"></span></span>
     </label>
   </header>
 
-  <section class="hero" id="hero" data-state="on">
-    <div class="ring">
-      <svg viewBox="0 0 120 120" aria-hidden="true">
-        <circle cx="60" cy="60" r="52" class="ring-bg"/>
-        <circle cx="60" cy="60" r="52" class="ring-fg" id="ringFg"/>
-      </svg>
-      <div class="ring-num"><span id="count">0</span><small>here</small></div>
-    </div>
-    <div class="hero-text">
-      <div class="status" id="status">Protecting this page</div>
+  <section class="now" id="hero" data-state="on">
+    <div class="count"><span id="count">0</span></div>
+    <div class="now-text">
+      <div class="status" id="status">hidden on this page</div>
       <div class="host" id="host">…</div>
       <div class="mini" id="mini"></div>
     </div>
@@ -39,48 +31,48 @@
 
   <section class="actions">
     <div class="pause-wrap">
-      <button class="btn" id="pauseBtn" aria-haspopup="menu" aria-expanded="false">⏸ Pause</button>
+      <button class="btn" id="pauseBtn" aria-haspopup="menu" aria-expanded="false">Pause</button>
       <div class="menu" id="pauseMenu" role="menu" hidden>
         <button role="menuitem" data-min="15">15 minutes</button>
         <button role="menuitem" data-min="60">1 hour</button>
         <button role="menuitem" data-min="240">4 hours</button>
-        <button role="menuitem" data-min="tomorrow">Until tomorrow</button>
+        <button role="menuitem" data-min="tomorrow">Until tomorrow morning</button>
       </div>
     </div>
-    <button class="btn" id="siteBtn">🚫 Off on this site</button>
-    <button class="btn" id="revealBtn" title="Alt+Shift+R">👁 Reveal page</button>
-    <button class="btn" id="reportBtn" title="Hide this page now, and share it if you follow a community server">🚩 Report page</button>
+    <button class="btn" id="siteBtn">Turn off here</button>
+    <button class="btn" id="revealBtn" title="Alt+Shift+R">Show all</button>
+    <button class="btn" id="reportBtn" title="Hide this page, and share it if you use a community server">Report</button>
   </section>
 
   <section class="block">
-    <div class="block-head">
+    <div class="row-head">
       <h2>Sensitivity</h2>
-    </div>
-    <div class="seg" id="sensitivity" role="radiogroup" aria-label="Sensitivity">
-      <button role="radio" data-v="relaxed">Relaxed</button>
-      <button role="radio" data-v="balanced">Balanced</button>
-      <button role="radio" data-v="strict">Blackout</button>
+      <div class="seg" id="sensitivity" role="radiogroup" aria-label="Sensitivity">
+        <button role="radio" data-v="relaxed">Relaxed</button>
+        <button role="radio" data-v="balanced">Balanced</button>
+        <button role="radio" data-v="strict">Blackout</button>
+      </div>
     </div>
     <p class="hint" id="sensHint"></p>
   </section>
 
   <section class="block">
-    <div class="block-head">
-      <h2>What to shield</h2>
-      <div class="links"><button class="link" id="allOn">All</button><button class="link" id="allOff">None</button></div>
+    <div class="row-head">
+      <h2>Hide</h2>
+      <span class="links"><button class="link" id="allOn">all</button> · <button class="link" id="allOff">none</button></span>
     </div>
     <div class="cats" id="cats"></div>
     <div class="cats custom" id="customCats"></div>
   </section>
 
   <form class="block quick" id="quickForm">
-    <input id="quickInput" type="text" placeholder="Always shield a word or name…" autocomplete="off" maxlength="80">
-    <button class="btn accent" type="submit">Add</button>
+    <input id="quickInput" type="text" placeholder="Always hide a word or name" autocomplete="off" maxlength="80">
+    <button class="btn" type="submit">Add</button>
   </form>
 
   <footer class="foot">
-    <span id="lifetime">0 spoilers shielded so far</span>
-    <button class="link" id="openOptions">All settings ⚙</button>
+    <span id="lifetime">0 hidden so far</span>
+    <button class="link" id="openOptions">Settings</button>
   </footer>
 
   <script src="../shared/defaults.js"></script>
